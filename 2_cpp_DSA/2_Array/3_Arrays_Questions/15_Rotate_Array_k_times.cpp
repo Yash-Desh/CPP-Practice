@@ -34,16 +34,19 @@ void rotate(vector<int> &nums, int k)
     vector<int> temp;
     k = k > n ? k % n : k;
 
+    // push_back last k elements into the new array
     for (int i = n - k; i < n; i++)
     {
         temp.push_back(nums[i]);
     }
 
+    // push_back remaining n-k elements into new array
     for (int i = 0; i < n - k; i++)
     {
         temp.push_back(nums[i]);
     }
 
+    // copy back contents of new array
     for (int i = 0; i < n; i++)
     {
         nums[i] = temp[i];

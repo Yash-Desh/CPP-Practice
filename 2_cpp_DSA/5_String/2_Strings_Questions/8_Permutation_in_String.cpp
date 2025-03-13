@@ -2,11 +2,14 @@
 // Date : 08-09-2022
 // Topic : Strings
 // Tutor : Love Babbar
+// Link : https://leetcode.com/problems/permutation-in-string/
 
 #include <bits/stdc++.h>
 using namespace std;
 
+///////////////////////////
 // Sliding Window Approach
+///////////////////////////
 
 // function to check if 2 arrays are identical
 bool checkIfEqual(int a[], int b[])

@@ -122,7 +122,9 @@ vector<vector<int>> findTriplets(vector<int> num, int n, int K)
         if (i == 0 || (i > 0 && num[i] != num[i - 1]))
         {
 
-            int lo = i + 1, hi = (int)(num.size()) - 1, sum = K - num[i];
+            int lo = i + 1;
+            int hi = (int)(num.size()) - 1;
+            int sum = K - num[i];
 
             while (lo < hi)
             {

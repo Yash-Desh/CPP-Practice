@@ -49,6 +49,7 @@ void display (int a[], int size)
 int main()
 {
     int n; 
+    cout<<"Enter Number of Elements in the Array : ";
     cin>>n;
     int arr[n];
     for(int i=0; i<n; i++)

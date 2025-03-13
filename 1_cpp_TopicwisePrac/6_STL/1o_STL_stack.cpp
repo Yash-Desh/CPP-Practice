@@ -28,6 +28,9 @@ int main()
     s.emplace(67);
     s.push(12);                  // stack top
 
+    // Top-of-Stack (TOS)
+    cout<<"Top of Stack is "<<s.top()<<endl;
+
     // stack size
     cout<<s.size()<<endl;       // 5
 

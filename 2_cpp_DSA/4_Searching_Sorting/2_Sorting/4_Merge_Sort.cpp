@@ -5,6 +5,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+////////////////////
+// DIVIDE & CONQUER
+///////////////////
+
 // Approach-1 : Less Memory Efficient
 // TC = O(N*LogN)
 // SC = O(N)

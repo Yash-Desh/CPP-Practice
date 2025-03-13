@@ -73,6 +73,14 @@ Node *buildTree(Node *root)
 //     }
 // }
 
+
+// Why do we need a separator ?
+// The above implementation without a separator prints all elements in a single line
+// To print in the pyramid shape like a normal binary tree, you need a separator
+// 1
+// 3 5
+// 7 11 17
+
 // Type - 2 : with separator
 void levelOrderTraversal(Node *root)
 {

@@ -57,6 +57,12 @@ public:
             arr[qfront] = -1;
             qfront++;
 
+            // // Shift all the elements
+            // // to the left.
+            // for (int i = 1; i < rear; i++) {
+            //     arr[i - 1] = arr[i];
+            // }
+
             // if the queue becomes empty after deletion
             // then reset the values of front & rear pointers
             if(qfront==rear){

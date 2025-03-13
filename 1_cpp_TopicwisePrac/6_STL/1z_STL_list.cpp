@@ -3,7 +3,10 @@
 // Tutor : Love Babbar
 
 #include <iostream>
-#include <list>   // -> necessary header file to be included
+
+// necessary header file
+#include <list>   
+
 using namespace std;
 
 void display (list<int> &lst)    // pass the list to a display function via reference.

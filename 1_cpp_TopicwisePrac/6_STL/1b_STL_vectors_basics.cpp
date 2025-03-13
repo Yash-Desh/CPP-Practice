@@ -9,8 +9,7 @@
 using namespace std;
 
 
-// Note : Accessing out of bound elements in vectors will lead
-// to segmentation faults 
+// Note : Accessing out of bound elements in vectors will lead to segmentation faults 
 
 
 // Simple function to print vector elements 
@@ -55,6 +54,7 @@ int main()
    // vector<int> v2 = {1, 2, 4, 7, 16, 49}; // {1,2,4,7,16,49}
    // v2.pop_back();                         // {1,2,4,7,16}
 
+   // -------------------------------------------------------------------
 
    // Size & Capacity of a vector 
 
@@ -69,10 +69,14 @@ int main()
    // cout<<"Size = "<<v.size()<<endl;              // 3
 
    // NOTE : Capcity & size are 2 different things
-   //        Capacity is the total space alloted to the vector
-   //        in memory
-   //        Size is the total space occupied by the vector
+   //        Capacity is the total space alloted to the vector in memory
+   //        Size is the total number of elements present in the vector
    //        Memory / Capacity is always alloted in multiples of 2
+   //        Capacity of vector doubles when a new element is added beyond the capacity.
+   //        On clearing the vector, size = 0, capacity remains unchanged
+
+
+   // -------------------------------------------------------------------
 
    // // Accessing vector elements  : TC = O(1) .. in constant time
 
@@ -89,7 +93,7 @@ int main()
    // // accessing last element of a vector
    // cout<<"last element = "<<v1.back()<<endl;                            
   
-   
+   // -------------------------------------------------------------------
 
    // // Accessing vector elements using for loops without iterators
 
@@ -124,6 +128,8 @@ int main()
 
    // // Other functions
 
+   // -------------------------------------------------------------------
+
    // // Copying vectors
    // vector<int> v3 = {9, 7, 6, 35};
    
@@ -136,13 +142,14 @@ int main()
    // vector<int> &v6 = v3; // v5 is a reference to v3
 
 
+   // -------------------------------------------------------------------
    // swapping 2 arrays
    vector<int> vt1 = {1,2,3,4};
    vector<int> vt2 = {5,6,7,8};
    vt1.swap(vt2);                   // swaps content of vt1 with vt2
    printVec(vt1);
    printVec(vt2);
-   
+   // -------------------------------------------------------------------
     
    // // clear / empty a vector 
    // vector <int> vt ={12,13,14};

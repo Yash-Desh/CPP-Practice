@@ -6,6 +6,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+
+// My Approach-1: Linear Search
+// Use 2 loops 
+// Traverse the array from the front to find the 1st occurence
+// Traverse the array from behind to find the last occurence
+
 // My Approach : Using Linear Search
 // TC : O(n)
 

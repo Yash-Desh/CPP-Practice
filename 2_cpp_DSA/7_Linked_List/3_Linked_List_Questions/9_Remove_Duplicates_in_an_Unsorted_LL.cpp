@@ -19,10 +19,11 @@ public:
 };
 
 
-
+// ##############################
 // Approach -1 : Brute Force, TLE
 // TC = O(N^2)
 // SC = O(1)
+// ##############################
 
 Node *removeDuplicates(Node *head)
 {
@@ -55,18 +56,20 @@ Node *removeDuplicates(Node *head)
     return head;
 }
 
-
+// ###########################################################
 // Approach - 2 : Better 
 // TC : O(N*logN)
 // SC : O(1)
 
 // Step-1 : Sort the LL
 // Step-2 : Apply "Remove Duplicates in a sorted LL Algorithm"
+// ###########################################################
 
-
+// ######################
 // Approach - 3 : Hashing
 // TC : O(N)
 // SC : O(N)
+// ######################
 
 Node *removeDuplicates(Node *head)
 {

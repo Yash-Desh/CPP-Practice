@@ -50,16 +50,17 @@ public:
 // Insert at beginning
 void insertAtHead(Node *&head, Node* &tail, int x)
 {
-    // Note : "&head" is used to make sure that all the changes
+    // Note :   &head is the head pointer passed by reference
+    //          "&head" is used to make sure that all the changes
     //         are made inside the original LL
     //         "&head" is used to prevent pass by value
     
     // when the SLL is empty 
     if(head == NULL)
     {
-        Node *temp = new Node (x);
+        Node *temp = new Node(x);
         head = temp;
-        tail =temp;
+        tail = temp;
     }
 
     // when the SLL is NOT empty
@@ -98,12 +99,11 @@ void insertAtTail(Node *&head, Node *&tail, int x)
 }
 
 // Insert at any position
-// Note : This function does
-// not check for invalid index
-// This function assumes the SLL
-// to be zero-indexed
+// Note : This function does not check for invalid index
+// This function assumes the SLL to be zero-indexed
 void insertAtPostion(Node *&head, Node *&tail, int index, int x)
 {
+    // check if the index is a valid index
 
     // Inserting at beginning
     if (index == 0)
@@ -112,9 +112,8 @@ void insertAtPostion(Node *&head, Node *&tail, int index, int x)
         return;
     }
 
-    // Create a pointer to traverse the SLL
-    // Depending on how you traverse ,
-    // the SLL can be zero-indexed or 1-indexed
+    // Traverse the SLL
+    // Depending on how you traverse, the SLL can be zero-indexed or 1-indexed
     Node *ptr = head;
     for (int i = 0; i < index - 1; i++)
     {
@@ -122,8 +121,7 @@ void insertAtPostion(Node *&head, Node *&tail, int index, int x)
     }
 
     // Insert at end
-    // This makes sure the tail pointer is
-    // also updated
+    // This makes sure the tail pointer is also updated
     if (ptr->next == NULL)
     {
         insertAtTail(head, tail, x);
@@ -131,9 +129,7 @@ void insertAtPostion(Node *&head, Node *&tail, int index, int x)
     }
 
     // Insert in middle
-    // Create a new Node
     Node *temp = new Node(x);
-
     temp->next = ptr->next;
     ptr->next = temp;
 }
@@ -192,23 +188,25 @@ void print(Node *&head)
 int main()
 {
 
-    // //***************************
-    // // Insert at beginning of SLL
-    // //***************************
+    //***************************
+    // Insert at beginning of SLL
+    //***************************
 
-    // // Create a new Node
-    // Node *node1 = new Node(150);
+    // Create a new Node
+    Node *node1 = new Node(150);
 
-    // // Make it head node
-    // Node *head = node1;
-    // print(head);
+    // Make it head node
+    Node *head = node1;
+    print(head);
 
-    // // Insertion at beginning
-    // insertAtHead(head, 25);
-    // print(head);
+    Node *tail = head;
 
-    // insertAtHead(head, 67);
-    // print(head);
+    // Insertion at beginning
+    insertAtHead(head, tail, 25);
+    print(head);
+
+    insertAtHead(head, tail, 67);
+    print(head);
 
     // //**********************
     // //  Insert at End of SLL
@@ -258,32 +256,32 @@ int main()
     // insertAtPostion(head, tail, 5, 55);
     // print(head);
 
-    // ************************
-    // Deletion at any position
-    // ************************
+    // // ************************
+    // // Deletion at any position
+    // // ************************
 
-    // NOTE : Deletion can be done using index & value
+    // // NOTE : Deletion can be done using index & value
 
-    // Create a new Node
-    Node *node1 = new Node(44);
+    // // Create a new Node
+    // Node *node1 = new Node(44);
 
-    // Make it head
-    Node *head = node1;
+    // // Make it head
+    // Node *head = node1;
 
-    // Make it Tail
-    Node *tail = node1;
-    print(head);
+    // // Make it Tail
+    // Node *tail = node1;
+    // print(head);
 
-    insertAtTail(head, tail, 63);
-    insertAtTail(head, tail, 105);
-    insertAtHead(head, tail, 67);
-    insertAtHead(head, tail, -9);
-    print(head);
-    cout << "tail : " << tail->data << endl;
+    // insertAtTail(head, tail, 63);
+    // insertAtTail(head, tail, 105);
+    // insertAtHead(head, tail, 67);
+    // insertAtHead(head, tail, -9);
+    // print(head);
+    // cout << "tail : " << tail->data << endl;
 
-    deleteNode(head, tail, 4);
-    print(head);
-    cout << "tail : " << tail->data << endl;
+    // deleteNode(head, tail, 4);
+    // print(head);
+    // cout << "tail : " << tail->data << endl;
 
     return 0;
 }
