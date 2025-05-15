@@ -51,6 +51,6 @@ int binarysearch(int arr[], int n, int k, int l, int h)
 int main()
 {
     int arr[10] = {12,25,45,64,112,150,165,212,403,777};
-    cout<<binarysearch(arr,10,777,0,9);
+    cout<<endl<<binarysearch(arr,10,777,0,9);
     return 0;
 }

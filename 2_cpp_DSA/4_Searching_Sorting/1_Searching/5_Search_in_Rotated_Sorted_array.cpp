@@ -24,6 +24,62 @@ int findPosition(vector<int>& arr, int n, int k)
     return -1;
 }
 
+// love babbar solution
+class Solution {
+    int find_pivot(vector<int>& nums)
+    {
+        int l = 0;
+        int h = nums.size()-1;
+
+        while(l < h)
+        {
+            int mid = l + (h-l)/2;
+
+            if(nums[mid] > nums[nums.size()-1])
+            {
+                l = mid+1;
+            }
+            else 
+                h = mid;
+        }
+        return l;
+    }
+
+    int binary_search(vector<int>& nums, int low, int high, int target)
+    {
+        int l=low;
+        int h=high;
+
+        while(l <= h)
+        {
+            int mid = l + (h-l)/2;
+            if(nums[mid] == target)
+            {
+                return mid;
+            }
+            else if(nums[mid] > target)
+                h = mid-1;
+
+            else 
+                l = mid+1;
+        }
+        return -1;
+    }
+
+
+public:
+    int search(vector<int>& nums, int target) {
+        int pivot = find_pivot(nums);
+
+        if(target >= nums[pivot] && target <= nums[nums.size()-1])
+        {
+            return binary_search(nums, pivot, nums.size()-1, target);
+        }
+        else 
+            return binary_search(nums, 0, pivot-1, target);
+    }
+};
+
 
 
 int main()

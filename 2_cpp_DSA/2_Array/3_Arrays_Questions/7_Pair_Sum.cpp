@@ -51,7 +51,29 @@ vector<vector<int>> pairSum(vector<int> &arr, int s)
     return ans;
 }
 
-// Best Approach : 2 pointer approach
+// Best Approach : 2 pointer approach only if array sorted
+
+
+// hash map
+vector<int> twoSum(vector<int>& nums, int target) {
+    unordered_map <int, int> mp;  // value -> index
+    vector <int> ans;
+    for(int i=0; i<nums.size(); i++)
+    {
+        int diff = target - nums[i];
+        if(mp.find(diff) != mp.end())
+        {
+            ans.push_back(mp[diff]);
+            ans.push_back(i);
+            break;
+        }
+        else
+        {
+            mp.insert({nums[i], i});
+        }
+    }
+    return ans;
+}
 
 int main()
 {

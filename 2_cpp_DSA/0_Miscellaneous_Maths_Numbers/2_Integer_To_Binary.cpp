@@ -1,6 +1,6 @@
 // Author : Yash Deshpande
 // Date : 14-08-2022
-// Tutor : Love Babbar 
+// Tutor : Love Babbar, striver 
 
 /* Q. To convert an integer to a binary number
       i) positive integer
@@ -9,11 +9,31 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Striver approach
+// Uses the divide by 2 algorithm used in maths
+// TC : O(logN)
+// SC : O(logN)
+string convert2Binary(int n)
+{
+    string res = "";
+    while(n != 0)
+    {
+        if(n%2 == 1)
+        {
+            res.push_back('1');
+        }
+        else
+        {
+            res.push_back('0');
+        }
+        n = n/2;
+    }
+    reverse(res.begin(), res.end());
+    return res;
+}
 
 
-
-
-
+// Babbary Approach
 // toBinary() is a function to convert positive integers to binary numbers
 int toBinary (int num)
 {
@@ -68,6 +88,8 @@ int main()
     cout<<toBinary(x)<<endl;
 
     cout<<toSignedBinary(-125)<<endl;
+
+    cout<<convert2Binary(8)<<endl;
     
     return 0;
 }

@@ -25,7 +25,7 @@ class Node{
 
 // Binary Tree creation 
 // Method-2 : From Level Order Traversal
-void buildFromLevelOrder (Node *root)
+void buildFromLevelOrder (Node* &root)
 {
     // create queue
     queue <Node*> q;

@@ -143,6 +143,8 @@ void deleteNode(Node *&head, Node *&tail, int index)
         Node *p = head;
         head = head->next;
         p->next = NULL;
+        // tail pointer ?
+
         delete p;
     }
     // deletion of middle/last node

@@ -7,7 +7,7 @@ using namespace std;
 
 
 // ########################################
-// Approach : 
+// Approach-1 : Brute Force
 // Code Library Approach
 // TC : O(N)  -> N is the number of nodes
 // SC : O(N)
@@ -51,6 +51,60 @@ vector<int> reverseLevelOrder(Node *root)
     reverse(ans.begin(), ans.end());
     return ans;
 }
+
+// ########################################
+// Approach-2 : Optimal -> using stacks
+// Source : GFG
+// TC : O(N)  -> N is the number of nodes
+// SC : O(N)
+// ########################################
+
+class Node{
+    public:
+    int data;
+    Node *left;
+    Node *right;
+
+    Node (int data)
+    {
+        this->data = data;
+        this->left = left;
+        this->right = right;
+    }
+};
+
+void reverse_level_order_traversal(Node *root)
+{
+    // declarations
+    queue <Node *> q;
+    stack <Node *> st;
+    q.push(root);
+
+    // level-order while loop
+    while(!q.empty())
+    {
+        Node *temp = q.front();
+        q.pop();
+        st.push(temp);
+
+        // Enqueue the right 
+        if(temp->right)
+            q.push(temp->right);
+
+        // Enqueue the left
+        if(temp->left)
+            q.push(temp->left);
+    }
+
+    // print the stack
+    while(!st.empty())
+    {
+        Node *temp = st.top();
+        cout<<temp->data<<" ";
+        st.pop();
+    }
+}
+
 
 int main()
 {

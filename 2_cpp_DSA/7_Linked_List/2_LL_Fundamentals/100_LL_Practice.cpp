@@ -6,7 +6,7 @@ using namespace std;
 
 class Node
 {
-public:
+    public:
     int data;
     Node *next;
 
@@ -18,19 +18,81 @@ public:
 
     ~Node()
     {
-        int value = this->data;
-        if (this->next != NULL)
+        int temp = this->data;
+        if(this->next != NULL)
         {
             delete this->next;
             this->next = NULL;
-        }
-        cout << "Value = " << value << endl;
+        } 
+        cout<<"Element deleted is "<<temp<<endl;
     }
 };
 
-// Display function
+void insertAtHead (Node* &head, Node* &tail, int data)
+{
+    Node *temp = new Node (data);
+    if(head == NULL)
+    {
+        head = temp;
+        tail = temp;
+    }
+    else
+    {
+        temp->next = head;
+        head = temp;
+    }
+}
+
+void insertAtTail (Node* &head, Node* &tail, int data)
+{
+    Node *temp = new Node(data);
+
+    if(tail == NULL)
+    {
+        tail = temp;
+        head = temp;
+    }
+
+    else{
+        tail->next = temp;
+        tail = temp;
+    }
+}
+
+void insertAtPosition(Node* &head, Node* &tail, int data, int position)
+{
+    // check for a valid position
+
+    if(position == 0)
+    {
+        insertAtHead(head, tail, data);
+        return;
+    }
+
+    Node *temp = head;
+    for(int i=0; i<position-1; i++)
+    {
+        temp = temp->next;
+    }
+
+    if(temp->next == NULL)
+    {
+        insertAtTail(head, tail, data);
+    }
+
+    Node *to_insert = new Node (data);
+    to_insert->next = temp->next;
+    temp->next = to_insert;
+
+}
+
 void display(Node *&head)
 {
+    if(head == NULL) {
+        cout << "List is empty "<< endl;
+        return;
+    }
+    
     Node *temp = head;
     while (temp != NULL)
     {
@@ -40,102 +102,40 @@ void display(Node *&head)
     cout << endl;
 }
 
-// Insert at head
-void insertAtHead(Node *&head, Node *&tail, int value)
+void deleteNode (Node* &head, Node* &tail, int position)
 {
-    Node *temp = new Node(value);
+    // check the position against the length
 
-    // if LL is empty
-    if (head == NULL)
+    if(head == NULL)
     {
-        head = temp;
-        tail = temp;
-    }
-
-    // if LL is not empty
-    else
-    {
-        temp->next = head;
-        head = temp;
-    }
-}
-
-// Insert at tail
-void insertAtTail(Node *&head, Node *&tail, int value)
-{
-    Node *temp = new Node(value);
-    // if LL is empty
-    if (tail == NULL)
-    {
-        head = temp;
-        tail = temp;
-    }
-
-    // is LL is NOT empty
-    {
-        tail->next = temp;
-        tail = temp;
-    }
-}
-
-// Insert at position
-void insertAtPosition(Node *&head, Node *&tail, int value, int index)
-{
-    if (index == 0)
-    {
-        insertAtHead(head, tail, value);
-    }
-
-    Node *ptr = head;
-    int cnt = 0;
-    while (cnt < index - 1)
-    {
-        ptr = ptr->next;
-        cnt++;
-    }
-
-    if (ptr->next == NULL)
-    {
-        insertAtTail(head, tail, value);
         return;
     }
 
-    Node *temp = new Node(value);
-    temp->next = ptr->next;
-    ptr->next = temp;
-}
-
-void deleteNode(Node *&head, Node *&tail, int index)
-{
-    if (index == 0)
+    if(position == 0)
     {
         Node *temp = head;
-        head = temp->next;
+        head = head->next;
         temp->next = NULL;
         delete temp;
     }
-
     else
     {
-        Node *current = head;
-        Node *previous = NULL;
-        int cnt = 0;
-        while (cnt < index)
+        Node *curr = head;
+        Node *prev = NULL;
+        for(int i=0; i<position; i++)
         {
-            previous = current;
-            current = current->next;
-            cnt++;
+            prev = curr;
+            curr = curr->next;
         }
-
-        if(current->next == NULL)
+        if(curr->next == NULL)
         {
-            tail = previous;
+            tail = prev;
         }
-
-        previous->next = current->next;
-        current->next = NULL;
-        delete current;
+        prev->next = curr->next;
+        curr->next = NULL;
+        delete curr;
     }
+
 }
 
 int main()
