@@ -1,2 +1,2 @@
 # CPP-Practice
-Repository for all the DSA practice questions 
+Repository for all the Fundamentals of C++ & DSA practice questions 
