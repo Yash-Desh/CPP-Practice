@@ -1,6 +1,6 @@
 // Date : 13-08-2024
 // Author : Yash Deshpande
-// Tutor : Love Babbar OS series
+// Tutor : Love Babbar OS series, The Cherno
 
 #include <iostream>
 // thread library is used in cpp for multithreading
@@ -39,7 +39,7 @@ int main()
     thread t1(taskA);
     thread t2(taskB);
 
-    // join statements used to prevent the 'main' task from terminating
+    // Main thread waits for the worker thread to finish
     t1.join();
     t2.join();
 
