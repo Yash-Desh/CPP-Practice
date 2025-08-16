@@ -1,6 +1,6 @@
 // Date : 13-08-2024
 // Author : Yash Deshpande
-// Tutor : Love Babbar OS series, The Cherno
+// Tutor : Love Babbar OS series
 
 #include <iostream>
 // thread library is used in cpp for multithreading
