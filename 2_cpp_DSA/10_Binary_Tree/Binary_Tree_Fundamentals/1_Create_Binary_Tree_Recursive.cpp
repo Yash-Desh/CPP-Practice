@@ -7,6 +7,15 @@
 #include <queue>
 using namespace std;
 
+/* Create a Binary Tree
+      2
+    /   \
+  3       5 
+ / \     /
+7   11  17 
+
+*/
+
 class Node
 {
 public:

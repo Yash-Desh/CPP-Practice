@@ -5,7 +5,7 @@
 #include <iostream>
 // thread library is used in cpp for multithreading
 #include <thread>
-#include <unistd.h>
+#include <unistd.h>  // for POSIX compliance -> sleep()
 
 using namespace std;
 
