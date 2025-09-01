@@ -24,7 +24,7 @@ int fib_memoization(int n, vector<int> &dp)
 }
 
 // #######################
-// DP Tabulation approach
+// DP Tabulation approach with space optimization
 // TC : O(N)
 // SC : O(1)
 // #######################

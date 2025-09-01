@@ -47,31 +47,31 @@ Node *buildTree(Node *root)
 }
 
 // Type-1 : without separator
-// void levelOrderTraversal(Node* root)
-// {
-//     queue <Node*>q;
+void levelOrderTraversal(Node* root)
+{
+    queue <Node*>q;
 
-//      // Check if root is not NULL
-//      if(!root)
-//          return;
+     // Check if root is not NULL
+     if(!root)
+         return;
 
-//     // push root node into queue
-//     q.push(root);
+    // push root node into queue
+    q.push(root);
 
-//     //
-//     while(!q.empty())
-//     {
-//         Node* temp = q.front();
-//         cout<<temp->data<<" ";
-//         q.pop();
+    //
+    while(!q.empty())
+    {
+        Node* temp = q.front();
+        cout<<temp->data<<" ";
+        q.pop();
 
-//         if(temp->left)
-//             q.push(temp->left);
+        if(temp->left)
+            q.push(temp->left);
 
-//         if(temp->right)
-//             q.push(temp->right);
-//     }
-// }
+        if(temp->right)
+            q.push(temp->right);
+    }
+}
 
 
 // Why do we need a separator ?
@@ -82,7 +82,7 @@ Node *buildTree(Node *root)
 // 7 11 17
 
 // Type - 2 : with separator
-void levelOrderTraversal(Node *root)
+void levelOrderTraversal_separator(Node *root)
 {
     // Check if root is not NULL
     if(!root)
