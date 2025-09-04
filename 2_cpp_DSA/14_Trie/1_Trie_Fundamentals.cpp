@@ -2,6 +2,13 @@
 // Date   : 31-08-2025
 // Tutor  : Love Babbar
 
+// ###############################
+// Trie Fundamentals
+// 1. Insertion
+// 2. Search
+// 3. Deletion
+// ###############################
+
 #include <iostream>
 using namespace std;
 
@@ -82,15 +89,51 @@ class Trie {
         return searchUtil(root, word);
     }
 
-    void deleteWord() {
-        // Set the isTerminal to false
-        // Empty the space.
+    // Returns true if root has no children.
+    bool isEmpty(TrieNode* root) {
+        for(int i=0; i<26; i++) {
+            if(root->children[i] != NULL) {
+                return false;
+            }
+        }
+        return true;
     }
 
+    TrieNode* deleteUtil(TrieNode* root, string word, int depth = 0) {
+        // Base Case.
+        if(root == NULL) {
+            return NULL;
+        }
+
+        // For processing the last character in the word.
+        if(depth == word.size()) {
+            if(root->isTerminal) {
+                root->isTerminal = false;
+            }
+
+            if(isEmpty(root)) {
+                delete root;
+                root = nullptr;
+            }
+            return root;
+        }
+
+        int index = word[depth] - 'A';
+        root->children[index] = deleteUtil(root->children[index], word, depth + 1);
+
+        if (isEmpty(root) && !root->isTerminal) {
+            delete (root);
+            root = NULL;
+        }
+
+        return root;
+    }
+
+    void deleteWord(string word) {
+        deleteUtil(root, word, 0);
+    }
 
 };
-
-
 
 int main() {
     Trie *t = new Trie();
@@ -98,6 +141,23 @@ int main() {
     t->insertWord("DO");
     t->insertWord("TIME");
 
-    cout<<"ABCD present or not ? "<<t->searchWord("TIM")<<endl;
+    cout<<"ABCD present or not ? "<<t->searchWord("ABCD")<<endl;
+    t->deleteWord("ABCD");
+    cout<<"ABCD present or not ? "<<t->searchWord("ABCD")<<endl;
     return 0;
 }
+
+/* 
+
+############################## Complexities Explained ##############################
+
+1. Insertion
+TC : O(N) where N is the length of the word.
+Each character is processed in a single recursive function call.
+
+2. Searching
+TC : O(N) where N is the length of the word.
+Each character is processed in a single recursive function call.
+
+
+*/
