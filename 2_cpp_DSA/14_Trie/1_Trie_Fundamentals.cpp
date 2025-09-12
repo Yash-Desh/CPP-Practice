@@ -67,6 +67,8 @@ class Trie {
     }
 
     bool searchUtil(TrieNode* root, string word) {
+        // NULL check.
+        
         if(word.length() == 0) {
             return root->isTerminal;
         }

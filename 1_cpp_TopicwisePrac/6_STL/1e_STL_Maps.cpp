@@ -37,7 +37,15 @@ int main()
     // // NOTE : Accessing elements in a map takes log(n) time
 
     cout<<mp[12]<<endl;     // abc
-    cout<<mp[51]<<endl;     // no key exist with value 5 , so this returns a null or 0 or empty string
+    cout<<mp[51]<<endl;     // no key exist with value 51, a new entry got created with key=51 & value = null or 0 or empty string
+    
+    
+    // Note the difference between 
+    cout<<mp.at(101)<<endl;     // This will give error
+    cout<<mp[101]<<endl;        // This will create a new entry & return value
+
+    // Determine the presence of a specific key in the map using  count() function
+    cout<<mp.count(101)<<endl;
     
     // // Printing map elements by iterating over them , accessing n elements thus takes nlog(n) 
 

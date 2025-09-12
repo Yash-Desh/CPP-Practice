@@ -7,6 +7,33 @@
 using namespace std;
 
 // ############################
+// Recursion Approach
+// TC : O(2^N) 
+// SC : O(N) for the recursion stack space
+// ############################
+int solve(int index, vector<int> &nums) {
+    // Base Case
+    if(index == 0) {
+        return nums[0];
+    }
+    if(index < 0) {
+        return 0;
+    }
+
+    int pick = nums[index] + solve(index-2, nums);
+    int notPick = solve(index-1, nums);
+    return max(pick, notPick);
+}
+
+int maximumNonAdjacentSum(vector<int> &nums){
+    // Write your code here.
+    int n = nums.size();
+    return solve(n-1, nums);
+}
+
+
+
+// ############################
 // Memoization Approach
 // TC : O(N) 
 // SC : O(N) + O(N) for the recursion stack space & dp array
@@ -90,3 +117,25 @@ int main()
     
     return 0;
 }
+
+/* 
+
+############################## Complexities Explained ##############################
+
+1. Recursive Approach
+TC : O(2^N)
+-> For each index, we have 2 choices/recursive function calls i.e. pick & notPick, hence
+   TC will be 2*2*2*...*2 = 2^N for N elements in the array
+
+SC : O(N)
+-> Considering that there is at least 1 recursive call per each index, max stack space will be N 
+
+2. Memoization Approach
+TC : O(N) 
+-> Each element will be called recursively once before storing result into dp array. Access to 
+   the dp array take place in constant time.
+
+SC : O(N) + O(N) 
+-> for the recursion stack space & dp array
+
+*/
