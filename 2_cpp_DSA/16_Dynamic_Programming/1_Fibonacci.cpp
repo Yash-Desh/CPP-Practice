@@ -39,7 +39,6 @@ int fib_tabulation(int n) {
         dp[i] = dp[i-1] + dp[i-2];
     }
     return dp[n];
-
 }
 
 
@@ -51,6 +50,7 @@ int fib_tabulation(int n) {
 // #######################
 int fib_space_opt(int n)
 {
+    if (n <= 1) return n;
     int prev = 1;
     int prev2 = 0;
     for(int i=2; i<=n; i++)
