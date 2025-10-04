@@ -84,6 +84,9 @@ int main()
 
     // similarly, these functions can be shown for vectors
 
+    // NOTE : v.end() for vectors points to location after last index
+    // similarly for arrays, its arr+n that points to location after last index 
+
 
     // // Binary Search
     

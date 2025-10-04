@@ -30,12 +30,11 @@ Node* insertIntoBST(Node* &root, int val) {
         return root;
     }
 
-    if(val < root->data) {
-        root->left = insertIntoBST(root->left, val);
-    }
-
     if(val > root->data) {
         root->right = insertIntoBST(root->right, val);
+    }
+    else {
+        root->left = insertIntoBST(root->left, val);
     }
     return root;
 }
@@ -47,42 +46,6 @@ void takeInput(Node* &root) {
         root = insertIntoBST(root, data);
         cin>>data;
     }
-}
-
-void displayBST_levelOrder(Node *root) {
-    queue<Node *> q;
-    q.push(root);
-    q.push(nullptr);
-
-    while(!q.empty()) {
-        auto front = q.front();
-        q.pop();
-        if(front == nullptr) {
-            if(!q.empty()) {
-                cout<<endl;
-                q.push(nullptr);
-            }
-            continue;
-        }
-
-        cout<<front->data<<" ";
-        if(front->left) {
-            q.push(front->left);
-        }
-        if(front->right) {
-            q.push(front->right);
-        }
-    }
-}
-
-void displayBST_inOrder(Node *root) {
-    if(root == nullptr) {
-        return;
-    }
-
-    displayBST_inOrder(root->left);
-    cout<<root->data<<" ";
-    displayBST_inOrder(root->right);
 }
 
 Node* minValue(Node *root) {
@@ -152,6 +115,45 @@ Node* deleteFromBST(Node* root, int val) {
         root->right = deleteFromBST(root->right, val);
     }
     return root;
+}
+
+// ############################
+// Utility Functions
+// ############################
+void displayBST_levelOrder(Node *root) {
+    queue<Node *> q;
+    q.push(root);
+    q.push(nullptr);
+
+    while(!q.empty()) {
+        auto front = q.front();
+        q.pop();
+        if(front == nullptr) {
+            if(!q.empty()) {
+                q.push(nullptr);
+            }
+            cout<<endl;
+            continue;
+        }
+
+        cout<<front->data<<" ";
+        if(front->left) {
+            q.push(front->left);
+        }
+        if(front->right) {
+            q.push(front->right);
+        }
+    }
+}
+
+void displayBST_inOrder(Node *root) {
+    if(root == nullptr) {
+        return;
+    }
+
+    displayBST_inOrder(root->left);
+    cout<<root->data<<" ";
+    displayBST_inOrder(root->right);
 }
 
 

@@ -2,6 +2,8 @@
 // Date : 15-10-2022
 // Tutor : Love Babbar
 
+// To show the deep copy & shallow copy semantics of a copy constructor.
+
 #include <bits/stdc++.h>
 using namespace std;
 

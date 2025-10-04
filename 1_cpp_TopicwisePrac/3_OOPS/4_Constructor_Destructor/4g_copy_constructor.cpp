@@ -1,5 +1,6 @@
 // Author : Yash Deshpande
-// Date : 31-01-2022
+// Date   : 31-01-2022
+// Tutor  : Code with Harry 
 
 #include<iostream>
 using namespace std;
@@ -7,18 +8,21 @@ using namespace std;
 class Number{
     int a;
     public:
-        Number(){
-            a = 0;
-        }
-
-        Number(int num){
-            a = num;
-        }
+        Number() {a = 0;}
+        Number(int num) {a = num;}
         
         // When no copy constructor is found, compiler supplies its own copy constructor
         // Note : The Parameter passed when defining a copy constructor is always 
         //        "Pass by Reference" hence the "&" sign is used 
-        Number(Number &obj){
+        // Number(Number &obj){
+        //     cout<<"Copy constructor called!!!"<<endl;
+        //     a = obj.a;
+        // }
+
+        // The const is optional but is added so that we do not modify the obj by mistake. 
+        // Copy constructor takes a reference to an object of the same class as an argument.
+        // NOTE : You can access the private data members of the passed object.
+        Number(const Number &obj){
             cout<<"Copy constructor called!!!"<<endl;
             a = obj.a;
         }
@@ -33,14 +37,17 @@ int main(){
     y.display();
     z.display();
 
-    Number z1(z); // Copy constructor invoked
+    // Case-1: Copy constructor invoked
+    Number z1(z); 
     z1.display();
 
-    z2 = z; // Copy constructor NOT called
-    z2.display();
-
-    Number z3 = z; // Copy constructor invoked
+    // Case-2: Copy constructor invoked
+    Number z3 = z; 
     z3.display();
+
+    // Case-3: Copy constructor NOT called  --> copy assignment operator
+    z2 = z; 
+    z2.display();
 
     // z1 should exactly resemble z  or x or y
 

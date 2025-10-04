@@ -28,6 +28,8 @@ class Heap {
     // TC : O(logN) -> Each element is compared with its parent
     // #############################
     void insert(int val) {
+        // Check whether there is space in the heap to insert new element
+
         // Every new element is inserted 
         // at the end of the array.
         size += 1;
@@ -98,6 +100,8 @@ class Heap {
 // TC' : O(logN) -> time for each element to reach its correct destination.
 // #############################
 void heapify(int arr[], int n, int i) {
+    // n = total number of elements in the array
+    // i = position of element 
     int largest = i;
 
     int left = 2*i;

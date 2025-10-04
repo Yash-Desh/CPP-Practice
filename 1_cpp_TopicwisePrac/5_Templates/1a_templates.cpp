@@ -23,6 +23,7 @@ class vector {
 int main() 
 {
     // Creating objects using the defined template "vector"
+    // Check "Most Vexing Parse" for why this code doesn't give a compiler error
     vector<int> myVec1();
     vector<float> myVec2();
     return 0;
