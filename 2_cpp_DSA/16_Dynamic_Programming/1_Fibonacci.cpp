@@ -28,8 +28,10 @@ int fib_memoization(int n, vector<int> &dp)
 // DP Tabulation Approach
 // TC : O(n)     -> only n recursive calls will be made the rest are constant calls
 // SC : O(n)     -> for the dp array
+// What if n == 0 ? dp[1] will give a seg fault
 // ########################
 int fib_tabulation(int n) {
+    if (n <= 1) return n;           // To avoid seg fault
     vector<int> dp(n+1, -1);
     
     // Base Cases.

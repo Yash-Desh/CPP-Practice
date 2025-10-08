@@ -6,6 +6,41 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// ############################
+// Recursion Approach
+// TC : 
+// SC : 
+// Time Limit Exceeded!
+// ############################
+int solve_recursion(int day, int prevActivity, vector<vector<int>> &points) {
+    // Base Case.
+    if(day == 0) {
+        // Return max of all the activities
+        int maxPoints = INT_MIN;
+        for(int i=0; i<3; i++) {
+            if(i != prevActivity) {
+                maxPoints = max(maxPoints, points[day][i]);
+            }
+        }
+        return maxPoints;   
+    }
+
+    int maxPoints = INT_MIN;
+        for(int i=0; i<3; i++) {
+            if(i != prevActivity) {
+                int currentPoints = solve_recursion(day-1, i, points) + points[day][i];
+                maxPoints = max(maxPoints, currentPoints);
+            }
+        }
+        return maxPoints;
+}
+
+
+int ninjaTraining_recursion(int n, vector<vector<int>> &points)
+{
+    // Write your code here.
+    return solve_recursion(n-1, 3, points);
+}
 
 // ############################
 // Memoization Approach

@@ -40,6 +40,33 @@ public:
     }
 };
 
+// ############################
+// Tabulation Approach
+// TC : O(N)
+// SC : O(N) for the dp array
+// ############################
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> dp(n, -1);
+
+        // Base Case.
+        dp[0] = nums[0];
+
+        // Bottom-Up Approach
+        for(int i=1; i<n; i++) {
+            int pick =  nums[i];
+            if(i > 1) pick += dp[i-2];
+            int notPick = dp[i-1];
+            
+            dp[i] = max(pick, notPick);
+        }
+
+        return dp[n-1];
+    }
+};
+
 int main()
 {
     

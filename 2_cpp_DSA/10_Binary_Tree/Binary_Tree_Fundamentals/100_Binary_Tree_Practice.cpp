@@ -9,52 +9,73 @@ public:
     Node *left;
     Node *right;
 
-    Node(int data)
-    {
-        this->data = data;
-        this->left = nullptr;
-        this->right = nullptr;
-    }
+    Node(int data) : data(data), left(nullptr), right(nullptr){}
 };
 
-void buildTreeLevelOrder(Node *&root)
-{
-    queue<Node *> q;
+Node* CBT_iterative(vector<int> &nums) {
+    // Base Case.
+    if(nums.size() == 0) {
+        return nullptr;
+    }
 
-    // Create the root node.
-    int data;
-    cout << "data for root node ";
-    cin >> data;
-    root = new Node(data);
+    // Level Order Traversal
+    Node *root = new Node(nums[0]);
+    int index = 1;
+
+    queue<Node*> q;
     q.push(root);
 
-    while (!q.empty())
-    {
-        Node *temp = q.front();
+    while(index < nums.size()) {
+        auto node = q.front();
         q.pop();
 
-        cout << "data for left root node ";
-        cin >> data;
-        if (data != -1)
-        {
-            temp->left = new Node(data);
-            q.push(temp->left);
+        if(index < nums.size()) {
+            node->left = new Node(nums[index++]);
+            q.push(node->left);
         }
 
-        cout << "data for right root node ";
-        cin >> data;
-        if (data != -1)
-        {
-            temp->right = new Node(data);
-            q.push(temp->right);
+        if(index < nums.size()) {
+            node->right = new Node(nums[index++]);
+            q.push(node->right);
         }
     }
+    return root;
 }
+
+Node* CBT_recursive(vector<int> &nums, int index) {
+    // Base Case.
+    if(index >= nums.size()) {
+        return nullptr;
+    }
+
+    Node* root = new Node(nums[index]);
+    root->left = CBT_recursive(nums, 2*index+1);
+    root->right = CBT_recursive(nums, 2*index+2);
+
+    return root;
+}
+
+void printTree(Node* root) {
+    if (!root) {
+        return;
+    }
+      printTree(root->left);
+    cout << root->data << " ";
+  
+    printTree(root->right);
+}
+
 
 int main()
 {
-    Node *root = NULL;
+    // Do Not Change This.
+    vector<int> nums = { 1, 2, 3, 4, 5, 6, 6, 6, 6 };
+    Node* root1 = CBT_iterative(nums);
+    printTree(root1);                    // 6 4 6 2 5 1 6 3 6
 
-    buildTreeLevelOrder(root);
+    cout<<endl;
+
+    Node* root2 = CBT_recursive(nums, 0);
+    printTree(root2);                    // 6 4 6 2 5 1 6 3 6
     return 0;
 }

@@ -10,6 +10,28 @@ using namespace std;
 // hence the max value you want to reach is n-1
 
 // ############################
+// Recursive Approach
+// ############################
+int solve_recursive(int n, vector<int> &heights) {
+    // Base Case
+    if(n == 0) return 0;
+
+    int jump1 = solve_recursive(n-1, heights) + abs(heights[n] - heights[n-1]);
+    int jump2 = INT_MAX;
+    if(n-1 > 0)
+        jump2 = solve_recursive(n-2, heights) + abs(heights[n] - heights[n-2]);
+
+    return min(jump1, jump2);
+}
+
+int frogJump_recursive(int n, vector<int> &heights)
+{
+    // Write your code here.
+    return solve_recursive(n-1, heights);
+}
+
+
+// ############################
 // Memoization Approach
 // TC : O(N)
 // SC : O(N) + O(N) for the recursion stack space & dp array
