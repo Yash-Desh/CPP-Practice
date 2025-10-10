@@ -87,35 +87,48 @@ int main()
 
     // Vector of vectors
 
-    vector <vector<int>> v4;
-    int N=3;
+    // vector <vector<int>> v4;
+    // int N=3;
 
-    // Taking input for vector of vectors
-    for(int i=0; i<N; i++)
-    {
-        // creating a new temporary vector & filling it with m values
-        vector <int> temp;
-        int m;
-        cout<<"Enter number of elements in vector :";
-        cin>>m;
-        for(int j=0; j<m; j++)
-        {
-            int val;
-            cin>>val;
-            temp.push_back(val);
+    // // Taking input for vector of vectors
+    // for(int i=0; i<N; i++)
+    // {
+    //     // creating a new temporary vector & filling it with m values
+    //     vector <int> temp;
+    //     int m;
+    //     cout<<"Enter number of elements in vector :";
+    //     cin>>m;
+    //     for(int j=0; j<m; j++)
+    //     {
+    //         int val;
+    //         cin>>val;
+    //         temp.push_back(val);
+    //     }
+
+    //     // Append the newly created vector to main vector v4
+    //     v4.push_back(temp);
+
+    //     // NOTE : you may also append an empty temp vector to the main vector , & then push_back elements to it
+    // }
+    // printVecVec(v4);
+
+    // // Accessing individual elements in a vector of vectors 
+    // cout<<endl<<endl<<v4[0][1]<<endl;
+
+
+    // ############################
+    // Nvidia Interview Question
+    // ############################
+    vector<vector<int>> myVec = {{1, 2, 3}, 
+                                 {4, 5, 6}, 
+                                 {7, 8, 9}};
+
+    for(int i=0; i<myVec.size(); i++) {
+        for(int j=0; j<myVec[i].size(); j++) {
+            cout<< &myVec[i][j] <<" ";
         }
-
-        // Append the newly created vector to main vector v4
-        v4.push_back(temp);
-
-        // NOTE : you may also append an empty temp vector to the main vector , & then push_back elements to it
+        cout<<endl;
     }
-    printVecVec(v4);
-
-    // Accessing individual elements in a vector of vectors 
-    cout<<endl<<endl<<v4[0][1]<<endl;
-
-
 
     return 0;
 }
