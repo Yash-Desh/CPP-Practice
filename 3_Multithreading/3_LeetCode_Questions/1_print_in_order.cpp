@@ -18,7 +18,7 @@ public:
     }
 
     void first(function<void()> printFirst) {
-        
+        std::unique_lock<std::mutex>lock(m);
         // printFirst() outputs "first". Do not change or remove this line.
         printFirst();
         turn = 1;

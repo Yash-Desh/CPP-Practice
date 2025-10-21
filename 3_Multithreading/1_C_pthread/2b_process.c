@@ -8,18 +8,23 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-// Compare this program & output with program 2a_thread.c
+// Compare this program & output with program 2b_thread.c
 
 int main(int argc, char *argv[]) {
     int x = 2;
     
     int pid = fork();
+
     if(pid == -1) {
         // return error
         return 1;
     }
 
-    printf("Hello from process %d\n", getpid());
+    if(pid == 0) {
+        x++;
+    }
+    sleep(2);
+    printf("Value of x is %d\n", x); 
 
     if(pid != 0) {
         // Inside the parent
@@ -28,9 +33,9 @@ int main(int argc, char *argv[]) {
 
     /*
     ################### Output of the program ###################
-    Hello from process
-    Hello from process
-
+    Value of x is 3
+    Value of x is 2
+    
     */
     return 0;
 }

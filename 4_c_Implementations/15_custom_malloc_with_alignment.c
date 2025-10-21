@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Note: This method is able to align only powers of 2
+// C11 introduced a portable method to do this -> void* aligned_alloc(size_t alignment, size_t size);
+
 void* aligned_malloc(size_t required_bytes, size_t alignment)
 {
     void* p1; // original block
@@ -14,6 +17,14 @@ void* aligned_malloc(size_t required_bytes, size_t alignment)
     {
        return NULL;
     }
+
+    // We move offset bytes forward from the start.
+    // Now, even if p1 was misaligned, this guarantees that somewhere in 
+    // [p1, p1+offset) there exists an aligned address.
+    // This bitwise AND rounds down to the nearest multiple of alignment.
+    // why convert the pointer to size_t ?
+    // You can't directly do bit manipulation on pointers, hence we convert 
+    // it to size_t, now you can do arithmetic on the address stored in p1
     p2 = (void**)(((size_t)(p1) + offset) & ~(alignment - 1));
     p2[-1] = p1;
     return p2;

@@ -16,29 +16,21 @@
 int x = 2;
 
 void* routine() {
-    x++;
-    sleep(2);
-    printf("Value of x = %d\n", x);
-}
-
-void* routine2() {
-    sleep(2);
-    printf("Value of x = %d\n", x);
+    printf("Hello from thread %d\n", getpid());
 }
 
 int main(int argc, char *argv[]) {
     // Perform error handling on thread creation & joining as needed.
+
+    // Create 2 threads & run the same routine in both
     pthread_t t1, t2;
 
     pthread_create(&t1, NULL, routine, NULL);
-    pthread_create(&t2, NULL, routine2, NULL);
+    pthread_create(&t2, NULL, routine, NULL);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
 
-    // Output
-    // Value of x = 3
-    // Value of x = 3
     
     return 0;
 }

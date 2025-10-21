@@ -38,3 +38,15 @@ int main() {
 
     return 0;
 }
+
+/*
+
+Add destructor, copy/move ctor, and copy/move assignment (Rule of 5).
+
+Check for nullptr inputs before dereferencing.
+
+Handle new throwing std::bad_alloc.
+
+overflow
+
+*/

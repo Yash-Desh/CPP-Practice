@@ -36,10 +36,10 @@ typedef struct structd_tag {
 
 int main()
 {
-    printf("sizeof(structa_t) = %lu\n", sizeof(structa_t));
-    printf("sizeof(structb_t) = %lu\n", sizeof(structb_t));
-    printf("sizeof(structc_t) = %lu\n", sizeof(structc_t));
-    printf("sizeof(structd_t) = %lu\n", sizeof(structd_t));
+    printf("sizeof(structa_t) = %lu\n", sizeof(structa_t));     // 3
+    printf("sizeof(structb_t) = %lu\n", sizeof(structb_t));     // 7
+    printf("sizeof(structc_t) = %lu\n", sizeof(structc_t));     // 13
+    printf("sizeof(structd_t) = %lu\n", sizeof(structd_t));     // 13
 
     return 0;
 }

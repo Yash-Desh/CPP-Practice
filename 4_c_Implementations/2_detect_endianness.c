@@ -19,9 +19,13 @@ int main() {
 
 /*
 
-To determine the endianness of a system using C code, one common method involves inspecting the byte order of a multi-byte integer.
-Method 1: Using a character pointer
-This method leverages the fact that a char pointer can access individual bytes of a multi-byte data type like an int.
+To determine the endianness of a system using C code, one common method involves 
+inspecting the byte order of a multi-byte integer.
+
+Method 1:
+-> Using a character pointer
+This method leverages the fact that a char pointer can access individual bytes 
+of a multi-byte data type like an int.
 
 
 Explanation:
