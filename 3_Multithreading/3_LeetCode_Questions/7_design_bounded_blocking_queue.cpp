@@ -26,7 +26,8 @@ public:
     int dequeue() {
         unique_lock<mutex> lock(mtx);
         not_empty.wait(lock, [&] { return !q.empty(); });
-        int val = q.front(); q.pop();
+        int val = q.front(); 
+        q.pop();
         not_full.notify_one(); // signal one waiting producer
         return val;
     }

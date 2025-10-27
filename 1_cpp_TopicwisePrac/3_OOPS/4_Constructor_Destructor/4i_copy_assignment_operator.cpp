@@ -25,7 +25,7 @@ public:
 
     //  ############### COMMENT THIS SECTION AND CHECK OUTPUT ###############
     // Overloaded assignment operator
-    GfG &operator=(const GfG &c)
+    GfG& operator=(const GfG &c)
     {
         // self assignment check
         if (this != &c)

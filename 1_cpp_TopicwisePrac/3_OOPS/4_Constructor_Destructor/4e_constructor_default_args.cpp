@@ -26,9 +26,9 @@ void Simple :: printData(){
 
 int main(){
     Simple s1(12, 13);
-    s1.printData();
+    s1.printData();         // The value of data1, data2 and data3 is 12, 13 and 8
 
     Simple s2(12);
-    s2.printData();
+    s2.printData();         // The value of data1, data2 and data3 is 12, 9 and 8
     return 0;
 }

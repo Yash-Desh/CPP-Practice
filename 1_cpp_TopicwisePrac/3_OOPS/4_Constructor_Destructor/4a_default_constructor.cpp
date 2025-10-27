@@ -34,6 +34,13 @@ int main()
     c2.printNumber();
     c3.printNumber();
 
+    /*
+    -------------- output --------------
+    Your number is 0 + 0i
+    Your number is 0 + 0i
+    Your number is 0 + 0i
+    */
+
     return 0;
 }
 

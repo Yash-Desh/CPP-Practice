@@ -9,7 +9,7 @@
 #include <time.h>
 
 // Parent thread exits after creating children, but the children should keep executing.
-// This is done using pthread_exit(), it exits the parent thread, but the process doesn;t terminate.
+// This is done using pthread_exit(), it exits the parent thread, but the process doesn't terminate.
 // The process waits till all the threads have finished execution.
 
 void *roll_dice() {

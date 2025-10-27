@@ -21,7 +21,9 @@ int main(int argc, char* argv[]) {
 
     for(int i; i<2; i++) {
         pthread_create(&th[i], NULL, routine, NULL);
-        printf("Main thread created pthread_t = %lu\n", th[i]);     // -> this number is assigned by the pthread api
+        // pthread_t is an unsigned long number 
+        // this number is assigned by the pthread API, not the linux kernel
+        printf("Main thread created pthread_t = %lu\n", th[i]);     
     }
 
     for(int i=0; i<2; i++) {
@@ -31,3 +33,11 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+/*
+
+The POSIX API recommends that you should never print out the pthread_t number.
+That is because the pthread_t is supposed to be an opaque data type.
+That means it is not guaranteed to be unsigned long on every system. 
+
+*/

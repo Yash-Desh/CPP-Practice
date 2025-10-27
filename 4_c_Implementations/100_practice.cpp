@@ -7,6 +7,11 @@
 
 int main() {
     int var = 10;
-    printf("%ld\n", my_sizeof(var));
+    if(0xFF == 0x00FF) {
+        printf("true\n");
+    }
+    else {
+        printf("false\n");
+    }
     return 0;
 }
