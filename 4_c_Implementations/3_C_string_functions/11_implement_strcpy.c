@@ -7,16 +7,13 @@
 
 // Function to implement strcpy
 char *my_strcpy(char *dest, const char *src) {
-    // Assertions to ensure valid pointers are passed
-    assert(dest != NULL);
-    assert(src != NULL);
-
-    char *temp = dest; // Store the original destination pointer to return it
-
+    if (!dest || !src) {        // Handle null pointers for safety
+        return NULL;
+    }
+    char *temp = dest;          // Store the original destination pointer to return it
     // Copy characters from source to destination until the null terminator is reached
     while ((*dest++ = *src++) != '\0');
-
-    return temp; // Return the original destination pointer
+    return temp;                // Return the original destination pointer
 }
 
 int main() {

@@ -20,15 +20,17 @@ void myMemCpy(void *dest, void *src, size_t n)
 // Driver program
 int main()
 {
+    // Example-1: Character Stream
     char csrc[] = "GeeksforGeeks";
     char cdest[100];
     myMemCpy(cdest, csrc, strlen(csrc) + 1);
     printf("Copied string is %s", cdest);
 
+    // Example-2: Integers
     int isrc[] = {10, 20, 30, 40, 50};
     int n = sizeof(isrc) / sizeof(isrc[0]);
     int idest[n], i;
-    myMemCpy(idest, isrc, sizeof(isrc));
+    myMemCpy(idest, isrc, sizeof(isrc));        // -> note the size
     printf("\nCopied array is ");
     for (i = 0; i < n; i++)
         printf("%d ", idest[i]);
