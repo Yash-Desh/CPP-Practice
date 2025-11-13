@@ -39,7 +39,7 @@ void* routine2(void* arg) {
 // But it was shown here as a good example to understand that binary semaphores
 // need not be sem_post() by the same thread called the sem_wait()
 // But mutexes have the concept of ownership, lock & unlock need to be called by the 
-// same threa.
+// same thread.
 
 int main(int argc, char* argv[]) {
     pthread_t th[THREAD_NUM];

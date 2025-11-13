@@ -20,10 +20,9 @@ struct date {
 
 int main()
 {
-    printf("Size of date is %lu bytes\n",
-           sizeof(struct date));
+    printf("Size of date is %lu bytes\n", sizeof(struct date));     // Size of date is 8 bytes
     struct date dt = { 31, 12, 2014 };
-    printf("Date is %d/%d/%d", dt.d, dt.m, dt.y);
+    printf("Date is %d/%d/%d", dt.d, dt.m, dt.y);                   // Date is -1/-4/2014
     return 0;
 }
 

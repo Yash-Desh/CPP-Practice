@@ -21,15 +21,26 @@ int main() {
 
     
     // // ################# Reading a single string #################
-    // FILE *ptr2 = NULL;
-    // ptr2 = fopen("read_text_file.txt", "r");
+    FILE *ptr2 = NULL;
+    ptr2 = fopen("read_text_file.txt", "r");
 
-    // char read_buffer[100]; 
-    // int read_size = 4;
-    // fgets(read_buffer, read_size, ptr2);
-    // printf("String read from the file is : %s\n", read_buffer);   // Thi\0
+    char read_buffer[100]; 
+    int read_size = 4;
+    fgets(read_buffer, read_size, ptr2);
+    printf("String read from the file is : %s\n", read_buffer);   // Thi\0
 
-    // fclose(ptr2);
+    // Read again.
+    read_size = 30;
+    fgets(read_buffer, read_size, ptr2);
+    printf("String read from the file is : %s\n", read_buffer);     // s is line-1
+
+
+    // Read once again.
+    read_size = 30;
+    fgets(read_buffer, read_size, ptr2);
+    printf("String read from the file is : %s\n", read_buffer);     // s is line-1
+
+    fclose(ptr2);
 
  
     // // ################# Writing a single character #################
@@ -44,13 +55,13 @@ int main() {
 
 
     // ################# Writing a single string #################
-    FILE *ptr4 = NULL;
-    ptr4 = fopen("write_text_file.txt", "w");
+    // FILE *ptr4 = NULL;
+    // ptr4 = fopen("write_text_file.txt", "w");
 
-    char write_buffer[100] = "This is to demonstrate the use of fputs()"; 
-    fputs(write_buffer, ptr4);
+    // char write_buffer[100] = "This is to demonstrate the use of fputs()"; 
+    // fputs(write_buffer, ptr4);
 
-    fclose(ptr4);
+    // fclose(ptr4);
 
 
     return 0;

@@ -1,1 +1,2 @@
-This is to demonstrate use of fputs()
+This line will be written to a file.
+This is the 2nd line.

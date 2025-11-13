@@ -2,6 +2,9 @@
 #include <thread>
 #include <iostream>
 #include <mutex>
+#include <semaphore>
+#include <condition_variable>
+#include <bits/stdc++.h>
 
 using namespace std;
 

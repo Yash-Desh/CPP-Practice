@@ -38,6 +38,14 @@ struct test_struct {
     int i;
 };
 
+// NVIDIA Mod
+struct test_struct_mod {
+    char a;
+    int b;
+    int i;
+    char *p;
+};
+
 int main() {
     struct abc1 s1;
     printf("Size of struct abc1 is %ld bytes\n", sizeof(s1));       // 8 bytes
@@ -52,7 +60,13 @@ int main() {
     printf("sizeof(structc_t) = %lu\n", sizeof(structc_t));         // 24 bytes
 
     struct test_struct Nvidia;
-    printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia));
+    printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia));   // 24 Bytes (64-bit addresses)
+
+    struct test_struct_mod Nvidia_mod;
+    printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia_mod));   // 16 Bytes (64-bit addresses)
+    printf("%p\n", &Nvidia_mod.a);
+    printf("%p\n", &Nvidia_mod.b);
+    printf("%p\n", &Nvidia_mod.i);
 
     return 0;
 }

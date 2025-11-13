@@ -29,7 +29,7 @@ uint32_t swap2(uint32_t org_hex) {
     char* org_ptr;
     org_ptr = (char *)&org_hex;
 
-    char* temp = NULL;
+    char temp;
 
     uint32_t len = sizeof(org_hex);
     for(int i=0; i<len/2; i++) {

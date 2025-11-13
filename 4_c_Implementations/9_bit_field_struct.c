@@ -22,7 +22,6 @@ struct statusOfLEDs {
     int LED5;
     int LED6;
     int LED7;
-
 };
 
 // Method-2 : Space Efficient

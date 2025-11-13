@@ -26,19 +26,19 @@ struct Node* buildTree(int *arr, int index, int size) {
     return temp;
 }
 
-void levelOrderTraversal(Node *head) {
+void inOrderTraversal(struct Node *head) {
     if(head == NULL) {
         return;
     }
 
-    levelOrderTraversal(head->left);
+    inOrderTraversal(head->left);
     printf("%d ", head->data);
-    levelOrderTraversal(head->right);
+    inOrderTraversal(head->right);
 }
 
 int main() {
      int arr[10] = {1, 3, 5, 7, 9, 2, 4, 6, 8, 10};
      struct Node * head = buildTree(arr, 0, 10);
-     levelOrderTraversal(head);
+     inOrderTraversal(head);
     return 0;
 }

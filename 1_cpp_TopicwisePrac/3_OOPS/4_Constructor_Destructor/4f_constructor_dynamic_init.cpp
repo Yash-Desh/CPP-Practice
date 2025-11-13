@@ -4,6 +4,9 @@
 #include<iostream>
 using namespace std;
 
+// ################################################################################
+// Note the different datatypes of arguments provided to the overloaded constructors.
+// ################################################################################
 
 class BankDeposit{
     int principal;
@@ -49,7 +52,9 @@ void BankDeposit :: show(){
 }
 
 int main(){
-    BankDeposit bd1, bd2, bd3;   // These objects are created using the default constructor & will generate an error if default constructor not found
+    // These objects are created using the default constructor & will generate 
+    // an error if default constructor not found
+    BankDeposit bd1, bd2, bd3;   
     int p, y;
     float r;
     int R;

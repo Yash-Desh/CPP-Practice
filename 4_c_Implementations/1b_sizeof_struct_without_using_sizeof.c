@@ -15,10 +15,10 @@ int main() {
 
     // 
     struct student tom;
-    printf("sizof(tom) = %ld\n", sizeof(tom));
+    printf("sizof(tom) = %ld\n", sizeof(tom));                    // sizof(tom) = 108
 
     // without using the sizeof() operator
     struct student *ptr = &tom;
-    printf("sizof(tom) = %ld\n", (char*)(ptr+1)-(char*)ptr);
+    printf("sizof(tom) = %ld\n", (char*)(ptr+1)-(char*)ptr);      // sizof(tom) = 108
     return 0;
 }
