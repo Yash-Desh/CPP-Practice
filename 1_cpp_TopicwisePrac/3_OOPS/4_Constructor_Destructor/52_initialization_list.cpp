@@ -25,12 +25,12 @@ public:
     // Test(int i, int j) : a(i), b(j) --> This works perfectly
     // Test(int i, int j) : a(i), b(2 * j) --> This works perfectly
 
-    // Test(int i, int j) : b(j), a(i+b) -->This will give a garbage value to a since a is initialized first 
+    Test(int i, int j) : b(j), a(i+b) // -->This will give a garbage value to a since a is initialized first 
                                            //irrespective of the order in which it is written here 
     
     // Test(int i, int j) : a(i), b(a + j) --> This works perfectly
     
-    Test(int i, int j) : a(i), b(j)  //Standard declaration
+    // Test(int i, int j) : a(i), b(j)  //Standard declaration
     {
         cout << "Constructor executed"<<endl;
         cout << "Value of a is "<<a<<endl;

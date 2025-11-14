@@ -1,6 +1,6 @@
 // Author : Yash Deshpande
 // Date   : 20-09-2025
-// Tutor  : GFG
+// Tutor  : GFG (https://www.geeksforgeeks.org/cpp/cpp-assignment-operator-overloading/)
 
 #include <iostream>
 #include <cstring>
@@ -76,6 +76,19 @@ int main()
     cout << c1.arr << endl;
     cout << c2.arr;
     return 0;
+
+
+    /*
+    Output with Shallow Copy ----------------------------------------
+    0x6282e871e2d0
+    free(): double free detected in tcache 2
+    Aborted (core dumped)
+
+    Output with Deep Copy --------------------------------------------
+    0x5776bb7d52f0
+    0x5776bb7d52d0
+    
+    */
 }
 
 /*

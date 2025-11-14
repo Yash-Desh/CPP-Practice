@@ -53,6 +53,12 @@ class Hero
     // default copy constructor
     
 
+    // ###################################################################################
+    // Note that this code doesn't have a destructor for dynamically allocated memory,
+    // So you won't have any double free errors but you would leak memory when the objects 
+    // go out of scope.
+    // ###################################################################################
+
     void setHealth (int health)
     {
         this->health = health;

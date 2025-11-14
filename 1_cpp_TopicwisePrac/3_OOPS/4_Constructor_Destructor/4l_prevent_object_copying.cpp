@@ -29,10 +29,10 @@ int main()
     main.cpp: In function ‘int main()’:
     main.cpp:26:25: error: use of deleted function ‘NonCopyables::NonCopyables(const NonCopyables&)’
     26 |     NonCopyables obj2 = obj1;
-        |                         ^~~~
+       |                         ^~~~
     main.cpp:10:5: note: declared here
     10 |     NonCopyables(const NonCopyables&) = delete;
-        |     ^~~~~~~~~~~~
+       |     ^~~~~~~~~~~~
     */
     return 0;
 }

@@ -45,6 +45,27 @@ int main(){
 }
 
 /*
+    ------------------------------ OUTPUT ------------------------------
+    We are inside our main function
+    Creating first object n1
+    This is the time when constructor is called for object number1
+
+    Entering this block
+    Creating two more objects
+    This is the time when constructor is called for object number2
+    This is the time when constructor is called for object number3
+    Exiting this block
+    This is the time when my destructor is called for object number3
+    This is the time when my destructor is called for object number2
+
+    Back to main
+    This is the time when constructor is called for object number2
+    This is the time when my destructor is called for object number2
+    This is the time when my destructor is called for object number1
+    
+*/
+
+/*
 
 ##############################################Extra Notes#####################################################s
 

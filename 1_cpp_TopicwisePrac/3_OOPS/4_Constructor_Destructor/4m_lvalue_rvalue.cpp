@@ -87,9 +87,9 @@ int main() {
     string fullname = firstname + lastname;
 
     // Call to overloaded Function-1
-    printname(fullname);
+    printname(fullname);                            // [lvalue] = YanChernikov
 
     // Call to overloaded Function-3
-    printname(firstname + lastname);
+    printname(firstname + lastname);                // [rvalue] = YanChernikov
     return 0;
 }
