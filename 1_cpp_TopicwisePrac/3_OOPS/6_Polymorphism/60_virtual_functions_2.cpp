@@ -31,7 +31,8 @@ class CWHVideo: public CWH      // // CWHVideo ==> Code With Harry Video tutoria
             cout<<"Ratings: "<<rating<<" out of 5 stars"<<endl;
             cout<<"Length of this video is: "<<videoLength<<" minutes"<<endl;
         }
-};    
+}; 
+   
 class CWHText: public CWH     // CWHText ==> Code With Harry Text tutorial
 {
     int words;

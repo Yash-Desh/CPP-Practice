@@ -14,21 +14,21 @@ class A
         {
             // this pointer stores the address of the
             // current object
-            cout<<"this -> "<<this<<endl;
+            cout<<"this -> "<<this<<endl;                       // this -> 0x7ffcd13899e4
         }
         void setData(int a){
             this->a = a;
         }
 
         void getData(){
-            cout<<"The value of a is "<<a<<endl;
+            cout<<"The value of a is "<<a<<endl;                // The value of a is 4
         }
 };
 
 
 int main(){
     A a;
-    cout<<"Address of the object a is "<<&a<<endl;
+    cout<<"Address of the object a is "<<&a<<endl;              // Address of the object a is 0x7ffcd13899e4
     a.setData(4);
     a.getData();
 

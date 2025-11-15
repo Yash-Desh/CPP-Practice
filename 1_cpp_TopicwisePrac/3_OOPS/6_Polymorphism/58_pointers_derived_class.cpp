@@ -3,6 +3,7 @@
 
 #include<iostream>
 using namespace std;
+
 class BaseClass{
     public:
         int var_base;
@@ -19,10 +20,11 @@ class DerivedClass : public BaseClass{
                 cout<<"Dispalying Derived class variable var_derived "<<var_derived<<endl;
             }
 };
+
 int main(){
-    BaseClass * base_class_pointer;  // BaseClass pointer
-    BaseClass obj_base; //BaseClass object
-    DerivedClass obj_derived; // DerivedClass Object
+    BaseClass * base_class_pointer;         // BaseClass pointer
+    BaseClass obj_base;                     // BaseClass object
+    DerivedClass obj_derived;               // DerivedClass Object
     
     
     // Pointing base class pointer to derived class object

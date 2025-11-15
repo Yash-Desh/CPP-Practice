@@ -14,12 +14,15 @@ public:
     // Base class parameterized constructor
     Employee(int inpId)
     {
+        cout<<"Called the Base Class Parameterized Constructor\n";
         id = inpId;
         salary = 34.0;
     }
 
     // Base class default constructor is a must !!!
-    Employee() {}
+    Employee() {
+        cout<<"Called the Base Class Default Constructor\n";
+    }
 };
 
 // Derived Class syntax
@@ -56,13 +59,13 @@ int main()
 {
     Employee harry(1), rohan(2);
     
-    cout << harry.salary << endl;
-    cout << rohan.salary << endl;
+    cout << harry.salary << endl;               // 34
+    cout << rohan.salary << endl;               // 34
     
     Programmer skillF(10);
-    cout << skillF.languageCode<<endl;
-    cout << skillF.id<<endl;
-    skillF.getData();
+    cout << skillF.languageCode<<endl;          // 9
+    cout << skillF.id<<endl;                    // 10
+    skillF.getData();                           // 10
     
     return 0;
     

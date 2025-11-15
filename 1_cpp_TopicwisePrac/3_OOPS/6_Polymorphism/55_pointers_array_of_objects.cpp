@@ -19,6 +19,7 @@ class ShopItem
             cout<<"Price of this item is "<<price<<endl;
         }
 };
+
 int main(){
     int size = 3;
     ShopItem *ptr = new ShopItem [size];

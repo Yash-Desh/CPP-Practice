@@ -56,7 +56,7 @@ void Derived ::display()
 int main()
 {
     Derived der;
-    //der.setData();
+    //der.setData();            // This is a private method of the object, can only be accessed within the class.
     der.process();
     der.display();
 
