@@ -43,7 +43,7 @@ int main()
         cout<<"Hello World\n";
     };
     f1();
-    cout<<"Value of x after calling the lambda = "<<x1<<endl;
+    cout<<"Value of x after calling the lambda = "<<x1<<endl;           // 5
 
     
     // Pass by Value
@@ -55,7 +55,7 @@ int main()
         cout<<"Hello World\n";
     };
     f2();
-    cout<<"Value of x after calling the lambda = "<<x2<<endl;
+    cout<<"Value of x after calling the lambda = "<<x2<<endl;           // 8
 
     
     // Pass by Value with mutable
@@ -65,7 +65,7 @@ int main()
         cout<<"Hello World\n";
     };
     f3();
-    cout<<"Value of x after calling the lambda = "<<x3<<endl;
+    cout<<"Value of x after calling the lambda = "<<x3<<endl;           // 16
 
 
     return 0;

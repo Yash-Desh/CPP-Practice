@@ -10,7 +10,8 @@ using namespace std;
 // 6 + 12i 
 class Complex{
     int a, b;
-    // Below line means that non member - sumComplex funtion is allowed to do anything with my private parts (members)
+    // Below line means that non member - sumComplex funtion is allowed 
+    // to do anything with my private parts (members)
     friend Complex sumComplex(Complex o1, Complex o2);
     public:
         void setNumber(int n1, int n2){
@@ -66,7 +67,7 @@ int main(){
 
     3. Can be invoked without the help of any object
 
-    4. Usually contans the objects as arguments
+    4. Usually contains the objects as arguments
 
     5. Can be declared inside public or private section of the class
 

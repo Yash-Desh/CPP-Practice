@@ -121,3 +121,13 @@ int main() {
 
     return 0;
 }
+
+/*
+
+- Use std::move() to convert an existing object to a temporary.
+- So if you need an existing variable to become a temporary, i.e. the same as marking an existing object
+  such that its resources can/should be stolen. 
+- std::move thus allows us to do the "move" operation on an existing variable.
+
+
+*/
