@@ -63,7 +63,7 @@ int main() {
     printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia));   // 24 Bytes (64-bit addresses)
 
     struct test_struct_mod Nvidia_mod;
-    printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia_mod));   // 16 Bytes (64-bit addresses)
+    printf("Size of struct abc2 is %ld bytes\n", sizeof(Nvidia_mod));   // 24 Bytes (64-bit addresses)
     printf("%p\n", &Nvidia_mod.a);
     printf("%p\n", &Nvidia_mod.b);
     printf("%p\n", &Nvidia_mod.i);

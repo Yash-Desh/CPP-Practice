@@ -1,6 +1,6 @@
 // Author : Yash Deshpande
 // Date   : 10-09-2025
-// Tutor  : GFG
+// Tutor  : GFG (https://www.geeksforgeeks.org/cpp/implement-your-own-sizeof/)
 
 #include <stdio.h>
 

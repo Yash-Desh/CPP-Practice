@@ -78,7 +78,7 @@ int front(struct Queue* q) {
 }
 
 void printQueue(struct Queue* q) {
-    for(int i=0; i< q->rear; i++) {
+    for(int i=q->front; i< q->rear; i++) {
         printf("%d ", q->arr[i]);
     }
     printf("\n");
