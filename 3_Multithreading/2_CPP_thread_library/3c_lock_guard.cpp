@@ -8,8 +8,16 @@
 #include <mutex>
 using namespace std;
 
+// This file is the part-3 for the series on lock_guard
+// lock_guard follows the RAII (Resource Acquisition is Initialization) principle
+// It's destructor will call the unlock whenever it goes out of scope. 
+// So it protects you from deadlocks when you forget to unlock. 
+
 static int shared_value = 0;
 std::mutex gLock;
+
+// Both examples of shared_value_increment() are working & demonstrate the use of lock_guard
+// Use either to study its behaviour. 
 
 // void shared_value_increment() {
 //     // Critical Section

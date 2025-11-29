@@ -8,6 +8,9 @@
 #include <atomic>
 using namespace std;
 
+// With std::atomic variables you have to careful with what operators you use,
+// as some cases can trigger race condition.  
+
 static std::atomic<int> shared_value = 0;
 
 void shared_value_increment() {

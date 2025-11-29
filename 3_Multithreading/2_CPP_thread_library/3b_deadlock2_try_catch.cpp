@@ -8,8 +8,16 @@
 #include <mutex>
 using namespace std;
 
-// The concept to take is call the unlock inside & outside the catch block
-// in case the exception occurs or not.
+// This is the part-2 on lock_guard, 
+// We know that a deadlock will occur if we forget to unlock.
+// This is real situation, where such a case could occur.
+// We grab a lock but an exception occurs, & you don't unlock in the
+// exception handling code.
+
+// DEADLOCK: uncomment the unlock in the catch block to solve the deadlock.
+
+// We should call the unlock inside & outside the catch block in case 
+// whether the exception occurs or not.
 
 static int shared_value = 0;
 std::mutex gLock;
@@ -26,7 +34,7 @@ void shared_value_increment() {
     catch(...)
     {
         cout<<"handle exception";
-        gLock.unlock();                 // unlock if exception occurs
+        // gLock.unlock();                 // DEADLOCK!! unlock if exception occurs
         return;
     }
     gLock.unlock();                     // unlock if exception doesn't occur

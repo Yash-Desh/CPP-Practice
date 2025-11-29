@@ -24,7 +24,7 @@ void DoWork()
 int main()
 {
     cout << "Started thread id = " << this_thread::get_id() << endl;
-    thread worker(DoWork);
+    std::thread worker(DoWork);
 
     // Press "Enter" to stop the worker thread.
     cin.get();

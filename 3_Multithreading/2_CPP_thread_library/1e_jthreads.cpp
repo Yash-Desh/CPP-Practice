@@ -23,3 +23,16 @@ int main() {
     return 0;
 }
 
+/*
+
+- Compile with C++20
+- Uses the concept of RAII (Resource Acquisition is Initialization)
+- Checkup the destructor on cppreference.com
+- During the destruction of a jthread, it will be joined with the parent. 
+- A jthread will join right at the end of the scope in which it is running.
+- Basically it means, you don't have to call the join if you wished to do
+  it in the standard way, i.e. in the parent thread.  
+
+
+*/
+

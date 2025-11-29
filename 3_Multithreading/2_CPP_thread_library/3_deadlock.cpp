@@ -8,6 +8,9 @@
 #include <mutex>
 using namespace std;
 
+// This code demonstrates that a deadlock will occur if we forget to unlock.
+// This file is the part-1 on lock_guard i.e. to introduce you to the problem.
+
 static int shared_value = 0;
 
 // Declare a global mutex

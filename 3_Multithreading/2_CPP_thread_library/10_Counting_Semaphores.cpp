@@ -2,28 +2,26 @@
 // Date   : 07-09-2025
 // Tutor  : GFG
 
-// Compilation Instruction 
-// -> g++ -std=c++20  6_Binary_Semaphore.cpp
-
-// C++ program to illustrate the binary semaphores
+// C++ Program to illustrate the use of counting_semaphore
 #include <iostream>
 #include <semaphore>
 #include <thread>
 using namespace std;
 
-// Initialize with a count of 1 (binary)
-binary_semaphore semaphore(1);
+// Initialize semaphore with a count of 3
+std::counting_semaphore<10> semaphore(3);
 
 void worker(int id)
 {
-    // aquire semaphore
+    // aquiring
     semaphore.acquire();
+
+    // doing some work
     cout << "Thread " << id << " acquired the semaphore."
          << endl;
 
-    // Do some work
+    // releasing
     semaphore.release();
-    // release
     cout << "Thread " << id << " released the semaphore."
          << endl;
 }
@@ -33,7 +31,9 @@ int main()
 {
     thread t1(worker, 1);
     thread t2(worker, 2);
+    thread t3(worker, 3);
     t1.join();
     t2.join();
+    t3.join();
     return 0;
 }
