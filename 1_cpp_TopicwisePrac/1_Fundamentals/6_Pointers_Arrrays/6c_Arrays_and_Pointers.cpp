@@ -24,10 +24,10 @@ int main()
 
     // int *r = &marks[0];  // initializies r to the first memory location of the array marks 
 
-    // cout<<"The address of the 1st memory location of the array is "<<marks<<endl;
-    // cout<<"The address of the 1st memory location of the array is "<<p<<endl;
-    // cout<<"The address of the 1st memory location of the array is "<<&marks[0]<<endl;
-    // cout<<"The address of the 1st memory location of the array is "<<&marks<<endl;
+    // cout<<"The address of the 1st memory location of the array is "<<marks<<endl;           // 0x7fffe7c5d1d0
+    // cout<<"The address of the 1st memory location of the array is "<<p<<endl;               // 0x7fffe7c5d1d0
+    // cout<<"The address of the 1st memory location of the array is "<<&marks[0]<<endl;       // 0x7fffe7c5d1d0
+    // cout<<"The address of the 1st memory location of the array is "<<&marks<<endl;          // 0x7fffe7c5d1d0
 
     // // Accessing array elements using pointer
     // for(int i = 0; i<4; i++)
@@ -135,16 +135,16 @@ int main()
 
     // the '\0' is inserted automatically
     char ch[6] = "abcde";
-    cout<<ch<<endl;
+    cout<<ch<<endl;                         // abcde
 
     char *c = &ch[0];
     // prints the entire char array
-    cout<<c<<endl<<endl;
+    cout<<c<<endl<<endl;                    // abcde
 
     char ch2 = 'a';
     char *ptr = &ch2;
-    cout<<*ptr<<endl;    // o/p = a
-    cout<<ptr<<endl;     // Prints some garbage value
+    cout<<*ptr<<endl;                       // a
+    cout<<ptr<<endl;                        // Prints some garbage value
     // This is because of how char
     // pointers are implemented 
     // To print all characters till

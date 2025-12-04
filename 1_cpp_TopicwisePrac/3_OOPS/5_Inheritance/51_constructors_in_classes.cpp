@@ -111,4 +111,8 @@ int main(){
     As in the example program above the “Base2” class is being inherited first and then “Base1” class is being inherited, 
     so the constructor of “Base2” class will be executed first.
 
+13. Order of calling destructors is the exact opposite to constructors, from derived to base.
+
+14. Also note when to use virtual destructor in cases of inheritance.
+
 */

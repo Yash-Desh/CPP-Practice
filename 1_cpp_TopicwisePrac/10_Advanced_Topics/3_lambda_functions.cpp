@@ -1,6 +1,12 @@
 // Author : Yash Deshpande
 // Date   : 28-09-2025
-// Tutor  : The Cherno
+// Tutor  : The Cherno (https://youtu.be/mWgmBBz0y8c?si=PEhgCHKh66nRVXnS)
+
+/*
+Function Pointers are pre-requisite to learn about lambda functions.
+This file is a continuation to the 2 files about function pointers.
+Function pointers can be replaced with lambda functions. 
+*/
 
 #include <iostream>
 #include <vector>
@@ -18,6 +24,10 @@ int main() {
     vector<int> values = {1, 5, 4, 3, 2};
 
     int a = 5;
+
+
+    // Example from the functions pointers part-2
+    forEach(values, [](int value){ cout << "value = " << value << endl; });
 
     // Declaring a lambda function -> using outside variable
 

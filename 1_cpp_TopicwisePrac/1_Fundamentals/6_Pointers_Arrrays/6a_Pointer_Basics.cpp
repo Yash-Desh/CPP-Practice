@@ -67,12 +67,12 @@ int main()
 
    // // Value Access Using pointers
 
-   // int a = 15;
-   // int b = a;
+   int a = 15;
+   int b = a;
 
-   // cout << "a before " << a << endl;
-   // b++;
-   // cout << "a after " << a << endl;
+   cout << "a before " << a << endl;            // 15
+   b++;
+   cout << "a after " << a << endl;             // 15
 
    // int *p = &a;
    // cout << "before " << *p << endl;
@@ -90,17 +90,17 @@ int main()
 
    // Pointer arithmetic
 
-   int var = 100;
-   int *p = &var;
+   // int var = 100;
+   // int *p = &var;
 
    // cout << "before " << *p << endl;
    // *p = *p + 1;
    // cout << "after " << (*p) << endl;
 
-   cout << "before " << p << endl;
-   p = p + 1;
-   // Now p does NOT point to the address of the variable 'var'
-   cout << "after " << p << endl;
+   // cout << "before " << p << endl;
+   // p = p + 1;
+   // // Now p does NOT point to the address of the variable 'var'
+   // cout << "after " << p << endl;
 
    // // Accessing Heap memory using a pointer
    // int *p;
@@ -109,6 +109,7 @@ int main()
    // p = new int[5];  // Array created in heap memory using dynamic allocation
 
    // // Method -2 : Using malloc()
+   int* ptr = (int*)malloc(sizeof(int)*5);
 
    return 0;
 }

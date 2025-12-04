@@ -1,6 +1,6 @@
 // Author : Yash Deshpande
 // Date   : 20-09-2025
-// Tutor  : GFG
+// Tutor  : GFG (https://www.geeksforgeeks.org/cpp/move-constructors-in-c-with-examples/)
 
 #include <iostream>
 using namespace std;

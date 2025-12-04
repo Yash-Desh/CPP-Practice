@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>         // for INT_MAX
 
 int* getAddress() {
     int local_var = 105;
@@ -33,6 +34,14 @@ int main() {
     // free(ptr);
 
 
+    // modifying a string literal   -> Segmentation fault (core dumped)
+    // char my_str[50] = "Max Verstappen is a 5-time World Champion";
+    // char* my_str = "Max Verstappen is a 5-time World Champion";
+    // my_str[20] = '4';
+    // printf("%s\n", my_str);
+
+
+
     // Dangling Pointer -> Segmentation fault (core dumped)
     // int* ptr = getAddress();
     // printf("Value of local variable = %d\n", *ptr);
@@ -47,10 +56,10 @@ int main() {
     // *ptr = 65;
     // printf("*ptr = %d\n", *ptr);
 
-    // Wild Pointer
-    int* ptr;
-    *ptr = 26;
-    printf("*ptr = %d\n", *ptr);
+    // Wild Pointer: No issues
+    // int* ptr;
+    // *ptr = 26;
+    // printf("*ptr = %d\n", *ptr);
 
 
     // Buffer Overflow
@@ -62,6 +71,20 @@ int main() {
     // int *arr1 = (int*)malloc(sizeof(int)*10);
     // arr1[50] = 45;
     // printf("%d\n", arr1[50]);
+
+
+    // Integer Overflow: No issues
+    // int stress = INT_MAX;
+    // stress++;
+    // printf("stress = %d\n", stress);
+
+
+    // Memory Leak  -> No issues
+    // int* ptr = (int*)malloc(10* sizeof(int));
+
+    // printing a null pointer
+    int* ptr = NULL;
+    printf("%p\n", ptr);
 
 
     return 0;

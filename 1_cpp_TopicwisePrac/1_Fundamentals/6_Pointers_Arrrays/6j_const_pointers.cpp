@@ -7,7 +7,7 @@
 // This code illustrates its use-case in pointers
 // To use as const pointer_variable
 // Other use-cases of the const word are present at 
-// const data_variable : C:\Users\Lenovo\Desktop\Vscode_Files\cpp_files\My_CPP_Practice\1_cpp_TopicwisePrac\1_Fundamentals\1_Variables_DataTypes\1f_constants.cpp
+// const data_variable : My_CPP_Practice\1_cpp_TopicwisePrac\1_Fundamentals\1_Variables_DataTypes\1f_constants.cpp
 // ###############################################
 
 

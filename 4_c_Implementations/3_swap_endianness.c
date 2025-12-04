@@ -1,3 +1,7 @@
+// Author: 
+// Date  : 29-11-2025
+// Tutor : GFG (https://www.geeksforgeeks.org/dsa/bit-manipulation-swap-endianness-of-a-number/)
+
 #include <stdio.h>
 
 // Function to swap a value from
