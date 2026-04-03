@@ -91,7 +91,7 @@ int main()
 
     // level order Traversal
     cout << "Printing level order traversal" << endl;
-    levelOrderTraversal(root);
+    levelOrderTraversal(root);                              // 1 3 5 7 11 17
 
     return 0;
 }
