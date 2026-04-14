@@ -34,6 +34,10 @@ public:
 
 // Create a binary tree
 // Recursive Function
+// There is no real need for providing the root as a parameter.
+// We can simply create new Node object within the function & 
+// then return that Node. 
+// Node* buildTree() {}
 Node *buildTree(Node *root)
 {
     // create node
