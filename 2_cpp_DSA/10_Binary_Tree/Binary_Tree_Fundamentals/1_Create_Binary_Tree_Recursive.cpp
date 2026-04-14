@@ -8,7 +8,7 @@
 using namespace std;
 
 /* Create a Binary Tree
-      2
+      1
     /   \
   3       5 
  / \     /
@@ -60,6 +60,9 @@ Node *buildTree(Node *root)
 // Level Order Traversal
 void levelOrderTraversal(Node *root)
 {
+    // Base Case
+    if(root == nullptr) { return; }
+
     queue<Node *> q;
 
     // push root node into queue
