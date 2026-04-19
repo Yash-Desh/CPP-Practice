@@ -8,6 +8,7 @@
 #include<unordered_map>
 #include<list>
 #include<queue>
+#include<vector>
 using namespace std;
 
 void createAdjList(int e, vector<vector<int>> &edges, unordered_map<int, list<int>> &adjList) {
@@ -26,10 +27,6 @@ void getIndegree(int v, unordered_map<int, list<int>> &adjList, vector<int> &inD
             inDegree[j]++;
         }
     }
-}
-
-void topoSort(int node, unordered_map<int, list<int>> &adjList) {
-    
 }
 
 vector<int> topologicalSort(vector<vector<int>> &edges, int v, int e)  {
@@ -66,7 +63,6 @@ vector<int> topologicalSort(vector<vector<int>> &edges, int v, int e)  {
             }
         }
     }
-    
     return ans;
 }
 
