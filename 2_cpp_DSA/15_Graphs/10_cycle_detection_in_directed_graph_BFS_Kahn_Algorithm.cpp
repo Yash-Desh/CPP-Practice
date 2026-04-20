@@ -6,7 +6,10 @@
 #include<iostream>
 #include<list>
 #include<queue>
-
+#include<vector>
+#include<utility>
+#include<unordered_map>
+using namespace std;
 
 void createAdjList(vector < pair < int, int >> & edges, unordered_map<int, list<int>>& adjList) {
   for(int i=0; i<edges.size(); i++) {
