@@ -24,17 +24,14 @@ void createAdjList(vector<vector<int>> &edges, unordered_map<int, list<int>> &ad
 }
 
 void dfs(int node, unordered_map<int, list<int>> &adjList, unordered_map<int, bool> &visited, vector<int> &temp) {
-    if(visited[node]) {
-        return;
-    }
-
     visited[node] = true;
     temp.push_back(node);
 
     for(auto neighbor : adjList[node]) {
-        dfs(neighbor, adjList, visited, temp);
+        if(!visited[neighbor]) {
+            dfs(neighbor, adjList, visited, temp);
+        }
     }
-
 }
 
 vector<vector<int>> depthFirstSearch(int V, int E, vector<vector<int>> &edges)
