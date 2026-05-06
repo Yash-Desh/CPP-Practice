@@ -8,8 +8,8 @@ using namespace std;
 
 // ############################
 // Recursion Approach
-// TC : 
-// SC : 
+// TC : O(2^N)  -> For the 2 function calls made for each level. 
+// SC : O(N)    -> For the recursion stack space
 // Time Limit Exceeded!
 // ############################
 int solve_recursion(int day, int prevActivity, vector<vector<int>> &points) {
@@ -101,10 +101,10 @@ int ninjaTraining_tabulation(int n, vector<vector<int>> &points)
     dp[0][2] = max(points[0][1], points[0][0]);
     dp[0][3] = max(points[0][1], max(points[0][2], points[0][0]));
 
-    for(int day=1; day<n; day++) {
-        for(int lastTask = 0; lastTask<4; lastTask++) {
+    for(int day = 1; day < n; day++) {
+        for(int lastTask = 0; lastTask < 4; lastTask++) {
             int maxPoints = INT_MIN;
-            for(int i=0; i<3; i++) {
+            for(int i = 0; i < 3; i++) {
                 if(i != lastTask) {
                     int currentPoints = points[day][i] + dp[day-1][i];
                     maxPoints = max(maxPoints, currentPoints);
