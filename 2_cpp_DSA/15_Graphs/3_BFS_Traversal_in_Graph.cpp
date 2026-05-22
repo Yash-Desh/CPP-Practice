@@ -6,6 +6,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// --------- COMPLEXITY ----------- // 
+// TC : O(N + E)
+// SC : O(N + E)
+// N = number of vertices
+// E = number of edges in the graph
+// -------------------------------- // 
+
 /*
 You are given an undirected & disconnected graph G(V,E) having V vertices 
 numbered from 0 to V-1 & E edges. Your task is to print its BFS Traversal
@@ -79,3 +86,24 @@ int main()
 {
 
 }
+
+
+/*
+
+---------------------- COMPLEXITY EXPLAINED ---------------------- 
+
+Striver's Explanation: https://youtu.be/-tgVpUgsQ5k?si=I6ds4qnalkGwopmv
+
+TC = O(N + E)
+1. Each node gets pushed into the queue once. hence the queue iterates through N   elements. 
+2. For each node, the inner for-loop will run on all its neighbors i.e. it runs on all its degrees(degree = no. of neighbor nodes)
+Total degrees in a graph = 2*E (proved by striver in graph series video-1)
+thus TC = O(N) + O(2*E)
+
+
+SC = O(N + E)
+Space required for queue (N elements), visited array (N elements), Array storing BFS order (N), adjacency list(N+E)
+i.e. N + N + N + N + E = 4*N + E
+
+*/ 
+
