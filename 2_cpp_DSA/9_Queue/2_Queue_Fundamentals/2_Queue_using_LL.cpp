@@ -2,6 +2,14 @@
 // Date : 06-02-2025
 // Tutor : GeeksforGeeks
 
+// --------------------------------------------------------------- //
+// WARNING!!!! 
+// THIS DESIGN IS NOT THREAD-SAFE. 
+// DO NOT PRACTICE.
+// Read the next 2b_queue_using_LL_thread_safe.cpp
+// --------------------------------------------------------------- //
+
+
 #include <iostream>
 #include <bits/stdc++.h>
 using namespace std;

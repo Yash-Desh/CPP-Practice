@@ -25,6 +25,10 @@ public:
         rear = 0;
     }
 
+    ~Queue() {
+        delete[] arr;
+    }
+
     /*----------------- Public Functions of Queue -----------------*/
 
     bool isEmpty() {

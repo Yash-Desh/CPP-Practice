@@ -2,6 +2,12 @@
 // Date : 10-02-2023
 // Tutor : Love Babbar
 
+// ------------------------------------------------------------------------ //
+// WARNING!!!
+// THIS CODE HAS SPECIAL CASESE DUE TO INIT VALUES OF front = rear = -1
+// DO NOT FOLLOW THIS METHOD
+// ------------------------------------------------------------------------ //
+
 
 // ########### Follow Queue code by Abdul Bari for better logic ###########
 
