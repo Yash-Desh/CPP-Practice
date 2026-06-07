@@ -15,36 +15,42 @@ public:
     // Using Parameterized constructor
     // Called whenever you create a new Node
 
+    // Method-1: 
     Node(int data)
     {
         this->data = data;
         this->next = NULL;
     }
 
+    // Method-2: Using Initializer List
+    // Node(int value) : data(value), next(nullptr) {}
+
     // Destructor
     // Called whenever you delete a Node
     // Or free memory
-    ~Node()
-    {
-        // store the data of the current node
-        int value = this->data;
+    // This is a recursive destructor that I personally don't like.
+    // Love Babbar showed it in his tutorial but don't use it in interviews.
+    // ~Node()
+    // {
+    //     // store the data of the current node
+    //     int value = this->data;
 
-        // if the current node is NOT the last node
-        if (this->next != NULL)
-        {
-            // Delete the next node
-            // This line will recursively run to delete all the nodes
-            // present in the LL after the current node
-            delete next;
+    //     // if the current node is NOT the last node
+    //     if (this->next != NULL)
+    //     {
+    //         // Delete the next node
+    //         // This line will recursively run to delete all the nodes
+    //         // present in the LL after the current node
+    //         delete next;
 
-            // After deleting the subsequent nodes, the next pointer 
-            // of the current node is set to NULL to prevent any 
-            // dangling pointers.
-            this->next = NULL;
-        }
-        // print the data of the current node
-        cout << "Memory is free for node with data " << value << endl;
-    }
+    //         // After deleting the subsequent nodes, the next pointer 
+    //         // of the current node is set to NULL to prevent any 
+    //         // dangling pointers.
+    //         this->next = NULL;
+    //     }
+    //     // print the data of the current node
+    //     cout << "Memory is free for node with data " << value << endl;
+    // }
 };
 
 // Insert at beginning

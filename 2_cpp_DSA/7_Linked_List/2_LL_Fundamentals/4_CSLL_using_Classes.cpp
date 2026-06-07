@@ -20,17 +20,18 @@ class Node
     }
 
 
-    // Destructor
-    ~Node()
-    {
-        int value = this->data;
-        if(this->next != NULL)
-        {
-            delete next;
-            next = NULL;
-        }
-        cout<<"Memory freed for the node with data "<<value<<endl;
-    }
+    // Destructor: As defined by Love Babbar, but this not necessary
+    // DO NOT IMPLEMENT.
+    // ~Node()
+    // {
+    //     int value = this->data;
+    //     if(this->next != NULL)
+    //     {
+    //         delete next;
+    //         next = NULL;
+    //     }
+    //     cout<<"Memory freed for the node with data "<<value<<endl;
+    // }
 };
 
 
