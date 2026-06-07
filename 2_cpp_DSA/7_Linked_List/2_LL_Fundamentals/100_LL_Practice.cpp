@@ -8,193 +8,146 @@ using namespace std;
 // Define insertAtHead(), insertAtTail(), insertAtPosition()
 // Define display(), deleteNode()
 
-
-class Node 
-{
-    public:
+class Node{
+public:
     int data;
-    Node *next;
-    Node *prev;
-
-    Node(int data)
-    {
+    Node* next;
+     
+    Node(int data) {
         this->data = data;
         this->next = nullptr;
-        this->prev = nullptr;
-    }
-
-    ~Node()
-    {
-        int value = this->data;
-        if(this->next != nullptr)
-        {
-            delete next;
-            this->next = nullptr;
-        }
-        cout<<value<<endl;
     }
 };
 
-void printForward(Node* head)
-{
-    Node *temp = head;
-    while(temp != NULL)
-    {
-        cout<<temp->data<<" ";
-        temp = temp->next;
-    }
-    cout<<endl;
-}
+void insertAtHead(Node* &head, Node* &tail, int val) {
+    Node* temp = new Node(val);
 
-void printBackward (Node *tail)
-{
-    Node *temp = tail;
-    while(temp != NULL)
-    {
-        cout<<temp->data<<" ";
-        temp = temp->prev;
-    }
-    cout<<endl;
-}
-
-
-// Length of a DLL
-int getLength (Node *head)
-{
-    int cnt = 0;
-    Node *temp = head;
-    while(temp != NULL)
-    {
-        cnt++;
-        temp = temp->next;
-    }
-    return cnt;
-}
-
-
-
-
-void insertAtHead (Node* &head, Node* &tail, int data)
-{
-    Node *temp = new Node (data);
-    if(head == nullptr)
-    {
+    if(head == nullptr) {
         head = temp;
         tail = temp;
     }
-    else
-    {
+    else {
         temp->next = head;
-        head->prev = temp;
         head = temp;
     }
 }
 
-void insertAtTail (Node* &head, Node* &tail, int data)
-{
-    Node* temp = new Node (data);
-    if(tail == nullptr)
-    {
+void insertAtTail(Node* &head, Node* &tail, int val) {
+    Node* temp = new Node(val);
+
+    if(tail == nullptr) {
         head = temp;
         tail = temp;
     }
-    else
-    {
+    else {
         tail->next = temp;
-        temp->prev = tail;
         tail = temp;
     }
 }
 
-void insertAtPosition (Node* &head, Node* &tail, int position, int data)
-{
-    if(position == 0)
-    {
-        insertAtHead(head, tail, data);
-        return;
+void display(Node* head) {
+    if(head == nullptr) {
+        cout << "List is empty\n"; 
+        return; 
     }
-
-    Node* ptr = head;
-    for(int i=0; i<position-1; i++)
-    {
-        ptr = ptr->next;
+    while(head) {
+        cout << head->data << " ";
+        head = head->next;
     }
-    if(ptr->next == nullptr)
-    {
-        insertAtTail(head, tail, data);
-        return;
-    }
-    Node *temp = new Node(data);
-    temp->next = ptr->next;
-    temp->prev = ptr;
-    ptr->next->prev = temp;
-    ptr->next = temp;
-
+    cout << endl;
 }
 
-void deleteNode(Node* &head, Node* &tail, int position)
-{
-    if(position == 0)
-    {
-        Node *temp = head;
+void insertAtPosition(Node* &head, Node* &tail, int val, int pos) {
+    // Checks for valid index 
+
+
+    if(pos == 0) {
+        insertAtHead(head, tail, val);
+    }
+    else {
+        Node* ptr = head;
+        for(int i = 0; i < pos-1; i++) {
+            ptr = ptr->next;
+        }
+        if(ptr == tail) {
+            insertAtTail(head, tail, val);
+        }
+        else {
+            Node* temp = new Node(val);
+            temp->next = ptr->next;
+            ptr->next = temp;
+        }
+    }
+}
+
+void deleteNode(Node* &head, Node* &tail, int index) {
+    // Checks for a valid index 
+
+    if(head == nullptr) {
+        cout << "Linked List is empty" << endl;
+        return;
+    }
+
+    if(index == 0) {
+        Node* temp = head; 
+        if(head == tail) {
+            tail = tail->next; 
+        }
         head = head->next;
-        temp->next = nullptr;
-        head->prev = nullptr;
         delete temp;
+        temp = nullptr;
     }
-
-    Node *current = head;
-    Node *previous = nullptr;
-    for(int i=0; i<position; i++)
-    {
-        previous = current;
-        current = current->next;
+    else {
+        Node* prev = nullptr;
+        Node* curr = head;
+        for(int i = 0; i < index; i++) {
+            prev = curr; 
+            curr = curr->next;
+        }
+        if(curr->next == nullptr) {
+            tail = prev;
+        }
+        prev->next = curr->next;
+        curr->next = nullptr;
+        delete curr;
+        curr = nullptr;
     }
-    if(current->next == nullptr)
-        tail = previous;
-    else
-        current->next->prev = previous;
-
-    previous->next = current->next;
-    current->next = nullptr;
-    current->prev = nullptr;
-    delete current;
 }
 
 
 int main()
 {
-    // // ############### TEST for SLL ###############
-    // // Create a new Node
-    // Node *node1 = new Node(150);
+    // ############### TEST for SLL ###############
+    // Create a new Node
+    Node *node1 = new Node(150);
 
-    // // Make it head node
-    // Node *head = node1;
-    // Node *tail = node1;
-    // display(head);
+    // Make it head node
+    Node *head = node1;
+    Node *tail = node1;
+    display(head);
 
-    // // Insertion at beginning
-    // insertAtHead(head, tail, 25);
-    // display(head);
+    // Insertion at beginning
+    insertAtHead(head, tail, 25);
+    display(head);
 
-    // insertAtHead(head, tail, 67);
-    // display(head);
+    insertAtHead(head, tail, 67);
+    display(head);
 
-    // // Insert at end
-    // insertAtTail(head, tail, 63);
-    // display(head);
+    // Insert at end
+    insertAtTail(head, tail, 63);
+    display(head);
 
-    // insertAtTail(head, tail, 77);
-    // display(head);
+    insertAtTail(head, tail, 77);
+    display(head);
 
-    // insertAtTail(head, tail, 71);
-    // display(head);
+    insertAtTail(head, tail, 71);
+    display(head);
 
-    // insertAtTail(head, tail, 82);
-    // display(head);
+    insertAtTail(head, tail, 82);
+    display(head);
 
-    // insertAtPosition(head, tail, 55, 5);
-    // display(head);
+    insertAtPosition(head, tail, 55, 5);
+    display(head);
 
     // deleteNode(head, tail, 4);
     // display(head);
@@ -214,41 +167,41 @@ int main()
     // */
 
     // ############### TEST for DLL ###############
-    Node *node1 = new Node(10);
-    Node *head = node1;
-    Node *tail = node1;
-    printForward(head);
-    cout<<getLength(head)<<endl;
+    // Node *node1 = new Node(10);
+    // Node *head = node1;
+    // Node *tail = node1;
+    // printForward(head);
+    // cout<<getLength(head)<<endl;
 
-    insertAtHead(head, tail, 55);
-    insertAtHead(head, tail, 12);
-    insertAtHead(head, tail, 78);
-    printForward(head);
-
-
-    insertAtTail(head, tail, 25);
-    printForward(head);
-
-    insertAtPosition(head,tail,0,79);
-    printForward(head);
-
-    insertAtPosition(head,tail,4,85);
-    printForward(head);
-
-    insertAtPosition(head,tail,7,37);
-    printForward(head);
-    cout<<"tail : "<<tail->data<<endl;
+    // insertAtHead(head, tail, 55);
+    // insertAtHead(head, tail, 12);
+    // insertAtHead(head, tail, 78);
+    // printForward(head);
 
 
-    deleteNode(head, tail, 7);
-    printForward(head);
-    cout<<"tail : "<<tail->data<<endl;
-    printBackward(tail);
+    // insertAtTail(head, tail, 25);
+    // printForward(head);
 
-    deleteNode(head, tail, 2);
-    printForward(head);
-    cout<<"tail : "<<tail->data<<endl;
-    printBackward(tail);
+    // insertAtPosition(head,tail,0,79);
+    // printForward(head);
+
+    // insertAtPosition(head,tail,4,85);
+    // printForward(head);
+
+    // insertAtPosition(head,tail,7,37);
+    // printForward(head);
+    // cout<<"tail : "<<tail->data<<endl;
+
+
+    // deleteNode(head, tail, 7);
+    // printForward(head);
+    // cout<<"tail : "<<tail->data<<endl;
+    // printBackward(tail);
+
+    // deleteNode(head, tail, 2);
+    // printForward(head);
+    // cout<<"tail : "<<tail->data<<endl;
+    // printBackward(tail);
 
     /*
     10 
