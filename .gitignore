@@ -1,2 +1,7 @@
 *.out
 *.exe
+.vscode/
+.claude/
+2_cpp_DSA/15_Graphs/15_minimum_spanning_tree_prims_algorithm_1_Notes.md
+2_cpp_DSA/16_Dynamic_Programming/8_Ninja_Training_Notes.md
+2_cpp_DSA/16_Dynamic_Programming/9_Unique_Paths_Notes.md
