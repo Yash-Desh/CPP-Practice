@@ -61,3 +61,65 @@ int main()
 
 */
 
+/*
+################################################################################################################
+INITIALIZER LIST vs. NORMAL (BODY ASSIGNMENT) - SUMMARY NOTES
+Model : Claude Opus 4.8
+Date  : 02-07-2026
+(All points below were verified by compiling & running example code with g++ 13.3.0)
+################################################################################################################
+
+The two styles:
+
+    // Style 1 - assignment inside the body (the "normal" way)
+    Test(int i, int j) {
+        a = i;      // assignment
+        b = j;
+    }
+
+    // Style 2 - initializer list (the part between ':' and '{')
+    Test(int i, int j) : a(i), b(j) {
+        // body can be empty
+    }
+
+----------------------------------------------------------------------------------------------------------------
+KEY IDEA: Members are ALWAYS built BEFORE the constructor body's first line runs.
+The only question is HOW they get built:
+    - Initializer list  -> the member is built DIRECTLY with your value          (ONE step)
+    - Body assignment   -> the member is first built with a DEFAULT value,
+                           then OVERWRITTEN by the assignment                     (TWO steps)
+
+So body assignment can do wasted work. For int/pointers this waste is negligible,
+but for heavy members (std::string, std::vector, other classes) the list is faster.
+
+----------------------------------------------------------------------------------------------------------------
+WHEN THE INITIALIZER LIST IS REQUIRED (body assignment simply won't compile):
+    1. const members        -> can never be changed, so assignment is illegal.
+    2. reference members    -> a reference must be bound when created; can't be reseated later.
+    3. members with NO default constructor -> can't be default-built first.
+
+----------------------------------------------------------------------------------------------------------------
+GOTCHA - INITIALIZATION ORDER (demonstrated above with a(i+b)):
+    Members are initialized in the order they are DECLARED in the class,
+    NOT the order written in the initializer list.
+    => Always write the list in the same order the members are declared.
+
+----------------------------------------------------------------------------------------------------------------
+QUICK COMPARISON:
+
+    Aspect                          | Body assignment        | Initializer list
+    --------------------------------|------------------------|-------------------------
+    How members get values          | default-built, then    | built directly (1 step)
+                                    | overwritten (2 steps)  |
+    Efficiency for heavy members    | slower                 | faster
+    Works for const members         | No (compile error)     | Yes
+    Works for reference members     | No                     | Yes
+    Works w/o a default constructor | No                     | Yes
+    Order of execution              | order of statements    | order of DECLARATION
+
+----------------------------------------------------------------------------------------------------------------
+TAKEAWAY: Prefer the initializer list by default. It is the only style that works in
+ALL situations (const, references, no-default-ctor members) and is never slower.
+################################################################################################################
+*/
+
