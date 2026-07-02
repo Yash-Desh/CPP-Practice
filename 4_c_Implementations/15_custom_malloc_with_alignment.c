@@ -8,7 +8,7 @@
 // Note: This method is able to align only powers of 2
 // C11 introduced a portable method to do this -> void* aligned_alloc(size_t alignment, size_t size);
 
-void* aligned_malloc(size_t required_bytes, size_t alignment)
+void* aligned_malloc(size_t required_bytes, size_t alignment/*must be a power of 2*/)
 {
     void* p1; // original block
     void** p2; // aligned block

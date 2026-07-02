@@ -17,6 +17,8 @@ int main() {
     struct student tom;
     printf("sizof(tom) = %ld\n", sizeof(tom));                    // sizof(tom) = 108
 
+    printf("sizeof(struct student) = %ld\n", sizeof(struct student));   // sizeof(struct student) = 108
+
     // without using the sizeof() operator
     struct student *ptr = &tom;
     printf("sizof(tom) = %ld\n", (char*)(ptr+1)-(char*)ptr);      // sizof(tom) = 108
