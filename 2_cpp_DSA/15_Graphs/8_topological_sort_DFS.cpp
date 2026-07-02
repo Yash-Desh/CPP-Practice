@@ -3,6 +3,27 @@
 // Tutor : Love Babbar (https://youtu.be/T_boOrr0rvk?si=3zxHv7s7yxFVeBqF)
 // Link to Question: https://www.naukri.com/code360/problems/topological-sort_982938
 
+/* -------------------------------------------------------------------------
+ * NOTE: What is Topological Sort? (added by Claude Opus 4.8, 02-07-2026)
+ * -------------------------------------------------------------------------
+ * A topological sort is a LINEAR ORDERING of the vertices of a Directed
+ * Acyclic Graph (DAG) such that for every directed edge u -> v, vertex u
+ * appears BEFORE vertex v in the ordering.
+ *
+ * In plain English: it arranges things so that every dependency comes
+ * before the thing that depends on it (e.g. course prerequisites, build
+ * order, task scheduling).
+ *
+ * Key properties:
+ *   - Only defined for a DAG (Directed + Acyclic). A cycle => no valid order.
+ *   - The ordering is NOT unique; many valid orderings can exist.
+ *
+ * This file: DFS + Stack approach.
+ *   A node is pushed onto the stack ONLY after all of its descendants are
+ *   processed. Popping the stack then yields dependencies first.
+ *   Time: O(V + E), Space: O(V + E).
+ * ------------------------------------------------------------------------- */
+
 #include<iostream>
 #include<unordered_map>
 #include<vector>
