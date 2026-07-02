@@ -17,6 +17,15 @@
 // crazy results like "malloc refused after 131060 GB". But none of this memory
 // is physically available nor allocated. OS lied to you!
 
+
+// Why 131060 GB ? 
+// On x86‑64 Linux, a user process gets a 47‑bit virtual address space for its own mappings. That works out to:
+
+// 2^47 bytes = 128 TB = 128 × 1024 GB = 131072 GB
+
+// The 12 GB gap (131072 − 131060 = 12) is just the address space already taken up by 
+// everything else in the process before your loop even starts:
+
 #include <stdio.h>
 #include <stdlib.h>
 
