@@ -29,6 +29,27 @@ int main()
     // cout<<"The address of the 1st memory location of the array is "<<&marks[0]<<endl;       // 0x7fffe7c5d1d0
     // cout<<"The address of the 1st memory location of the array is "<<&marks<<endl;          // 0x7fffe7c5d1d0
 
+    // ----------------------------------------------------------------------
+    // NOTE added by Claude Opus 4.8 on Jun 23, 2026
+    // WARNING: `marks` and `&marks` print the SAME address but are NOT the same.
+    //   They differ in TYPE, which changes pointer arithmetic:
+    //     - marks      -> type int*       (decays to pointer to first element)
+    //     - &marks[0]  -> type int*       (pointer to first element)
+    //     - &marks     -> type int(*)[4]  (pointer to the WHOLE array of 4 ints)
+    //
+    //   Same byte address, but the type controls how far "+1" moves:
+    //
+    //   int marks[4] = {18,16,20,15};
+    //   cout << marks      << endl;  // 0x...d1d0
+    //   cout << marks + 1  << endl;  // 0x...d1d4   moves 4 bytes  (1 int)
+    //   cout << &marks     << endl;  // 0x...d1d0
+    //   cout << &marks + 1 << endl;  // 0x...d1e0   moves 16 bytes (whole int[4])
+    //
+    //   Also: sizeof(marks) == 16 (whole array) but sizeof(&marks) == 8 (a pointer).
+    //   This is because of array-to-pointer "decay"; &marks and sizeof(marks)
+    //   are exceptions where the array name does NOT decay to a pointer.
+    // ----------------------------------------------------------------------
+
     // // Accessing array elements using pointer
     // for(int i = 0; i<4; i++)
     // {

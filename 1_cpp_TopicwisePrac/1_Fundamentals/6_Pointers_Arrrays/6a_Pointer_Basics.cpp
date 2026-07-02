@@ -138,8 +138,13 @@ int main()
 
 8. Pointer variables are also stored in the stack memory.
 
-9. Size of a pointer variable is equal to the size of int datatype in the compiler.
-   for e.g. -> integer pointer variable may take 2 bytes or 4 bytes
+9. The size of a pointer variable depends on the system architecture (memory model),
+   NOT on the data type it points to or the size of int.
+     - 32-bit system -> pointer = 4 bytes
+     - 64-bit system -> pointer = 8 bytes
+   All pointer types (int*, char*, double*, ...) have the same size on a given platform,
+   since a pointer only stores a memory address.
+   for e.g. -> on a 64-bit Linux system, sizeof(int) == 4 but sizeof(int*) == 8
 
 
 10. A pointer can be initialized with NULL, zero, Address of an object of the same type.

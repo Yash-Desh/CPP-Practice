@@ -96,6 +96,22 @@ int main()
     
     // Variable sized array : Creating array of size defined by the user
 
+    // ----------------------------------------------------------------------
+    // NOTE added by Claude Opus 4.8 on Jun 23, 2026
+    // WARNING: The code below is NOT valid standard C++.
+    //   `int var_arr[arr_size];` is a Variable Length Array (VLA), where the
+    //   size is known only at runtime. The C++ standard requires array sizes
+    //   to be compile-time constants, so VLAs are not part of standard C++.
+    //
+    //   Why it might still compile:
+    //   GCC and Clang support VLAs as a non-standard compiler extension, so
+    //   g++/clang++ will usually compile this without error. It will FAIL on
+    //   standard-conforming compilers (e.g. MSVC) and when compiled with
+    //   `-std=c++17 -pedantic-errors` (error: ISO C++ forbids variable length array).
+    //
+    //   Prefer std::vector<int> var_arr(arr_size);  (or new int[arr_size]).
+    // ----------------------------------------------------------------------
+
     // int arr_size ;
     // cout<<"Enter the size of the array :";
     // cin>>arr_size;
