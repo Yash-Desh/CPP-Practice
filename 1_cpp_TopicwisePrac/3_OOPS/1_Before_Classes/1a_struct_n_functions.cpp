@@ -28,6 +28,10 @@ void changeLength (struct Rectangle *ptr2, int len)  // Changes the length of th
 int main()
 {
     struct Rectangle r;
+    // Note (added 08-07-2026, Claude Opus 4.8): 'r' is a local (automatic) variable with no
+    // constructor, so its members 'length' and 'breadth' are NOT default-initialized here.
+    // They hold indeterminate (garbage) values until initialize() assigns them below.
+    // (Use 'struct Rectangle r{};' to zero-initialize, or 'struct Rectangle r{15, 10}' to set explicit values.)
     initialize(&r, 15,10);
     area(r);
     changeLength(&r, 20);
@@ -44,6 +48,20 @@ int main()
 
 2. passed by value where values inside the struct are not modified and passed by address when values inside the 
    struct are to be modified by the function.  
+
+3. Initialization of 'struct Rectangle r' (members 'length' & 'breadth'):
+
+   Declaration                    | length  | breadth
+   -------------------------------|---------|---------
+   struct Rectangle r;            | garbage | garbage
+   struct Rectangle r{};          | 0       | 0
+   struct Rectangle r{15, 10};    | 15      | 10
+
+   - A local (automatic) variable like 'struct Rectangle r;' is NOT default-initialized, so its
+     members hold indeterminate (garbage) values until assigned.
+   - However, if 'r' were declared as a GLOBAL variable instead, both members would be automatically
+     zero-initialized (length = 0, breadth = 0). This is because objects with static storage duration
+     are zero-initialized by default, unlike automatic (stack) variables.
 
 
 */
