@@ -5,7 +5,10 @@
 #include<cmath>
 using namespace std;
 
-class Point{
+// Exercise: Create a function (Hint: Make it a friend function) which takes 2 point objects and computes the distance between 
+// those 2 points
+
+class Point {
     int x, y;
     public:
         friend double distance(Point o1, Point o2);
@@ -15,16 +18,15 @@ class Point{
         }
 
         void displayPoint(){
-            cout<<"The point is ("<<x<<", "<<y<<")"<<endl;
+            cout << "The point is (" << x << ", " << y << ")" << endl;
         }
 
 };
+
 double square (double n)
 {
     return n*n;
 }
-// Create a function (Hint: Make it a friend function) which takes 2 point objects and computes the distance between 
-// those 2 points
 
 double distance(Point o1,Point o2)
 {

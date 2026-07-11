@@ -59,11 +59,11 @@ int main()
 
     cout << "\nAfter move:\n";
     cout << "obj1: ";
-    // Should show "No data"
-    obj1.display();
+    obj1.display();                     // Should show "No data"
+    
+    // ------------------------------------------------------------- //
     cout << "obj2: ";
-    // Should show "Value: 42"
-    obj2.display();
+    obj2.display();                     // Should show "Value: 42"
 
     return 0;
 }
