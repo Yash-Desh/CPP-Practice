@@ -4,6 +4,18 @@
 #include <iostream>
 using namespace std;
 
+/*
+ * Disclaimer: Summary generated on Jul 10, 2026 by the Claude Opus 4.8
+ * model. Verify against a compiler/standard before relying on it.
+ *
+ * Why "class Complex;" is needed: the classes are circularly dependent.
+ * Calculator uses Complex as a parameter type (only needs the name, so an
+ * incomplete type is enough), while Complex befriends Calculator's member
+ * functions (needs Calculator's COMPLETE definition). So the order must be:
+ * forward-declare Complex -> define Calculator -> define Complex. Without
+ * the forward declaration, Complex is an unknown type in Calculator's
+ * methods and the compiler errors: "'Complex' does not name a type".
+ */
 class Complex;
 
 class Calculator

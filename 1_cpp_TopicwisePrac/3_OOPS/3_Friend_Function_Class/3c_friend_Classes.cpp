@@ -83,4 +83,17 @@ int main()
 2. The main thing to note here is that if the class is made friend of another class then it can access all 
    the private members of that class. 
 
+Disclaimer: Point 3 (and its sub-points) summarized on Jul 10, 2026 by the Claude Opus 4.8 model.
+Verify against a compiler/standard before relying on it.
+
+3. Friendship only grants PERMISSION to access private members - it does not hand you an object to act on.
+   To read/write a NON-STATIC private member you still need an actual object of that class.
+
+   a. Passing that object as a parameter (like sumRealComplex(Complex, Complex) above) is the most common way,
+      but not the only one. The object can also be created locally inside the friend, be a global object, or be
+      reached via a reference/pointer (e.g. a Complex& / Complex* stored as a data member of a friend class).
+
+   b. STATIC private members are the exception: they belong to the class, not to any instance, so a friend can
+      access them directly via ClassName::member with no object at all.
+
 */
