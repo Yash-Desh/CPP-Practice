@@ -51,6 +51,7 @@ class Hero
     // IF no copy constructor is definded
     // hence the compiler will supply its 
     // default copy constructor
+    // Shallow copy only affects dynamically allocated data members.
     
 
     // ###################################################################################
@@ -96,10 +97,10 @@ int main()
 
 
     // Modifications made to h2
-    cout<<endl<<"After modifying h2"<<endl;
-    h2.setHealth(175);
-    h2.name[0] = 'G';
-    h2.level = 'Y';
+    cout<<endl<<"After modifying h2"<<endl;     // Outcome of default copy constructor 
+    h2.setHealth(175);                          // Modified only in h2
+    h2.name[0] = 'G';                           // Modified in BOTH h1 & h2 if default copy constructor.
+    h2.level = 'Y';                             // Modified only in h2
     cout<<"Printing h2"<<endl;
     h2.print();
 
