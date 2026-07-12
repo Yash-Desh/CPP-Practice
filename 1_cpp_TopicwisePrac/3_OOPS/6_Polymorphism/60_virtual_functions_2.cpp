@@ -1,5 +1,6 @@
 // Author : Yash Deshpande 
 // Date : 26-02-2022
+// Tutor: Code With Harry, Claude Opus 4.8 
 
 #include <iostream>
 using namespace std;
@@ -16,7 +17,9 @@ class CWH     // CWH ==> Code With Harry
             rating = r;
         }
         
-        virtual void display(){}
+        virtual void display(){
+            cout<<"Base Class display called for: "<<title<<endl;
+        }
 };
 
 class CWHVideo: public CWH      // // CWHVideo ==> Code With Harry Video tutorial
@@ -47,6 +50,18 @@ class CWHText: public CWH     // CWHText ==> Code With Harry Text tutorial
          }
 };
 
+class CWHAudio: public CWH     // CWHAudio ==> Code With Harry Audio tutorial
+{
+    float audioLength;
+    public:
+        CWHAudio(string s, float r, float al): CWH(s, r){
+            audioLength = al;   // al ==> Audio length
+        }
+        // Note: display() is intentionally NOT overridden here.
+        // Calling display() through a CWH* pointer will run the base class
+        // CWH::display(), so its fallback message is printed.
+};
+
 int main()
 {
     string title;
@@ -65,12 +80,35 @@ int main()
     rating = 4.19;
     CWHText djText(title, rating, words);    // djtext ==> django Text
 
-    CWH* tuts[2];
+    // for Code With Harry Audio (display() is NOT overridden in CWHAudio)
+    title = "Django tutorial Audio";
+    float alen = 3.21;
+    rating = 4.05;
+    CWHAudio djAudio(title, rating, alen);   // djaudio ==> django Audio
+
+    CWH* tuts[3];
     tuts[0] = &djVideo;
     tuts[1] = &djText;
+    tuts[2] = &djAudio;
 
     tuts[0]->display();
     tuts[1]->display();
+    tuts[2]->display();   // runs base CWH::display() -> prints fallback message
+
+    // ---------------------------------------------------------------- //
+    // $ ./a.out 
+    // This is an amazing video with title Django tutorial
+    // Ratings: 4.89 out of 5 stars
+    // Length of this video is: 4.56 minutes
+    // This is an amazing text tutorial with title Django tutorial Text
+    // Ratings of this text tutorial: 4.19 out of 5 stars
+    // Number of words in this text tutorial is: 433 words
+    // Base Class display called for: Django tutorial Audio
+    //
+    // (The last line comes from the base class CWH::display() because
+    //  CWHAudio does not override display(). Since display() is virtual,
+    //  the base implementation is inherited and used as a fallback.)
+    // ---------------------------------------------------------------- //
     
     return 0;
 }

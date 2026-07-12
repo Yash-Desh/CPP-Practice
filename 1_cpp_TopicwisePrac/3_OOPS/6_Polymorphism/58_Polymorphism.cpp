@@ -36,6 +36,8 @@ and you know that this function is going to run.
     need to be different. 
     ii. If function overloading is done in the program and function calls are made the compiler already knows that which functions 
     to execute.
+    iii. To know all the exhaustive rules of function overloading, read the file :
+         path to CPP-Practice/1_cpp_TopicwisePrac/2_Functions/1g_function_overloading.cpp
 
 Operator Overloading
     i. This is a feature that lets us define operators working for some specific tasks. 

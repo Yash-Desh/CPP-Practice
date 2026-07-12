@@ -67,6 +67,18 @@ int main()
     tuts[0]->display();
     cout<<""<<endl;
     tuts[1]->display(); 
+
+    // ---------------------------------------------------------------- //
+    // $ ./a.out 
+    // This is an amazing video with title Django Video Tutorial
+    // Ratings: 4.89 out of 5 stars
+    // Length of this video is: 4.56 minutes
+
+    // This is an amazing text tutorial with title Django Text Tutorial
+    // Ratings of this text tutorial: 4.19 out of 5 stars
+    // No of words in this text tutorial is: 433 words
+    // ---------------------------------------------------------------- //
+
     return 0;
 }
 /*
