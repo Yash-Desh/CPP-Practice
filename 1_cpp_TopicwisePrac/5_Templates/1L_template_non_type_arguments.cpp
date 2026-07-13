@@ -23,3 +23,14 @@ int main() {
     cout<<array.GetSize()<<endl;
     return 0;
 }
+
+/*
+
+Template non-type arguments are passed during compile-time. 
+Thus they are compile time constants. 
+You cannot pass run-time values as template non-type arguments.
+
+Constructor Arguments on the other hand are run-time entities.
+Hence they both are different & used for different purposes.
+
+*/

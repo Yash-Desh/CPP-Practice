@@ -14,7 +14,13 @@ float average(T1 a , T2 b)
 int main()
 {
     float result ;
-    result = average(5,2.3);
+
+    // Method-1: Implicit Template Argument Deduction
+    // result = average(5,2.3);
+
+    // Method-2: Explicit Template Arguments
+    result = average<int, float>(5.46,2.3);
+
     cout<<"Average = "<<result<<endl;
     
     return 0;
@@ -28,5 +34,7 @@ int main()
    the function with them. 
 
 2. And that’s it. Our function has become general for all sorts of data types.
+
+3. At function call time, you may OR may not provide explicit template arguments
 
 */

@@ -21,7 +21,9 @@ class Harry
     void display();
 };
 
-template <class T>     // -> This line is compulsory for fn declaration outside of class definition since the class is a template  
+// Rewriting template <class T> for fn declaration outside 
+// of class definition since the class is a template is COMPULSORY
+template <class T>       
 void Harry<T> :: display()
 {
     cout<<data<<endl;
