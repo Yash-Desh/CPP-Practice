@@ -24,7 +24,7 @@ void prepareAdjList(unordered_map<int, list<int>> &adjList, vector<pair<int, int
     for(int i=0; i<edges.size(); i++)
     {
         int u = edges[i].first;
-        int v = edges[v].second;
+        int v = edges[i].second;
 
         // Undirected Graph.
         adjList[u].push_back(v);
