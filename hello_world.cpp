@@ -5,13 +5,16 @@
 Youtube Tutors : 1. CodeWithHarry
 */
 
+// compile command: g++ hello_world.cpp -o hello_world
+// run command    : ./hello_world                           --> DO NOT DELETE FROM REPOSITORY
+
 
 #include <iostream>
-using namespace std ;
-int main ()
-{
+using namespace std;
+
+int main () {
     // Print hello world to the console 
-    cout<<"hello world!!";
+    cout << "hello world!!" << endl;
 
     return 0;
 }
