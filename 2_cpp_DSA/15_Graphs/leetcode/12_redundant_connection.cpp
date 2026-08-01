@@ -82,3 +82,55 @@ public:
         return ans;
     }
 };
+
+
+class Solution {
+    void makeSet(int n, vector<int> &parent) {
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int findParent(vector<int> &parent, int node) {
+        // Base Case
+        if(parent[node] == node) {
+            return node;
+        }
+        return parent[node] = findParent(parent, parent[node]);
+    }
+
+    void unionSet(int u, int v, vector<int> &parent, vector<int> &rank) {
+        u = findParent(parent, u);
+        v = findParent(parent, v);
+
+        if(rank[u] < rank[v]) { parent[u] = v; }
+        else if(rank[u] > rank[v]) { parent[v] = u; }
+        else {
+            parent[v] = u;
+            rank[u]++;
+        }
+    }
+
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<int> parent(n+1);
+        vector<int> rank(n+1, 0);
+
+        makeSet(n, parent);
+        vector<int> ans;
+
+        for(int i = 0; i < n; i++) {
+            int u = findParent(parent, edges[i][0]);
+            int v = findParent(parent, edges[i][1]);
+
+            if(u != v) {
+                unionSet(u, v, parent, rank);
+            }
+            else {
+                return ans = edges[i];
+            }
+        }
+        return ans;
+    }
+};
