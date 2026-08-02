@@ -32,6 +32,21 @@ This video shows you how to inspect your compiled binaries, using gnu binutils, 
 // 5) Strip                     --> removes symbols from your binary
 // Usage: strip ./a.out
 
+/*
+The following program is just a hello world program with a few modifications
+- A global variable
+- A different print statement
+- A conditional 'if' statement that checks the programs first argument
+- A check for a preset password
+
+=> compile with debug symbols: gcc -g 2_tool_gnu_binutils.c
+
+This creates a binary file, cannot be opened with a normal text editor 
+But can be opened with a hex editor: bless a.out
+
+*/
+
+
 int myValue = 47;
 
 int main(int argc, char** argv) {

@@ -1,0 +1,56 @@
+ydeshpan@XSJYDESHPAN02:~/my_repos/personal/CPP-Practice/7_Debugging/Debug_Tools/debugger$ gdb ./a.out 
+GNU gdb (Ubuntu 15.1-1ubuntu1~24.04.1) 15.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...
+(gdb) break 14
+Breakpoint 1 at 0x1155: file gdb_inspect_memory.c, line 20.
+(gdb) run 
+Starting program: /home/ydeshpan/my_repos/personal/CPP-Practice/7_Debugging/Debug_Tools/debugger/a.out 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, main () at gdb_inspect_memory.c:20
+20          timestuff_t t = {.hours=6, .micros=0x12345678, .seconds = 0xDEAD};
+(gdb) list
+15          uint32_t micros;
+16          uint16_t seconds;
+17      } timestuff_t;
+18
+19      int main() {
+20          timestuff_t t = {.hours=6, .micros=0x12345678, .seconds = 0xDEAD};
+21          printf("%lu\n", sizeof(t));
+22          return 0;
+23      }
+(gdb) p sizeof(t)
+$1 = 12
+(gdb) p t
+$2 = {hours = -1 '\377', micros = 4294956584, seconds = 32767}
+(gdb) x &t 
+0x7fffffffd4f4: 0x00007fff
+(gdb) x/12 &t 
+0x7fffffffd4f4: 0x00007fff      0xffffd628      0x00007fff      0xffffd5a0
+0x7fffffffd504: 0x00007fff      0xf7c2a1ca      0x00007fff      0xffffd550
+0x7fffffffd514: 0x00007fff      0xffffd628      0x00007fff      0x55554040
+(gdb) x/12x &t
+0x7fffffffd4f4: 0x00007fff      0xffffd628      0x00007fff      0xffffd5a0
+0x7fffffffd504: 0x00007fff      0xf7c2a1ca      0x00007fff      0xffffd550
+0x7fffffffd514: 0x00007fff      0xffffd628      0x00007fff      0x55554040
+(gdb) x/12xb &t
+0x7fffffffd4f4: 0xff    0x7f    0x00    0x00    0x28    0xd6    0xff    0xff
+0x7fffffffd4fc: 0xff    0x7f    0x00    0x00
+(gdb) x/3xw &t 
+0x7fffffffd4f4: 0x00007fff      0xffffd628      0x00007fff
+(gdb) 
