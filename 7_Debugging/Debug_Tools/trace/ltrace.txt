@@ -1,0 +1,3 @@
+puts("Hello World")                              = 12
+Hello World
++++ exited (status 0) +++
