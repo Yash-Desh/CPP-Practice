@@ -11,6 +11,16 @@
 | 1 | [Learn GDB in 60 seconds](https://youtu.be/mfmXcbiRs0E?si=OmHf3q55oTmNN0xj) | Jacob Sorber | 1:32 |
 | 2 | [How to examine memory in GDB](https://youtu.be/A_pV61xFty8?si=sF4zUq-Y-UG2iL3D) | Jacob Sorber | 1:47 |
 
+## Index
+
+1. [Perils of `printf` debugging](#perils-of-printf-debugging)
+2. [What is a debugger?](#what-is-a-debugger)
+3. [What a debugger is (and isn't) for](#what-a-debugger-is-and-isnt-for)
+4. [Why does gdb require `-g`?](#why-does-gdb-require--g)
+5. [How does GDB work?](#how-does-gdb-work)
+6. [Gotcha: setting a breakpoint](#gotcha-setting-a-breakpoint)
+7. [Challenge: inspect memory — why is `sizeof(struct)` 12? (Jack Sorber)](#challenge-inspect-memory--why-is-sizeofstruct-12-jack-sorber)
+
 ## Perils of `printf` debugging
 
 Before reaching for a debugger, most of us start with `printf`. It works — until it
