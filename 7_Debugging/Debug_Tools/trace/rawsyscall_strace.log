@@ -1,0 +1,5 @@
+execve("./a.out", ["./a.out"], 0x7ffc83a102e0 /* 60 vars */) = 0
+write(1, "Hey world! I made a syscall!\n", 29Hey world! I made a syscall!
+) = 29
+exit(0)                                 = ?
++++ exited with 0 +++
