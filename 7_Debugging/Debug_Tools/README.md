@@ -30,6 +30,7 @@ All located under [`binary_inspection/`](binary_inspection/).
 | **strip** | Removes symbols and debug info from a binary (`strip ./a.out`). |
 | **stat** | Shows file metadata (size, permissions, timestamps). |
 | **wc** | Counts bytes/lines/words of a file. |
+| **file** | Identifies a file's type from its contents — ELF class, architecture, stripped vs. not (`file ./a.out`). |
 
 ### Demo Programs & Notes
 
