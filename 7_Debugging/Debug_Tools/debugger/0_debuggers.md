@@ -10,6 +10,7 @@
 |---|-------|--------|----------|
 | 1 | [Learn GDB in 60 seconds](https://youtu.be/mfmXcbiRs0E?si=OmHf3q55oTmNN0xj) | Jacob Sorber | 1:32 |
 | 2 | [How to examine memory in GDB](https://youtu.be/A_pV61xFty8?si=sF4zUq-Y-UG2iL3D) | Jacob Sorber | 1:47 |
+| 3 | [Debugging with Core Dumps](https://youtu.be/GV10eIuPs9k?si=qx_nc9nlkiBLlfeI) | Jacob Sorber | 9:16 |
 
 ## Index
 
@@ -448,3 +449,30 @@ x/5s  &t    # 5 strings
 Format = `x/[count][format][size]`. Size letters: `b` byte, `h` halfword (2B),
 `w` word (4B), `g` giant (8B). Format letters include `x` hex, `d` decimal,
 `i` instruction, `s` string, `c` char.
+
+
+# Core Dump
+
+What is a core dump ? 
+
+core dump(n): a dump of main memory, carried out typically as an aid to debugging
+
+Core dumps are helpful because you can skip the program execution right to the point 
+where it crashed. So you don't have to wait on the program to crash. 
+
+Always compile with debug symbols to make use of core dumps. 
+If you want to debug someone else's code, make them send you a core dump. 
+
+ulimit -c  gives the size of core dump
+
+set size of core dump 
+ulimit -c unlimited 
+
+Run the program again to generate the core dump file. 
+
+it is a large file. 
+
+Run gdb: gdb ./a.out core.340204
+
+
+Core dumps compress easily using tools like bzip2
