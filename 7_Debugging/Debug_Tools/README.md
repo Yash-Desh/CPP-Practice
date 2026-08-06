@@ -31,6 +31,7 @@ All located under [`binary_inspection/`](binary_inspection/).
 | **stat** | Shows file metadata (size, permissions, timestamps). |
 | **wc** | Counts bytes/lines/words of a file. |
 | **file** | Identifies a file's type from its contents — ELF class, architecture, stripped vs. not (`file ./a.out`). |
+| **ulimit** |  |
 
 ### Demo Programs & Notes
 
