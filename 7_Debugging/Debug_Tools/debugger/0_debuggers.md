@@ -450,29 +450,33 @@ Format = `x/[count][format][size]`. Size letters: `b` byte, `h` halfword (2B),
 `w` word (4B), `g` giant (8B). Format letters include `x` hex, `d` decimal,
 `i` instruction, `s` string, `c` char.
 
+## Core Dump
 
-# Core Dump
+What is a core dump?
 
-What is a core dump ? 
+> **core dump** (n): a dump of main memory, carried out typically as an aid to
+> debugging
 
-core dump(n): a dump of main memory, carried out typically as an aid to debugging
+Core dumps are helpful because you can skip the program execution right to the point
+where it crashed. So you don't have to wait on the program to crash.
 
-Core dumps are helpful because you can skip the program execution right to the point 
-where it crashed. So you don't have to wait on the program to crash. 
+Always compile with debug symbols to make use of core dumps. If you want to debug
+someone else's code, make them send you a core dump.
 
-Always compile with debug symbols to make use of core dumps. 
-If you want to debug someone else's code, make them send you a core dump. 
+`ulimit -c` gives the size of core dump.
 
-ulimit -c  gives the size of core dump
+Set size of core dump:
 
-set size of core dump 
-ulimit -c unlimited 
+```
+ulimit -c unlimited
+```
 
-Run the program again to generate the core dump file. 
+Run the program again to generate the core dump file. It is a large file.
 
-it is a large file. 
+Run gdb:
 
-Run gdb: gdb ./a.out core.340204
+```
+gdb ./a.out core.340204
+```
 
-
-Core dumps compress easily using tools like bzip2
+Core dumps compress easily using tools like bzip2.
