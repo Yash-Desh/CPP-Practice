@@ -45,7 +45,7 @@ public:
 // TC : O(N)
 // SC : O(N) for the dp array
 // ############################
-class Solution {
+class Solution_Tabulation {
 public:
     int rob(vector<int>& nums) {
         int n = nums.size();
