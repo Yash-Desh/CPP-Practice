@@ -23,7 +23,7 @@ class Test
 public:
 
     // Test(int i, int j) : a(i), b(j) --> This works perfectly
-    // Test(int i, int j) : a(i), b(2 * j) --> This works perfectly
+    // Test(int i, int j) : a(i), b(2 * j) // --> This works perfectly
 
     Test(int i, int j) : b(j), a(i+b) // -->This will give a garbage value to a since a is initialized first 
                                            //irrespective of the order in which it is written here 
@@ -56,8 +56,14 @@ int main()
 4. In the initialization section, the data members are initialized
 
 5. To note here is that if we use the code shown to initialize data members --> Test(int i, int j) : b(j), a(i+b)
-   the compiler will throw an error because the data member “a” is being initialized first and the “b” is being 
-   initialized second so we have to assign the value to “a” data member first.
+   the compiler will NOT throw an error - it compiles and runs. Because "a" is DECLARED first, it is initialized
+   first, so "i + b" reads "b" while it is still uninitialized. That is undefined behaviour: "a" may get garbage,
+   or (as often happens) whatever junk was on the stack, which may coincidentally be 0.
+
+   g++ 13.3.0 only warns, and only if you ask for the warnings:
+       -Wall   -> warning: 'Test::b' will be initialized after 'int Test::a'   [-Wreorder]
+       -Wextra -> warning: member 'Test::b' is used uninitialized              [-Wuninitialized]
+   A bare "g++ file.cpp" is completely silent. Use -Wall -Wextra -Werror to turn this into a real build failure.
 
 */
 
