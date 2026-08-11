@@ -71,8 +71,8 @@
 //   So:
 //     - Class with only value members  --> default copy is fine (shallow == deep).
 //     - Class owning a raw pointer      --> default copy is a BUG (aliasing -->
-//       double free). This is exactly what 4h_copy_constructor_2.cpp (copy ctor)
-//       and 4i_copy_assignment_operator.cpp (copy assignment) demonstrate.
+//       double free). This is exactly what 11_copy_constructor_2.cpp (copy ctor)
+//       and 12_copy_assignment_operator.cpp (copy assignment) demonstrate.
 //
 //
 // ============================================================================
@@ -91,7 +91,7 @@
 // ============================================================================
 // RELATED FILES IN THIS DIRECTORY
 // ============================================================================
-//   - 4g_copy_constructor.cpp          : copy constructor basics
-//   - 4h_copy_constructor_2.cpp        : shallow vs deep copy via copy ctor (char *name)
-//   - 4i_copy_assignment_operator.cpp  : shallow vs deep copy via operator= (int *arr)
+//   - 10_copy_constructor.cpp          : copy constructor basics
+//   - 11_copy_constructor_2.cpp        : shallow vs deep copy via copy ctor (char *name)
+//   - 12_copy_assignment_operator.cpp  : shallow vs deep copy via operator= (int *arr)
 //
