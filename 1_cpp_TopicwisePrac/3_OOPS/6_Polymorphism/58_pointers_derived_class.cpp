@@ -31,7 +31,9 @@ int main(){
     base_class_pointer = &obj_derived; 
     base_class_pointer->var_base = 34;
     base_class_pointer->display();
-    // base_class_pointer->var_derived= 134; --> Will throw an error
+
+    // base_class_pointer->var_derived= 134;    // --> Will throw a compile-time error
+                                                // error: ‘class BaseClass’ has no member named ‘var_derived’
     base_class_pointer->var_base = 3400; 
     base_class_pointer->display();
 
@@ -50,13 +52,21 @@ int main(){
 }
 /*
 
-##############################################Extra Notes#####################################################s
+############################################## Extra Notes #####################################################s
 
 1.  We cannot set the value of the derived class data member by using the base class pointer 
     otherwise the compiler will throw an error.
 
+    WHY: Member access is resolved at COMPILE TIME using the STATIC TYPE of the pointer
+     (BaseClass*), not the type of the object it actually points to (DerivedClass).
+     The compiler only checks "does BaseClass declare a member named var_derived?" -> No.
+     Error: "'class BaseClass' has no member named 'var_derived'"
+     It never reaches the question of what object the pointer currently holds.
+
 2. When the function “display” is called using a base class pointer the main thing to note here is that 
-   the base class “display” function will run here
+   the base class “display” function will run here. 
+
+   WHY: Because display is NOT a virtual function. We will see in CPP-Practice/1_cpp_TopicwisePrac/3_OOPS/6_Polymorphism/59_virtual_functions_1.cpp
 
 3. We can set the value of base class data member by using derived class pointer 
    but we cannot set the value of derived class data member by using base class pointer
