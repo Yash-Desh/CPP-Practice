@@ -1,5 +1,11 @@
 # CPP-Practice
-Repository for all the Fundamentals of C++ & DSA practice questions 
+Repository for all the Fundamentals of C++ & DSA practice questions
+
+## C++ Resources
+- [Code with Harry](https://youtube.com/playlist?list=PLu0W_9lII9agpFUAlPFe_VNSlXW5uE0YL&si=GdQGto0GKgBFb-CU)
+- [The Cherno] (https://youtube.com/playlist?list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&si=cpSDSYJaNNzLZBJU)
+- [Mike Shah] (https://www.youtube.com/playlist?list=PLvv0ScY6vfd8j-tlhYVPYgiIyXduu6m-L)
+- [Jacob Sorber](https://www.youtube.com/@JacobSorber)
 
 ## DSA Tip Sheet
 1. Always check for NULL pointers before pointer dereferencing. 
