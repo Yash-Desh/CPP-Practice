@@ -6,12 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-How to Inspect Compiled Binaries (binutils) // Sometimes it's useful to examine 
-the executables that your compiler (or someone else's compiler) created. 
-This video shows you how to inspect your compiled binaries, using gnu binutils, like objdump. 
-*/
-
 // Tools Discussed in this tutorial
 // Hex Editor: Bless            --> can't download on WSL 
 // GNU Binutils
