@@ -20,10 +20,12 @@
 6. [Symbol table](#symbol-table)
 7. [`objdump -t` vs `readelf --symbols`](#objdump--t-vs-readelf---symbols)
 8. [Sections — `objdump -s`](#sections--objdump--s)
-9. [Disassembly — `objdump -d`](#disassembly--objdump--d)
-10. [Segments (program headers) — `readelf --segments`](#segments-program-headers--readelf---segments)
-11. [`strip` — remove symbols and debug info](#strip--remove-symbols-and-debug-info)
-12. [`objdump` vs `readelf` — which tool, when](#objdump-vs-readelf--which-tool-when)
+9. [Where read-only data lives in the address space](#where-read-only-data-lives-in-the-address-space)
+10. [Disassembly — `objdump -d`](#disassembly--objdump--d)
+11. [Segments (program headers) — `readelf --segments`](#segments-program-headers--readelf---segments)
+12. [File offsets vs virtual addresses](#file-offsets-vs-virtual-addresses)
+13. [`strip` — remove symbols and debug info](#strip--remove-symbols-and-debug-info)
+14. [`objdump` vs `readelf` — which tool, when](#objdump-vs-readelf--which-tool-when)
 
 
 # How to inspect Compiled Binaries
@@ -38,6 +40,7 @@
 - stat
 - wc
 - nm
+- ldd
 
 
 ## What is a hex editor?
@@ -190,6 +193,8 @@ so basically modified the bytes of the compiled binary & hacked the executable w
 GNU Binutils
 
 ## Strings tool
+
+`strings` scans any binary — executable or otherwise — and pulls out all the printable strings it contains, making it the quickest way to grab readable text out of a binary file.
 
 `strings a.out` scans the binary and prints every run of **printable characters** (default: 4+ in a row, terminated by a non-printable byte). It looks at the same raw bytes as `xxd`, but filters *out* the machine code and keeps only the human-readable islands buried in it.
 
@@ -385,6 +390,63 @@ readelf -S a.out           # list all sections with sizes/addresses (no contents
 ```
 
 
+## Where read-only data lives in the address space
+
+String literals and other read-only data live in **`.rodata`**, which the loader maps into a **read-only (`R`) LOAD segment** — sandwiched between the code and the writable data.
+
+```
+HIGH addresses
+   ┌──────────────────────┐
+   │  stack               │  grows DOWN (locals, params)
+   │        v             │
+   ├──────────────────────┤
+   │        ^             │
+   │  heap                │  grows UP (malloc/new)
+   ├──────────────────────┤
+   │  .bss    @ 0x4014    │  RW  — uninitialized globals
+   │  .data   @ 0x4000    │  RW  — initialized globals
+   ├──────────────────────┤
+   │  .rodata @ 0x2000    │  R   <- string literals & const data
+   ├──────────────────────┤
+   │  .text   @ 0x1080    │  R E — machine code
+   └──────────────────────┘
+LOW addresses
+```
+
+`.rodata` lands in the LOAD segment whose flags are `R` only — **not writable, not executable**. That's hardware-enforced by the MMU, not just a convention.
+
+### What goes in `.rodata`
+
+- **String literals** — `"FEEDBEEF"`, `"Correct"`, `"Incorrect"` (at `0x2004`, `0x200d`, `0x2015`)
+- **`const` globals** — `const int limit = 100;`
+- **`const` arrays / lookup tables** — `const char *names[] = {...}`
+- **Compiler-generated tables** — jump tables for large `switch` statements
+- **Floating-point constants** — literals like `3.14159` that can't be encoded as an immediate
+
+### The practical consequence — a classic C bug
+
+This is *why* it matters that `.rodata` is read-only:
+
+```c
+char *p = "hello";     // p points INTO .rodata
+p[0] = 'H';            // <- SIGSEGV! writing to a read-only page
+
+char arr[] = "hello";  // COPY made on the stack (or .data if global)
+arr[0] = 'H';          // <- fine, it's writable memory
+```
+
+Both look similar in source, but `char *p = "..."` gives a pointer into `.rodata`, while `char arr[] = "..."` copies the bytes into writable storage. The segfault is the MMU enforcing the `R`-only segment permission. This is also why modern C++ requires `const char *` for string literals — the type system warning you before the hardware does.
+
+### Two more things worth knowing
+
+- **Literals are deduplicated.** If `"hello"` appears in five places, the compiler typically stores it **once** in `.rodata` and points all five references at the same address (the `M`/`S` "merge/strings" section flags in `readelf -S`).
+- **`.rodata` is loaded from the file, unlike `.bss`.** Its bytes physically exist on disk — which is why `strings` and `objdump -s` can show `FEEDBEEF` at file offset `0x2004`. Contrast `.bss`, which has no file bytes at all (`NOBITS`) and is zero-filled at load time.
+
+### Tie-back to the patching trick
+
+Since `.rodata` is read-only *at runtime*, the running program can't change `FEEDBEEF` itself. But the **file on disk isn't protected** — which is why the hex-editor patch works. You modify the bytes before the loader ever maps them, and the process starts up with the new value already in its read-only page.
+
+
 ## Disassembly — `objdump -d`
 
 `objdump -d a.out` **disassembles**: it translates the raw machine-code bytes in `.text` back into human-readable **assembly instructions**. This is the one thing `readelf` can't do. Every tool above showed *data*; this shows the *logic* — the actual CPU instructions the C code compiled into.
@@ -539,6 +601,75 @@ SECTIONS (linker's view)          SEGMENTS (loader's view)
 ```
 
 Sections are for building, segments are for running; the many-to-one bundling is how the OS turns dozens of link-time sections into a handful of permission-protected memory regions.
+
+
+## File offsets vs virtual addresses
+
+Not every address these tools print is a virtual address. There are **three** distinct kinds of number, and mixing them up will break a patching attempt.
+
+### 1. File offsets — position of bytes *on disk*
+
+- `xxd` / `hexdump` offset column
+- `readelf -S` **Offset** column
+- `readelf -l` **Offset** column
+- `readelf -h`: "Start of section headers: 15096 (bytes **into file**)"
+
+### 2. Virtual addresses — where bytes land *in memory*
+
+- `readelf -S` **Address** column
+- `readelf -l` **VirtAddr** column
+- Symbol table **Value** (`main` @ `0x1169`, `myValue` @ `0x4010`)
+- `objdump -d` instruction addresses
+- Entry point (`0x1080`)
+
+### They are genuinely different numbers
+
+```
+[25] .data    Address 0x4000    Offset 0x3000      <- differ by 0x1000
+LOAD          VirtAddr 0x3db0   Offset 0x2db0      <- differ by 0x1000
+```
+
+The linker shifts them so each segment starts on a fresh 4 KB page in memory. `.rodata` happens to have Address == Offset (`0x2000` both) — a **coincidence** of this layout, not a rule.
+
+**Practical consequence for patching:** to hex-edit `FEEDBEEF` you need the **file offset**, not the virtual address. They match for `.rodata` here, but to patch something in `.data`, `objdump -d` says `0x4010` while the byte to edit sits at file offset `0x3010`.
+
+```
+file_offset = virtual_address - (segment VirtAddr - segment Offset)
+```
+
+### 3. Sections with no virtual address at all
+
+```
+[27] .comment    Address 0x0000000000000000    Offset 0x3014
+```
+
+`.comment`, `.symtab`, `.debug_*`, `.strtab` show Address `0x0` because **they're never loaded into memory** — they exist only in the file. Address `0` means "not applicable," not "address zero." Same reason they belong to no `LOAD` segment.
+
+### Even the virtual addresses aren't the final runtime ones
+
+This binary is **Type: DYN (PIE)**, so every address shown is a **link-time address relative to a load base of 0**. At runtime **ASLR** picks a random base and slides everything:
+
+```
+actual runtime address = random_base + 0x1169
+```
+
+Attach `gdb` to the running process and `main` sits at something like `0x5555_5555_5169`, not `0x1169`. Static tools can't know the base — it's chosen fresh each run. For a non-PIE binary (`Type: EXEC`, built with `-no-pie`) the addresses *are* the literal runtime addresses, no sliding.
+
+### Summary
+
+| Tool / column                     | What the number is                        |
+|-----------------------------------|-------------------------------------------|
+| `xxd`, `hexdump` offset           | **File offset**                           |
+| `readelf -S` Offset               | **File offset**                           |
+| `readelf -l` Offset               | **File offset**                           |
+| `readelf -S` Address              | Virtual (link-time, base 0 for PIE)       |
+| `readelf -l` VirtAddr             | Virtual (link-time)                       |
+| `nm` / `readelf --symbols` Value  | Virtual (link-time)                       |
+| `objdump -d` addresses            | Virtual (link-time)                       |
+| `.comment` / `.symtab` Address = 0| No virtual address — never loaded         |
+| gdb on a *running* process        | **Real** runtime address (base + offset)  |
+
+Static inspection tools show either file offsets or link-time virtual addresses. Only a debugger on a live process shows true runtime virtual addresses.
 
 
 ## `strip` — remove symbols and debug info

@@ -6,26 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Tools Discussed in this tutorial
-// Hex Editor: Bless            --> can't download on WSL 
-// GNU Binutils
-// 1) Strings                   --> Goes through the binary, Grabs all the printable strings 
-// Usage: strings ./a.out 
-
-// 2) Symbol Table              --> Gets all the symbols/identifiers defined inside this program
-// Usage: readelf --symbols ./a.out
-
-// 3) Object Dump               --> Same as symbol table
-// Usage: objdump -t ./a.out 
-// Usage: objdump -s ./a.out
-// Usage: objdump -d ./a.out
-
-// 4) Individual Segments
-// Usage: readelf --segments ./a.out
-
-// 5) Strip                     --> removes symbols from your binary
-// Usage: strip ./a.out
-
 /*
 The following program is just a hello world program with a few modifications
 - A global variable
@@ -53,3 +33,23 @@ int main(int argc, char** argv) {
     }
     return 0;
 }
+
+// Tools Discussed in this tutorial
+// Hex Editor: Bless            --> can't download on WSL 
+// GNU Binutils
+// 1) Strings                   --> Goes through the binary, Grabs all the printable strings 
+// Usage: strings ./a.out 
+
+// 2) Symbol Table              --> Gets all the symbols/identifiers defined inside this program
+// Usage: readelf --symbols ./a.out
+
+// 3) Object Dump               --> Same as symbol table
+// Usage: objdump -t ./a.out 
+// Usage: objdump -s ./a.out
+// Usage: objdump -d ./a.out
+
+// 4) Individual Segments
+// Usage: readelf --segments ./a.out
+
+// 5) Strip                     --> removes symbols from your binary
+// Usage: strip ./a.out
