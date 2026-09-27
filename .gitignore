@@ -1,5 +1,7 @@
 *.out
 *.exe
+*.so
+*.elf
 core
 core.*
 *.core
