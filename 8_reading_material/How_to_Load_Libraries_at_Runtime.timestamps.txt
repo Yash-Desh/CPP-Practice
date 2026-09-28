@@ -1,0 +1,71 @@
+Title: How to Load Libraries at Runtime
+Video ID: _kIa4D7kQ8I
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:03] Hey everybody, welcome back. Today is Libraries in C, Part 2.
+[00:00:08 -> 00:00:12] I recently made a video that showed you how to make Libraries in C. That included static libraries
+[00:00:12 -> 00:00:17] and shared libraries, or dynamic libraries, sometimes called DLLs. And if you missed
+[00:00:17 -> 00:00:20] that video, you might want to check it out, because it'll make today's video make a little
+[00:00:20 -> 00:00:25] more sense. But our discussion last time left out a big piece of the puzzle, and that piece
+[00:00:25 -> 00:00:29] of the puzzle is dynamic loading. So we made dynamic libraries last time, and I talked about
+[00:00:29 -> 00:00:34] how they're loaded at runtime, but we still knew what libraries we were using, and we knew what
+[00:00:34 -> 00:00:38] functions we were going to call when we compiled the program. So what happens if you don't know
+[00:00:38 -> 00:00:41] what functions you're going to call? You don't know what libraries you're going to use, and
+[00:00:41 -> 00:00:45] that's all going to be dynamic at runtime. That's our topic for today. Let's say I'm
+[00:00:45 -> 00:00:49] writing a program, and I want later on to be able to add or remove functionality from it,
+[00:00:49 -> 00:00:53] but without recompiling the whole thing. Well, one way that I could do that is to make
+[00:00:53 -> 00:00:57] shared libraries and then load them dynamically. And to do this in C, we're going to use
+[00:00:57 -> 00:01:02] three functions, one to open the library, one to get symbols from the library, and one that
+[00:01:02 -> 00:01:08] closes the library. Now in Linux or Mac OS, this is going to be DL open, DL sim, and DL close.
+[00:01:08 -> 00:01:14] In Windows, it's going to be load library or load library X, get proc address, and free
+[00:01:14 -> 00:01:18] library. The functions have different names, but on each platform, they basically are doing
+[00:01:18 -> 00:01:22] the same thing. All right, let's jump into code and look at an example of how this works.
+[00:01:22 -> 00:01:26] First, let's make a few shared libraries. I'm going to add two functions to this library.
+[00:01:26 -> 00:01:29] The first I'm just going to add so that we can get information about what the library does.
+[00:01:29 -> 00:01:34] It's basically the library can tell us what it does, and it just returns a string. And the
+[00:01:34 -> 00:01:38] second is just going to do some operation on a number. So in this case, it just adds one,
+[00:01:38 -> 00:01:43] and that's why I call the library lib plus one. Okay, now let's make another called lib
+[00:01:43 -> 00:01:49] plus two, just the same, except this one adds two to the number. Now we need a test program,
+[00:01:49 -> 00:01:54] and this program is going to use our libraries. So it's going to take two arguments,
+[00:01:54 -> 00:01:58] a library name and a number. And we don't know what library we're going to use at compile time,
+[00:01:58 -> 00:02:03] so we're going to use dlopen to open the library that the user specified.
+[00:02:03 -> 00:02:07] Okay, so dlopen takes two arguments. The name of the library we want to open and flags.
+[00:02:07 -> 00:02:11] Basically, it tells how you want it to load. In this case, I'm telling it that I want to
+[00:02:11 -> 00:02:15] use lazy loading, which just means that the functions are going to be loaded when I try to
+[00:02:15 -> 00:02:19] use them. There are other options. I'm going to leave you to look through the man pages,
+[00:02:19 -> 00:02:23] check them out, but they're pretty straightforward. And dlopen will return null
+[00:02:23 -> 00:02:26] if it couldn't find the library. And so we're just going to check for that right here.
+[00:02:26 -> 00:02:31] And now let's declare a function pointer that looks like the function I want from the library.
+[00:02:31 -> 00:02:35] And in this case, it's one that takes an int and returns an int. And then we can call
+[00:02:35 -> 00:02:40] the dlsim function to get the address of a named function in the library we just opened
+[00:02:40 -> 00:02:44] and assign it to that function pointer. At this point, I just want to mention some of
+[00:02:44 -> 00:02:48] you may not be comfortable with function pointers. That's okay. These declarations
+[00:02:48 -> 00:02:51] can be a little bit obtuse. If you're finding function pointers difficult,
+[00:02:51 -> 00:02:54] you might want to check out one of the first videos that I made back when I first started
+[00:02:54 -> 00:02:58] this channel. It's on function pointers. It breaks down sort of how the declarations work
+[00:02:58 -> 00:03:02] and gives you some ideas on maybe how to understand them. I will link to that in the
+[00:03:02 -> 00:03:07] description. But this code right here is just saying go get a function called do operation
+[00:03:07 -> 00:03:13] from this library and give me a pointer to it so I can call it. Okay, so now let's apply
+[00:03:13 -> 00:03:16] the function to a number that the user gave us. So the user gave us a number. Let's just,
+[00:03:16 -> 00:03:21] we're just going to print out that plus one. And we're going to print out the before and after.
+[00:03:21 -> 00:03:24] And then of course, don't forget to close the library. Now let's make a quick make
+[00:03:24 -> 00:03:28] file that will compile the two libraries. Note that I'm doing this on my Mac today so
+[00:03:28 -> 00:03:33] that I'm using the extension dylib. If you were on Linux, it would be .so but everything
+[00:03:33 -> 00:03:37] else would work just the same. Okay, so now we can compile our code and we can run it.
+[00:03:38 -> 00:03:43] Remember, it takes a library name and a number. So let's run it with our first library
+[00:03:43 -> 00:03:48] and that seems to be working. It adds one. Okay, now we can run it and pass in our second library
+[00:03:48 -> 00:03:53] and it adds two. Okay, now for good measure, let's just make use of our other function in
+[00:03:53 -> 00:03:57] our libraries and let's add another function pointer. This one takes no arguments and
+[00:03:57 -> 00:04:02] returns a character pointer just like the function in our library. And it's called get
+[00:04:02 -> 00:04:08] library name. So okay, so let's put in our code. Let's print out the library name.
+[00:04:08 -> 00:04:15] Okay, so now it prints out the string we returned. Great. So now one final thing. DLSim can return
+[00:04:15 -> 00:04:19] null if the library didn't have the function I asked for or if I got the name wrong,
+[00:04:19 -> 00:04:23] then it's going to return null. And we all know calling a null function never ends well.
+[00:04:23 -> 00:04:27] So let's check our pointers. And you can see that now if I get the name wrong,
+[00:04:27 -> 00:04:31] it now catches it, which is a lot better than a segfault. At least we know what happened.
+[00:04:31 -> 00:04:36] And so that's it. Now you know how to make a program that loads a library at runtime that
+[00:04:37 -> 00:04:41] it didn't even know existed at compile time. And this can be a powerful tool for making
+[00:04:41 -> 00:04:46] software that's easier to extend, that's more modular and easier to update. And I hope this
+[00:04:46 -> 00:04:49] helps you out. I hope it gives you an idea of what options are out there when working
+[00:04:49 -> 00:05:01] with libraries. And until next time, happy coding and I will see you later.

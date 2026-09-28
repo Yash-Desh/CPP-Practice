@@ -1,0 +1,557 @@
+Title: What does it take to design a memory allocator? Dynamic Memory Allocation System Design
+Video ID: UTii4dyhR5c
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:03] Hi, I'm Chris Kanej, and this is CS361, Systems Programming.
+[00:00:03 -> 00:00:06] Today, we're going to be talking about the design and implementation
+[00:00:06 -> 00:00:08] of dynamic memory allocators.
+[00:00:08 -> 00:00:11] So in the last video, we talked about the trade-offs
+[00:00:11 -> 00:00:14] between time efficiency and space efficiency
+[00:00:14 -> 00:00:18] and what it is we're trying to build on top of the operating
+[00:00:18 -> 00:00:21] system's functionality to give dynamic memory allocation
+[00:00:21 -> 00:00:22] to the user-level code.
+[00:00:22 -> 00:00:24] What we're going to go over in this lecture
+[00:00:24 -> 00:00:26] is all of these different moving pieces
+[00:00:26 -> 00:00:28] that we're actually going to need to implement to give
+[00:00:28 -> 00:00:31] a design of a memory allocator.
+[00:00:31 -> 00:00:34] So say we get a whole big chunk of memory,
+[00:00:34 -> 00:00:36] say four kilobytes, eight kilobytes, one megabyte,
+[00:00:36 -> 00:00:38] two megabytes from the operating system,
+[00:00:38 -> 00:00:40] we're going to hand it out in anything
+[00:00:40 -> 00:00:43] from one byte, which is actually one byte,
+[00:00:43 -> 00:00:46] all the way up to that whole entire one, two megabytes
+[00:00:46 -> 00:00:46] of space.
+[00:00:46 -> 00:00:47] We want to do that efficiently.
+[00:00:47 -> 00:00:50] We don't need to bug the operating system about it
+[00:00:50 -> 00:00:52] every single time, and we want
+[00:00:52 -> 00:00:53] to make it correct above all.
+[00:00:53 -> 00:00:55] So the things we're going to think about here
+[00:00:55 -> 00:00:58] are how are we going to keep track of these free blocks,
+[00:00:58 -> 00:01:00] how are we going to keep track of the available blocks
+[00:01:00 -> 00:01:02] and the allocated blocks, where are we
+[00:01:02 -> 00:01:03] going to store that information,
+[00:01:03 -> 00:01:06] how are we going to access that information efficiently,
+[00:01:06 -> 00:01:07] how are we going to make freeze fast,
+[00:01:07 -> 00:01:10] how are we going to make allocations fast,
+[00:01:10 -> 00:01:13] how are we going to use the space as efficiently as we
+[00:01:13 -> 00:01:17] can, even though we don't know what the request
+[00:01:17 -> 00:01:19] stream is going to look like,
+[00:01:19 -> 00:01:21] whether somebody's going to ask for one and one and one
+[00:01:21 -> 00:01:22] and one, then 100 and one and then one
+[00:01:22 -> 00:01:25] and then 2,162, whatever it is,
+[00:01:25 -> 00:01:28] no matter what they ask for, we want our application
+[00:01:28 -> 00:01:32] to be relatively efficient in how it uses memory
+[00:01:32 -> 00:01:34] and how it uses Tom.
+[00:01:34 -> 00:01:35] So how are we going to do this?
+[00:01:35 -> 00:01:38] The first step is creating a header on the block.
+[00:01:38 -> 00:01:41] When we call malloc, we return a pointer
+[00:01:41 -> 00:01:44] to the beginning of the payload right here.
+[00:01:44 -> 00:01:48] But in actuality, there are four bytes above that.
+[00:01:48 -> 00:01:50] So the four previous bytes are going
+[00:01:50 -> 00:01:53] to have special information in them in a header.
+[00:01:53 -> 00:01:55] And as we're going to see a little bit later on,
+[00:01:55 -> 00:01:57] for efficiency's sake, that same information
+[00:01:57 -> 00:02:00] is duplicated in the four bytes at the very bottom
+[00:02:00 -> 00:02:03] of that block that is allocated.
+[00:02:03 -> 00:02:05] And again, the really, really important thing here
+[00:02:05 -> 00:02:08] is that the block that has a specific size
+[00:02:08 -> 00:02:11] that is going to be delineated as everything,
+[00:02:11 -> 00:02:14] including the payload, the padding,
+[00:02:14 -> 00:02:16] in order to get up to an even multiple of eight,
+[00:02:16 -> 00:02:17] we're going to see a little bit later on,
+[00:02:17 -> 00:02:19] and the block header and the block footer.
+[00:02:19 -> 00:02:20] Every time we allocate something,
+[00:02:20 -> 00:02:22] we're going to store this extra information
+[00:02:22 -> 00:02:23] in the header and the footer,
+[00:02:23 -> 00:02:24] and that's going to give us an idea
+[00:02:24 -> 00:02:27] of what we need to do to keep track
+[00:02:27 -> 00:02:28] of what's going on here.
+[00:02:28 -> 00:02:31] So you could imagine that if you were doing
+[00:02:31 -> 00:02:34] your pointer arithmetic wrong after you malloced something
+[00:02:34 -> 00:02:36] and you overshot or you undershot
+[00:02:36 -> 00:02:38] where you were supposed to be writing something,
+[00:02:38 -> 00:02:40] you can very easily clash your program
+[00:02:40 -> 00:02:42] by accidentally overwriting the block size,
+[00:02:42 -> 00:02:44] accidentally overwriting the allocated bit,
+[00:02:44 -> 00:02:45] all that type of thing.
+[00:02:45 -> 00:02:49] The next design primitive that we have access to here
+[00:02:49 -> 00:02:51] is the idea of an implicit free list.
+[00:02:51 -> 00:02:53] This is going to be super important
+[00:02:53 -> 00:02:55] because this allows us to take the entire chunk
+[00:02:55 -> 00:02:58] that we get from the operating system
+[00:02:58 -> 00:03:01] that's an even multiple of four kilobytes,
+[00:03:01 -> 00:03:02] and we're going to split it up
+[00:03:02 -> 00:03:04] into these individual pieces.
+[00:03:04 -> 00:03:06] This is one of the first places
+[00:03:06 -> 00:03:08] where we're going to see our efficiency argument
+[00:03:08 -> 00:03:09] come into play.
+[00:03:09 -> 00:03:13] What we want to do here is efficiently store information
+[00:03:13 -> 00:03:15] about what blocks are stored
+[00:03:15 -> 00:03:17] without having to have an extra data structure.
+[00:03:17 -> 00:03:20] Rather than keeping an additional hash table
+[00:03:20 -> 00:03:21] or something else along those lines,
+[00:03:21 -> 00:03:23] we're just going to keep the information
+[00:03:23 -> 00:03:27] about which chunks are in use in the chunks themselves.
+[00:03:27 -> 00:03:28] And because we're going to be storing
+[00:03:28 -> 00:03:30] the size of the chunk
+[00:03:30 -> 00:03:32] and we're keeping everything contiguous,
+[00:03:32 -> 00:03:34] we can actually hop through this list
+[00:03:34 -> 00:03:37] to find each individual chunk within the entire heap.
+[00:03:38 -> 00:03:41] So in this example, as we saw in the previous one,
+[00:03:41 -> 00:03:45] we have a block size in each of these headers
+[00:03:45 -> 00:03:47] that we know exactly how far it is
+[00:03:47 -> 00:03:50] from here to here is this big.
+[00:03:51 -> 00:03:56] If we put these things end to end all in a nice list
+[00:03:56 -> 00:03:59] as if they're all contiguous within that chunk of pages
+[00:03:59 -> 00:04:00] that the opting system gave us,
+[00:04:00 -> 00:04:02] what we end up with is saying,
+[00:04:02 -> 00:04:04] okay, well, this one is eight bytes long.
+[00:04:04 -> 00:04:07] If we go eight bytes forward from the beginning of this,
+[00:04:07 -> 00:04:09] we're going to start at the next chunk.
+[00:04:09 -> 00:04:11] And that's going to be another chunk header.
+[00:04:11 -> 00:04:13] So we know if we started a chunk header,
+[00:04:13 -> 00:04:14] we interpret its size,
+[00:04:14 -> 00:04:16] we hop forward by that many bytes,
+[00:04:16 -> 00:04:18] we're going to be at another chunk header.
+[00:04:18 -> 00:04:20] And we can keep doing this and doing this and doing this
+[00:04:20 -> 00:04:22] until we get to a special block that says,
+[00:04:22 -> 00:04:24] hey, my size is zero.
+[00:04:24 -> 00:04:27] And we allocate that at the very beginning saying,
+[00:04:27 -> 00:04:30] this is the header of the end.
+[00:04:30 -> 00:04:32] So this is the epilogue block that says we are done.
+[00:04:32 -> 00:04:34] This is the end of the heap.
+[00:04:34 -> 00:04:37] One other important property of the blocks
+[00:04:37 -> 00:04:39] that we are receiving from malloc
+[00:04:39 -> 00:04:41] is that they're always going to have an even multiple
+[00:04:41 -> 00:04:44] of eight bytes within the entire block.
+[00:04:44 -> 00:04:48] So if the block size is always evenly divisible by eight,
+[00:04:48 -> 00:04:50] so if something is evenly divisible by eight,
+[00:04:50 -> 00:04:53] that means that the lowest three bits
+[00:04:53 -> 00:04:55] are going to be set to zero no matter what.
+[00:04:55 -> 00:04:57] This comes in really important
+[00:04:57 -> 00:05:00] because if the block size is going to be divisible
+[00:05:00 -> 00:05:03] by eight, then we know that we can always mask those off.
+[00:05:03 -> 00:05:05] If we didn't know how big a block is,
+[00:05:05 -> 00:05:07] we just mask these three bits as zero
+[00:05:07 -> 00:05:11] and then compute the block size as this number
+[00:05:11 -> 00:05:13] and boom, we're done, no big deal.
+[00:05:13 -> 00:05:17] The next thing that we can do with this interpretation
+[00:05:17 -> 00:05:19] is that we've got three bits to use for whatever we want to.
+[00:05:19 -> 00:05:22] So in this basic allocator case,
+[00:05:22 -> 00:05:25] we're gonna use the lowest order bit of that block header
+[00:05:25 -> 00:05:28] to indicate whether something is allocated or free.
+[00:05:28 -> 00:05:30] And so you can see in this implicit free list
+[00:05:30 -> 00:05:33] that we're going to keep track of each of these blocks
+[00:05:33 -> 00:05:35] contiguously from one block to one block
+[00:05:35 -> 00:05:36] to one block to one block.
+[00:05:36 -> 00:05:38] Each of these blocks as a block header,
+[00:05:38 -> 00:05:40] that block header is going to have a zero
+[00:05:40 -> 00:05:42] in the least significant bit if it's free.
+[00:05:42 -> 00:05:44] It's gonna have a one in the least significant bit
+[00:05:44 -> 00:05:46] if it's allocated and after we mask off
+[00:05:46 -> 00:05:49] each of those three least significant bits,
+[00:05:49 -> 00:05:52] we can take the size and then we're going to add the size
+[00:05:52 -> 00:05:55] to the block pointer and that brings us
+[00:05:55 -> 00:05:57] to another block header pointer
+[00:05:57 -> 00:05:59] that points at another header.
+[00:05:59 -> 00:06:02] We can interpret that number right there,
+[00:06:02 -> 00:06:04] mask off of three lower bits,
+[00:06:04 -> 00:06:06] interpret it as an integer, add it to the pointer.
+[00:06:06 -> 00:06:08] That brings us to the next header.
+[00:06:08 -> 00:06:12] As you can see, if you keep your size in your header,
+[00:06:12 -> 00:06:15] you have implicitly created a linked list
+[00:06:15 -> 00:06:19] of the pieces of memory in your heap.
+[00:06:19 -> 00:06:21] If you always keep track of these chunks
+[00:06:21 -> 00:06:23] with their size in them, that is what you get.
+[00:06:23 -> 00:06:26] And if we wanna keep track of the free blocks,
+[00:06:26 -> 00:06:30] which is gonna be useful for lots of different situations,
+[00:06:30 -> 00:06:33] we will be able to just iterate from the very beginning
+[00:06:33 -> 00:06:35] all the way through to the very end.
+[00:06:35 -> 00:06:36] We could say, oh, this one is free
+[00:06:36 -> 00:06:39] and this one is free and that's what we have to work with.
+[00:06:39 -> 00:06:41] If somebody asks for 32, we can just give them 32.
+[00:06:41 -> 00:06:44] If somebody asks for 24, we can split this up
+[00:06:44 -> 00:06:47] and give them the 24 and then keep the other eight
+[00:06:47 -> 00:06:48] for our own purposes.
+[00:06:49 -> 00:06:51] This gets a little bit more complicated
+[00:06:51 -> 00:06:55] when we see the way that our allocator works in class
+[00:06:55 -> 00:06:57] where we're actually gonna use an implicit free list
+[00:06:57 -> 00:06:59] that goes backwards and forward.
+[00:06:59 -> 00:07:01] So what we end up with is a header.
+[00:07:01 -> 00:07:04] And as I said in the previous slide, a footer
+[00:07:04 -> 00:07:07] that duplicates that header value.
+[00:07:07 -> 00:07:09] And this allows us to say,
+[00:07:09 -> 00:07:12] if I've popped through this list to here,
+[00:07:12 -> 00:07:13] well, if it was a singly linked list,
+[00:07:13 -> 00:07:16] remember we can only go forward, we can't go backwards.
+[00:07:16 -> 00:07:19] But if we know that if right here is a header,
+[00:07:19 -> 00:07:22] that means that four bytes earlier is a footer
+[00:07:22 -> 00:07:25] and we can iterate backwards through the list that way.
+[00:07:25 -> 00:07:26] This is gonna come in handy
+[00:07:26 -> 00:07:29] when we're trying to efficiently keep track
+[00:07:29 -> 00:07:32] of the blocks that we have unallocated in our system.
+[00:07:32 -> 00:07:35] Now you could imagine if you have a system like this,
+[00:07:35 -> 00:07:38] you're going to ask for a certain amount of memory
+[00:07:38 -> 00:07:39] from the operating system,
+[00:07:39 -> 00:07:43] you're gonna give some chunk to the user
+[00:07:43 -> 00:07:45] and then you're gonna have the remainder that is on out
+[00:07:45 -> 00:07:47] that presumably if they didn't ask
+[00:07:47 -> 00:07:49] for an even multiple of four kilobytes,
+[00:07:49 -> 00:07:51] you're gonna have a little bit of extra information
+[00:07:51 -> 00:07:54] that you can use for other calls to mallet.
+[00:07:54 -> 00:07:56] When we get this brand clean memory,
+[00:07:56 -> 00:07:58] yeah, it sounds pretty obvious that we would say,
+[00:07:58 -> 00:08:00] okay, the very first thing we're just gonna take it,
+[00:08:00 -> 00:08:01] we're gonna make it a certain size,
+[00:08:01 -> 00:08:03] we're gonna split it up and have the other thing be free.
+[00:08:03 -> 00:08:06] And we've implicitly already said,
+[00:08:06 -> 00:08:07] we're gonna have a decision
+[00:08:07 -> 00:08:11] about how we're going to create new chunks of memory.
+[00:08:11 -> 00:08:13] We're just gonna find the very first place
+[00:08:13 -> 00:08:18] that actually has enough space of unallocated memory
+[00:08:18 -> 00:08:20] and give it to the user, chop it up into two pieces,
+[00:08:20 -> 00:08:23] give the one part to the user, keep the rest as free.
+[00:08:23 -> 00:08:25] That makes sense,
+[00:08:25 -> 00:08:27] but that's not the only way that we can do it.
+[00:08:27 -> 00:08:30] If we look at how we're going to decide
+[00:08:31 -> 00:08:33] which block goes where,
+[00:08:33 -> 00:08:36] we're very quickly gonna end up with our space constraint
+[00:08:36 -> 00:08:39] where we're trying to optimize how much space we're using
+[00:08:39 -> 00:08:42] and say, well, finding the very first location
+[00:08:42 -> 00:08:45] isn't necessarily always gonna be the best thing
+[00:08:45 -> 00:08:47] because we're gonna very quickly end up with
+[00:08:47 -> 00:08:49] kind of like a block marked memory allocator
+[00:08:49 -> 00:08:52] where if users are allocating things
+[00:08:52 -> 00:08:53] and then freeing things and allocating things
+[00:08:53 -> 00:08:54] and then freeing things,
+[00:08:54 -> 00:08:57] we just put it in the very first spot that we find,
+[00:08:57 -> 00:08:59] we're gonna end up with increasingly smaller
+[00:08:59 -> 00:09:02] and smaller free allocations
+[00:09:02 -> 00:09:03] to the point where things are gonna look like,
+[00:09:03 -> 00:09:08] oh, here's a small thing, here's a small thing,
+[00:09:08 -> 00:09:11] here's a small thing, here's a small thing.
+[00:09:11 -> 00:09:13] And if we just always find the first one that fits,
+[00:09:13 -> 00:09:15] we say, oh, there's gonna be eight bytes left over,
+[00:09:15 -> 00:09:17] who cares, whatever.
+[00:09:17 -> 00:09:20] But if nobody ever needs an eight byte allocation,
+[00:09:20 -> 00:09:22] then we've wasted those eight bytes.
+[00:09:22 -> 00:09:24] And if you waste enough of those little eight byte
+[00:09:24 -> 00:09:28] chunks, you might end up with a 24 byte allocation
+[00:09:28 -> 00:09:30] and say, oh, I've got thousands of bytes,
+[00:09:30 -> 00:09:32] but none of them are 24 by themselves.
+[00:09:32 -> 00:09:34] We got eight here, 16 here, eight here, eight here,
+[00:09:34 -> 00:09:35] eight here.
+[00:09:35 -> 00:09:37] If somebody asks you for 24 bytes,
+[00:09:37 -> 00:09:39] you need to give them 24 bytes in a row.
+[00:09:39 -> 00:09:41] You can't give them a little bit from over here
+[00:09:41 -> 00:09:42] and a little bit from over there.
+[00:09:42 -> 00:09:44] That's just not the way that it works
+[00:09:44 -> 00:09:46] at this user level memory allocation.
+[00:09:46 -> 00:09:48] You're guaranteed to get contiguous memory.
+[00:09:48 -> 00:09:50] And if we use first fit,
+[00:09:50 -> 00:09:53] we're very quickly going to run out of contiguous memory.
+[00:09:53 -> 00:09:55] The opposite to first fit is best fit,
+[00:09:55 -> 00:09:57] where we say, listen,
+[00:09:57 -> 00:09:59] rather than being very time efficient
+[00:09:59 -> 00:10:01] and just finding the first thing, chopping it up
+[00:10:01 -> 00:10:02] and giving it back to the user,
+[00:10:02 -> 00:10:04] boom, boom, ready, go, done.
+[00:10:04 -> 00:10:06] We're gonna be space efficient and say, listen,
+[00:10:06 -> 00:10:08] the worst thing that we can possibly do
+[00:10:08 -> 00:10:10] is take really, really big pieces of memory
+[00:10:10 -> 00:10:12] and put it into small, tiny little chunks.
+[00:10:12 -> 00:10:16] It'd be much better if we say somebody asks for 24,
+[00:10:16 -> 00:10:19] I'm gonna find the smallest possible region
+[00:10:19 -> 00:10:22] that still has at least 24 allocatable bytes
+[00:10:22 -> 00:10:24] and I'm gonna use that one.
+[00:10:24 -> 00:10:27] That's going to preserve our big chunks
+[00:10:27 -> 00:10:30] for when we actually need to use those big chunks.
+[00:10:30 -> 00:10:35] So best fit kind of gives us a very low run time.
+[00:10:35 -> 00:10:38] So it's gonna be very inefficient in time,
+[00:10:38 -> 00:10:41] especially if we're going through a linked list, right?
+[00:10:41 -> 00:10:43] But it is gonna be very efficient in space
+[00:10:43 -> 00:10:44] because you're gonna say, you know what?
+[00:10:44 -> 00:10:47] I don't know when allocations are gonna come in,
+[00:10:47 -> 00:10:49] how big they're gonna be, any of that stuff,
+[00:10:49 -> 00:10:52] but I do know on a case by case basis,
+[00:10:52 -> 00:10:54] I am always wasting the smallest amount of memory
+[00:10:54 -> 00:10:56] at any given point in time.
+[00:10:56 -> 00:10:59] And so without any sort of crazy predictive analytics,
+[00:10:59 -> 00:11:02] I'm probably using the most efficient allocator
+[00:11:02 -> 00:11:03] I possibly can.
+[00:11:03 -> 00:11:06] The next optimization that's covered in the book
+[00:11:06 -> 00:11:07] is this thing called next fit.
+[00:11:07 -> 00:11:09] And while it's not super important
+[00:11:09 -> 00:11:12] because it actually ends up not being super efficient,
+[00:11:12 -> 00:11:14] it is interesting to think about its design
+[00:11:14 -> 00:11:17] and the intention behind that design.
+[00:11:17 -> 00:11:19] So we start thinking about the first fit allocator
+[00:11:19 -> 00:11:22] and we say, this is supposed to be fast,
+[00:11:22 -> 00:11:25] but what happens in actuality?
+[00:11:25 -> 00:11:28] In actuality, first fit always starts looking
+[00:11:28 -> 00:11:31] for a free space from the very beginning of the memory
+[00:11:31 -> 00:11:33] and it finds the very first one it finds
+[00:11:33 -> 00:11:35] and it says, yes, this is where I'm gonna put this thing.
+[00:11:35 -> 00:11:38] So you can imagine that if you had a really big array
+[00:11:38 -> 00:11:42] of memory and all of this memory is totally yours
+[00:11:42 -> 00:11:44] for your process, it can do whatever it wants with it.
+[00:11:44 -> 00:11:46] And it keeps saying, okay, well, I'm gonna start
+[00:11:46 -> 00:11:47] at the very, very beginning and say,
+[00:11:47 -> 00:11:48] oh, are there 24 bytes here?
+[00:11:48 -> 00:11:49] Are there 24 bytes here?
+[00:11:49 -> 00:11:51] Are there 24 bytes here?
+[00:11:51 -> 00:11:53] It's gonna find them, it's gonna use them.
+[00:11:53 -> 00:11:55] And you could imagine that over time,
+[00:11:55 -> 00:11:58] if there's allocations and deallocations,
+[00:11:58 -> 00:12:00] there's all this free memory down here,
+[00:12:00 -> 00:12:03] but the allocator keeps saying, oh, I'm gonna check
+[00:12:03 -> 00:12:05] the first one, the second one, the third one,
+[00:12:05 -> 00:12:07] the fourth one, the fifth one, the sixth one, et cetera.
+[00:12:07 -> 00:12:10] And even if you did something very, very simple,
+[00:12:10 -> 00:12:11] maybe not the most optimized thing in the world,
+[00:12:11 -> 00:12:14] but you just malloc 5,000 different things
+[00:12:14 -> 00:12:17] and you did first fit, you're going to be iterating
+[00:12:17 -> 00:12:19] over a bunch of allocated blocks over and over
+[00:12:19 -> 00:12:22] and over again, before you find the free one
+[00:12:22 -> 00:12:24] and then you're good to go.
+[00:12:24 -> 00:12:28] So next fit is an optimization of this process
+[00:12:28 -> 00:12:33] that's designed to say, I looked at how first fit works
+[00:12:33 -> 00:12:36] and it sounds in theory like it's a good idea,
+[00:12:36 -> 00:12:39] but in actuality, it is very time inefficient
+[00:12:39 -> 00:12:40] because of this.
+[00:12:40 -> 00:12:42] The optimization we're gonna use here
+[00:12:42 -> 00:12:44] is between different allocations,
+[00:12:44 -> 00:12:46] we're gonna keep track of where we did
+[00:12:46 -> 00:12:50] our last allocation and the next time we get
+[00:12:50 -> 00:12:52] another request for an allocation,
+[00:12:52 -> 00:12:55] we're gonna start our iteration from that chunk header
+[00:12:55 -> 00:12:57] rather than the very first chunk header
+[00:12:57 -> 00:13:03] in the entire system.
+[00:13:03 -> 00:13:05] This will give us a faster allocator,
+[00:13:05 -> 00:13:09] but in actuality, it's going to end up creating
+[00:13:09 -> 00:13:12] an even more Swiss cheese looking memory layout
+[00:13:12 -> 00:13:15] and so it's not actually in use in the real world.
+[00:13:15 -> 00:13:17] What I want you to take away from this
+[00:13:17 -> 00:13:20] is that sometimes when we design something
+[00:13:20 -> 00:13:22] based on first principles,
+[00:13:22 -> 00:13:24] it's not always gonna be as simple as it seems.
+[00:13:24 -> 00:13:25] We're gonna have to go back through
+[00:13:25 -> 00:13:28] and look at how things actually work in reality
+[00:13:28 -> 00:13:31] and design optimizations or fixes on top of that.
+[00:13:31 -> 00:13:34] Remember, all of these allocators are correct.
+[00:13:34 -> 00:13:37] Remember, our first most important job
+[00:13:37 -> 00:13:40] is to make the allocator work the way it's supposed to.
+[00:13:41 -> 00:13:43] All three of these algorithms will give you memory.
+[00:13:43 -> 00:13:45] Will they give you memory fast?
+[00:13:45 -> 00:13:46] Will they give you memory efficiently?
+[00:13:46 -> 00:13:50] I don't know, but the important part to realize here
+[00:13:50 -> 00:13:51] is that there are these different trade-offs
+[00:13:51 -> 00:13:53] in time and in space
+[00:13:53 -> 00:13:55] and in how the program actually works.
+[00:13:55 -> 00:13:58] They're gonna go into designing the right way
+[00:13:58 -> 00:14:00] to do this allocation.
+[00:14:00 -> 00:14:03] The next thing that I wanna go over is coalescing.
+[00:14:03 -> 00:14:06] So when we were talking about our whole entire heap before,
+[00:14:06 -> 00:14:08] we were talking about this problem
+[00:14:08 -> 00:14:11] where we take our chunks, we split them into,
+[00:14:11 -> 00:14:16] and we end up with a lot of smaller pieces.
+[00:14:16 -> 00:14:18] So the bad situation that we saw earlier was that,
+[00:14:18 -> 00:14:21] oh, if this one and this one and this one
+[00:14:21 -> 00:14:23] and this one and this one and this one
+[00:14:23 -> 00:14:25] and this one are allocated
+[00:14:25 -> 00:14:28] and somebody comes in and asks for this much memory,
+[00:14:28 -> 00:14:31] we've got, you know, we have this much free,
+[00:14:31 -> 00:14:34] but we wouldn't be able to make a single allocation
+[00:14:34 -> 00:14:34] of that size.
+[00:14:34 -> 00:14:36] That's bad, right?
+[00:14:36 -> 00:14:37] But what's even worse,
+[00:14:37 -> 00:14:40] if we took a completely naive implementation
+[00:14:40 -> 00:14:44] where we split things apart when we need a new allocation
+[00:14:44 -> 00:14:47] and we free them, and when we free them,
+[00:14:47 -> 00:14:48] we just mark them as free,
+[00:14:48 -> 00:14:53] what we would end up with is a whole bunch of free pieces.
+[00:14:53 -> 00:14:59] So if all of these were individual free pieces,
+[00:14:59 -> 00:15:02] but they're individually small size chunks
+[00:15:02 -> 00:15:04] and somebody comes in and asks for this much,
+[00:15:04 -> 00:15:06] they're not gonna be able to get it
+[00:15:06 -> 00:15:10] even though we have more than that much space.
+[00:15:10 -> 00:15:13] How did this F turn into a G?
+[00:15:13 -> 00:15:15] Even though we have more than enough space
+[00:15:15 -> 00:15:18] to allocate that piece of memory,
+[00:15:18 -> 00:15:20] that's really, really bad.
+[00:15:20 -> 00:15:22] So what we wanna do is say,
+[00:15:22 -> 00:15:27] okay, when there are two freed pieces next to each other,
+[00:15:27 -> 00:15:30] we want to turn them into one freed piece.
+[00:15:31 -> 00:15:32] And that makes it bigger,
+[00:15:32 -> 00:15:34] and a bigger piece is always better
+[00:15:34 -> 00:15:36] for keeping track of our memory.
+[00:15:36 -> 00:15:38] We can always split things in half easily,
+[00:15:38 -> 00:15:40] but it's much, much harder to put them back together
+[00:15:40 -> 00:15:42] because you can only put them back together
+[00:15:42 -> 00:15:44] when they are both free at the same time.
+[00:15:44 -> 00:15:46] So again, this is one of those places
+[00:15:46 -> 00:15:49] where kind of the naive way to approach it
+[00:15:49 -> 00:15:50] might not be the most efficient one,
+[00:15:50 -> 00:15:52] but I'll tell you the way that I just see
+[00:15:52 -> 00:15:54] when I'm not thinking super, super deeply
+[00:15:54 -> 00:15:55] about these things,
+[00:15:55 -> 00:15:56] I'm gonna just like, you know what?
+[00:15:56 -> 00:15:57] First possible solution here,
+[00:15:57 -> 00:15:59] it looks like every once in a while,
+[00:15:59 -> 00:16:01] I should go through my entire heap
+[00:16:01 -> 00:16:03] and I should just say, are these two free together?
+[00:16:03 -> 00:16:04] Okay, coalesce them.
+[00:16:04 -> 00:16:06] Are these two free together?
+[00:16:06 -> 00:16:06] Okay, coalesce them.
+[00:16:06 -> 00:16:07] Are these two free together?
+[00:16:07 -> 00:16:08] Okay, coalesce them.
+[00:16:08 -> 00:16:11] And that's gonna take order N for,
+[00:16:11 -> 00:16:12] N is the number of chunks that we have,
+[00:16:12 -> 00:16:14] and we do that every once in a while.
+[00:16:14 -> 00:16:16] And so it sounds like, okay, that's a good idea
+[00:16:16 -> 00:16:19] that'll certainly get the job done,
+[00:16:19 -> 00:16:21] but it sounds like it's gonna take
+[00:16:21 -> 00:16:23] a very variable amount of time.
+[00:16:23 -> 00:16:27] I would rather do a small constant amount of work
+[00:16:27 -> 00:16:29] every single time there's a free
+[00:16:29 -> 00:16:34] rather than do a lot of work every once in a long while
+[00:16:34 -> 00:16:36] because then I'll have a much more predictable delay
+[00:16:36 -> 00:16:38] and predictable delays,
+[00:16:38 -> 00:16:40] especially when overall the average is low
+[00:16:40 -> 00:16:43] are kind of the best way that we can design these systems.
+[00:16:43 -> 00:16:48] So what we're gonna see is that coalescing
+[00:16:48 -> 00:16:52] in the abstract is just taking two free blocks
+[00:16:52 -> 00:16:54] and turning them into one thing.
+[00:16:54 -> 00:16:58] So if I were to free this piece,
+[00:16:58 -> 00:17:03] and then I said, okay, this piece is free
+[00:17:03 -> 00:17:06] and the piece after it is also free,
+[00:17:06 -> 00:17:09] then I now have one big free piece.
+[00:17:11 -> 00:17:13] Likewise, if I free something
+[00:17:14 -> 00:17:18] and there's nothing free above it
+[00:17:18 -> 00:17:22] and nothing free below it, it just becomes free.
+[00:17:22 -> 00:17:26] And if I free something and there's something free above it
+[00:17:26 -> 00:17:28] and there's something free below it,
+[00:17:28 -> 00:17:31] then I have the entire chunk altogether.
+[00:17:31 -> 00:17:35] I add the one above it, I add the one below it, I'm done.
+[00:17:35 -> 00:17:38] Now, the really important thing about this
+[00:17:38 -> 00:17:40] that I was just like when I first realized it
+[00:17:40 -> 00:17:43] is that those are the only three situations
+[00:17:43 -> 00:17:44] you can have.
+[00:17:44 -> 00:17:46] Yeah, this first one, maybe it's the,
+[00:17:46 -> 00:17:47] maybe the one below it is free,
+[00:17:47 -> 00:17:49] maybe the one above it is free.
+[00:17:49 -> 00:17:51] But these three situations are the only ones
+[00:17:51 -> 00:17:52] that could possibly ever happen
+[00:17:52 -> 00:17:57] if I do my coalescing after every single free.
+[00:17:58 -> 00:18:00] And this is a small constant amount of time.
+[00:18:00 -> 00:18:02] Every single time you're gonna check a few bits above,
+[00:18:02 -> 00:18:04] check a few bits below
+[00:18:04 -> 00:18:06] and do a few different manipulations
+[00:18:06 -> 00:18:09] of a few different headers very, very fast.
+[00:18:09 -> 00:18:10] But the most amazing part is
+[00:18:10 -> 00:18:13] that there's never gonna be some weird situation
+[00:18:13 -> 00:18:17] where this one was free and this one was free
+[00:18:17 -> 00:18:20] and we gotta kind of coalesce all of these things
+[00:18:20 -> 00:18:22] and there's some sort of cascading situation.
+[00:18:22 -> 00:18:24] Because if we do it every single time,
+[00:18:24 -> 00:18:28] we're guaranteed that every single thing that gets freed
+[00:18:28 -> 00:18:31] is going to have a free chunk above it
+[00:18:31 -> 00:18:33] and then an allocated above that.
+[00:18:33 -> 00:18:35] A free chunk below it and an allocated one below that
+[00:18:35 -> 00:18:38] or allocated below or and free above
+[00:18:38 -> 00:18:41] or allocated above and allocated below
+[00:18:41 -> 00:18:43] in which case we just free it.
+[00:18:43 -> 00:18:45] So we only have these three situations.
+[00:18:45 -> 00:18:49] We only are going to coalesce to one above,
+[00:18:49 -> 00:18:51] one below and the same idea.
+[00:18:52 -> 00:18:53] Not do any coalescing
+[00:18:53 -> 00:18:55] or coalesce with the one above and the one below.
+[00:18:55 -> 00:18:57] We never have to do any more than that
+[00:18:57 -> 00:18:59] if we do it every single time.
+[00:18:59 -> 00:19:00] If we didn't do it every single time,
+[00:19:00 -> 00:19:02] if we only did it once every 10th time,
+[00:19:02 -> 00:19:04] then yeah, we might end up in a bad situation
+[00:19:04 -> 00:19:06] where we've gotta coalesce above
+[00:19:06 -> 00:19:08] and then above that one and then above that one.
+[00:19:08 -> 00:19:10] But if we amortize that time
+[00:19:10 -> 00:19:11] by doing it every single time,
+[00:19:11 -> 00:19:15] we're gonna end up with less overall effort
+[00:19:15 -> 00:19:19] and much, much lower overall variance in our response time.
+[00:19:19 -> 00:19:22] So the last optimization that I'm gonna talk about here
+[00:19:22 -> 00:19:24] in how we're gonna design a memory allocator
+[00:19:24 -> 00:19:26] is the use of an explicit free list.
+[00:19:26 -> 00:19:28] So as we saw earlier on,
+[00:19:28 -> 00:19:33] if we had our whole big long list of allocations
+[00:19:34 -> 00:19:39] and we said, okay, this whole entire allocation,
+[00:19:40 -> 00:19:41] this one is allocated, this one's allocated,
+[00:19:41 -> 00:19:43] this one's allocated, this one's allocated,
+[00:19:43 -> 00:19:45] this one's allocated, this one's allocated,
+[00:19:45 -> 00:19:48] then we would have to iterate through this one
+[00:19:48 -> 00:19:50] to this one to this one to this one to this one
+[00:19:50 -> 00:19:52] to find, say, that block.
+[00:19:52 -> 00:19:55] And so iterating over allocated blocks
+[00:19:55 -> 00:19:57] isn't super, super useful.
+[00:19:57 -> 00:20:00] If we're trying to find something that's free,
+[00:20:00 -> 00:20:02] going over this and this and this and this
+[00:20:02 -> 00:20:04] isn't useful, right?
+[00:20:04 -> 00:20:06] Like yes, we're using that implicit free list
+[00:20:06 -> 00:20:08] to hop from header to header to header.
+[00:20:08 -> 00:20:11] And when we have allocated the space
+[00:20:11 -> 00:20:14] in that individual block to the user,
+[00:20:14 -> 00:20:16] we can't touch it, right?
+[00:20:16 -> 00:20:18] But if it gets freed to us,
+[00:20:18 -> 00:20:23] then we're free to optimize this a little bit more.
+[00:20:23 -> 00:20:25] Rather than hop, hop, hop, hop, hop,
+[00:20:25 -> 00:20:27] let's say this one here is free
+[00:20:27 -> 00:20:29] and we wanna find this one, this is the best fit,
+[00:20:29 -> 00:20:31] and we're trying to do best fit
+[00:20:31 -> 00:20:33] in a implicit free list,
+[00:20:33 -> 00:20:35] we'd have to go one, two, three, four,
+[00:20:35 -> 00:20:38] five, six, seven, eight hops.
+[00:20:38 -> 00:20:42] But because we have these free chunks here,
+[00:20:42 -> 00:20:43] we can say, okay,
+[00:20:43 -> 00:20:47] I'm going to put a PTR to the next free chunk
+[00:20:47 -> 00:20:50] and I'm gonna put a PTR to the previous free chunk area
+[00:20:50 -> 00:20:53] where there used to be user level data.
+[00:20:53 -> 00:20:56] Because it's been freed, we as the library
+[00:20:56 -> 00:20:58] can do whatever the heck we want with it.
+[00:20:58 -> 00:21:00] So that's pretty useful.
+[00:21:00 -> 00:21:01] So we can take this PTR next
+[00:21:01 -> 00:21:04] and that goes all the way here to the next free block.
+[00:21:04 -> 00:21:05] And in that free block,
+[00:21:05 -> 00:21:09] we can keep another PTR next and then PTR prev.
+[00:21:09 -> 00:21:11] And that will take us all the way to the next free block
+[00:21:12 -> 00:21:14] and that way, the amount of time it takes
+[00:21:14 -> 00:21:18] for us to iterate through the free list
+[00:21:18 -> 00:21:21] is gonna be proportional to the number of freed blocks
+[00:21:21 -> 00:21:24] rather than the number of allocated blocks
+[00:21:24 -> 00:21:25] and free blocks.
+[00:21:25 -> 00:21:27] So it could be much, much lower,
+[00:21:27 -> 00:21:30] especially after a program has been in use for a while
+[00:21:30 -> 00:21:32] and has lots and lots of information stored in it,
+[00:21:32 -> 00:21:33] especially in lots of different
+[00:21:33 -> 00:21:35] little itty bitty malloc chunks.
+[00:21:36 -> 00:21:39] So this is a little visualization of what we had.
+[00:21:39 -> 00:21:40] This is an old payload.
+[00:21:40 -> 00:21:42] So we know that we have at least enough space
+[00:21:42 -> 00:21:45] for one of those predecessor pointers
+[00:21:45 -> 00:21:46] and one of those successor pointers
+[00:21:46 -> 00:21:49] to go back and forth within this thing.
+[00:21:49 -> 00:21:51] And another fantastic part about this
+[00:21:51 -> 00:21:54] is that if we have enough space here for these pointers,
+[00:21:54 -> 00:21:56] nothing says we have to make
+[00:21:56 -> 00:21:58] just a garden variety linked list.
+[00:21:58 -> 00:22:01] We could turn this into a heap or a binary tree
+[00:22:01 -> 00:22:02] or anything like that
+[00:22:02 -> 00:22:06] to make this allocation much, much more efficient.
+[00:22:06 -> 00:22:08] So there's a little bit of disadvantage here
+[00:22:08 -> 00:22:10] that you have to have those blocks
+[00:22:10 -> 00:22:12] be sized large enough to keep those pointers.
+[00:22:12 -> 00:22:15] Again, that's going to be a space efficiency issue,
+[00:22:15 -> 00:22:18] but we're gonna get this huge time efficiency benefit
+[00:22:18 -> 00:22:22] by being able to very quickly find a free block
+[00:22:22 -> 00:22:24] that is going to fit the needs
+[00:22:24 -> 00:22:28] of the individual allocation request that was given to us.
+[00:22:28 -> 00:22:29] That's all I've got for you in this video.
+[00:22:29 -> 00:22:32] Thanks so much for watching and I'll see you next time.

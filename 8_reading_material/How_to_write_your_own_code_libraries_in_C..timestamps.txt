@@ -1,0 +1,189 @@
+Title: How to write your own code libraries in C.
+Video ID: JbHmin2Wtmc
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:03] Hey everybody, our topic for today is libraries.
+[00:00:03 -> 00:00:15] If you are a programmer, you use software libraries all the time, but you may not think
+[00:00:15 -> 00:00:18] about it, and many of you probably have never made your own.
+[00:00:18 -> 00:00:22] And today we're going to change that and write some of our own libraries in C. A
+[00:00:22 -> 00:00:28] library is a collection of pieces of software that you bunch together and you want to distribute.
+[00:00:28 -> 00:00:32] You put them together in a collection so that you can reuse them in different programs.
+[00:00:32 -> 00:00:35] Maybe you have a favorite data structure, hash table, linked list, a queue, whatever,
+[00:00:35 -> 00:00:39] you want to be able to use it all over the place, you want to give it to your friends,
+[00:00:39 -> 00:00:42] then maybe that's a good candidate for something you might want to put in a library.
+[00:00:42 -> 00:00:46] The library that you use all the time but you probably don't think about is libc, otherwise
+[00:00:46 -> 00:00:49] known as the C standard library.
+[00:00:49 -> 00:00:53] Libc is home to malloc, caloc, realoc, free, printf, and all the other favorite
+[00:00:53 -> 00:00:57] functions that you call all the time but you didn't write and you didn't really
+[00:00:57 -> 00:00:58] think about where they came from.
+[00:00:58 -> 00:01:00] They're mostly all in libc.
+[00:01:00 -> 00:01:03] But today we're interested in making our own libraries, so let's make a library
+[00:01:03 -> 00:01:05] in C for Linux.
+[00:01:05 -> 00:01:06] So let's start with a header file.
+[00:01:06 -> 00:01:10] This is the header file that programmers will include when they want to use your library.
+[00:01:10 -> 00:01:14] We've got to add the usual boilerplate stuff.
+[00:01:14 -> 00:01:18] And let's add a function that I'm going to put in my library, and we're going to need
+[00:01:18 -> 00:01:19] a .cfile.
+[00:01:19 -> 00:01:23] Okay, that's where I'm going to put the function's code.
+[00:01:23 -> 00:01:26] Okay, so the function of the day is reverse.
+[00:01:26 -> 00:01:29] It's going to take a string and reverse it in place.
+[00:01:29 -> 00:01:33] It doesn't copy the string, it's destructive, so it just reverses the bytes just in
+[00:01:33 -> 00:01:38] order, takes the last byte, swaps it with the first byte. It also returns a pointer to the string and
+[00:01:38 -> 00:01:42] that's really just for convenience. So this is the function I'm going to play around with today.
+[00:01:42 -> 00:01:46] I could really use any function, though, and I could have more than one function in this library.
+[00:01:46 -> 00:01:49] And I'm also going to make another test file that's going to test my library. It's going
+[00:01:49 -> 00:01:53] to call this reverse function so that we can see whether or not it actually works.
+[00:01:54 -> 00:01:57] Okay, and this test program is just going to print out the first argument and the reverse
+[00:01:57 -> 00:02:01] of the first argument. So it just takes that argument I passed to the test program
+[00:02:01 -> 00:02:03] and it reverses it and prints it both ways.
+[00:02:03 -> 00:02:08] I've also made a little makefile to compile my code, and first off I'm compiling my library
+[00:02:08 -> 00:02:10] code into a .o file.
+[00:02:10 -> 00:02:14] Now you've probably seen .o files before, we usually think of a .o file as an intermediate
+[00:02:14 -> 00:02:19] step in compilation before you get your final binary, usually link together a bunch
+[00:02:19 -> 00:02:24] of .o files, but you can really think of a .o file as a simple library, for lack
+[00:02:24 -> 00:02:25] of a better term.
+[00:02:25 -> 00:02:29] I could take that .o file, copy it into another directory, into another project,
+[00:02:29 -> 00:02:33] Or I could send it to a friend of mine and they could use it in their projects.
+[00:02:33 -> 00:02:34] So let's do that.
+[00:02:34 -> 00:02:37] Let's link our .o file with our test program and it works.
+[00:02:37 -> 00:02:40] Okay, now where do we go from here?
+[00:02:40 -> 00:02:44] Well for one, I'm going to add a clean target to my makefile so that I can clear out
+[00:02:44 -> 00:02:45] past compiles.
+[00:02:45 -> 00:02:46] That's just for convenience.
+[00:02:46 -> 00:02:50] And then I'm going to add another rule to compile my library another way.
+[00:02:50 -> 00:02:55] As a .so file, aka a shared object or a dynamically linked library.
+[00:02:55 -> 00:02:58] If you're on Windows and see a DLL file,
+[00:02:58 -> 00:02:59] that's what we're talking about.
+[00:02:59 -> 00:03:02] Now, shared objects or shared libraries
+[00:03:02 -> 00:03:03] are a little different.
+[00:03:03 -> 00:03:06] They still hold code, but while the linker actually
+[00:03:06 -> 00:03:09] put that .o file into my final compiled binary,
+[00:03:09 -> 00:03:11] a .so file is separate.
+[00:03:11 -> 00:03:12] It's designed to be separate,
+[00:03:12 -> 00:03:15] and it's designed to be loaded at runtime.
+[00:03:15 -> 00:03:16] And when we build our .so file,
+[00:03:16 -> 00:03:19] we need a few options you may not have seen before.
+[00:03:19 -> 00:03:22] Dash FPIC just means we're going to generate,
+[00:03:22 -> 00:03:24] or the compiler is going to generate,
+[00:03:24 -> 00:03:25] position-independent code,
+[00:03:25 -> 00:03:28] that's code that can be placed anywhere in memory
+[00:03:28 -> 00:03:29] and still run correctly.
+[00:03:29 -> 00:03:30] And because at runtime,
+[00:03:30 -> 00:03:32] you're gonna load this program into memory,
+[00:03:32 -> 00:03:34] and we don't know where it's gonna be put in memory,
+[00:03:34 -> 00:03:36] position-independent code is important.
+[00:03:36 -> 00:03:37] The other option is dash shared.
+[00:03:37 -> 00:03:40] All that means is I want a shared library,
+[00:03:40 -> 00:03:41] and we've already talked about what that means.
+[00:03:41 -> 00:03:44] Okay, so and then I'm gonna add my new shared library
+[00:03:44 -> 00:03:47] to the default all rule, and we can compile it.
+[00:03:47 -> 00:03:49] Okay, now I wanna use my new shared library,
+[00:03:49 -> 00:03:51] so let's make a new program.
+[00:03:51 -> 00:03:52] It's actually just my old program,
+[00:03:52 -> 00:03:54] but I'm going to compile it differently.
+[00:03:54 -> 00:03:56] The first difference is that I'm not gonna pass
+[00:03:56 -> 00:03:59] my .o file to my compiler.
+[00:03:59 -> 00:04:02] Instead, I'm going to add a dash l option,
+[00:04:02 -> 00:04:03] telling the compiler to look
+[00:04:03 -> 00:04:05] in the current directory for libraries.
+[00:04:05 -> 00:04:08] And then I'm gonna add a dash little l option
+[00:04:08 -> 00:04:10] to tell it that I wanna link the program
+[00:04:10 -> 00:04:12] with lib mycode.
+[00:04:12 -> 00:04:14] Okay, now this might be a good time to mention
+[00:04:14 -> 00:04:19] that this dash l mycode is shorthand for dash lib mycode.
+[00:04:19 -> 00:04:21] My compiler is assuming that all libraries
+[00:04:21 -> 00:04:30] beginning with the words lib. Okay, so libc would just be dash lc. lib my code is dash l my code.
+[00:04:30 -> 00:04:35] This is just telling it I want to link this program with this library. And once we specify
+[00:04:35 -> 00:04:38] that that linkage is supposed to happen, then the compiler can figure out the rest.
+[00:04:38 -> 00:04:44] Okay, so compile that. Good. Okay, and then I try to run it. Not so good.
+[00:04:45 -> 00:04:50] The problem is the program loader is looking for libraries and it can't find our new library,
+[00:04:50 -> 00:04:54] so we're going to have to help it. We can tell the loader where to find our new library by adding
+[00:04:54 -> 00:04:59] it to the ld library path environment variable. Now this variable tells the loader where to look
+[00:04:59 -> 00:05:05] for libraries, so I'm just going to add my directory to the front, and then I can run my
+[00:05:05 -> 00:05:10] program and it works. But what a pain! I don't want to have to type that in every time I
+[00:05:10 -> 00:05:15] run my program. So the other option is I can install my library to one of the directories
+[00:05:15 -> 00:05:21] that the program loader automatically searches for libraries at runtime. Like userlib, for example.
+[00:05:21 -> 00:05:25] If I put our new library in one of these directories, then I won't need all that
+[00:05:25 -> 00:05:29] LD library path business. I can just run my program and it will find it.
+[00:05:29 -> 00:05:32] Okay, but so this still seems like a little bit of a hassle. Why would I want to use
+[00:05:32 -> 00:05:37] a shared library? And the reason is code size. So if I use object dump to look at
+[00:05:37 -> 00:05:44] the symbol table, you can see that the first program assigns an address to my reverse function.
+[00:05:44 -> 00:05:49] But with the second one, the one that uses the shared library, the address is all zeros,
+[00:05:50 -> 00:05:55] and the section is undefined. That's because it's going to be assigned when the program runs.
+[00:05:56 -> 00:06:00] And if we look at the two different programs, you'll notice that the one that uses the shared
+[00:06:00 -> 00:06:05] library is smaller. Now, in this example, it's not a huge difference. It's only about 600 bytes,
+[00:06:05 -> 00:06:09] and that's because the amount of code in the library is really small. But when you're
+[00:06:09 -> 00:06:13] When you're dealing with large libraries, large code bases, a lot of code, it can make
+[00:06:13 -> 00:06:16] a big difference, and it can save you a lot of space.
+[00:06:16 -> 00:06:20] So think of it this way, on the machine I'm currently using, libc takes up about two megabytes
+[00:06:20 -> 00:06:21] of space.
+[00:06:21 -> 00:06:25] Now, two megabytes is not that big of a deal, but keep in mind that every program
+[00:06:25 -> 00:06:27] on this machine is linking to libc.
+[00:06:27 -> 00:06:32] So if I don't use a shared library, that means that every program on my machine
+[00:06:32 -> 00:06:35] is going to be two megabytes larger, and that also means that for every one
+[00:06:35 -> 00:06:38] of those programs, that that could be up to two megabytes more that I would have
+[00:06:38 -> 00:06:42] load into memory every time I run a program. So that could really add up. The other advantage
+[00:06:42 -> 00:06:47] of using a shared library is let's say that we find a bug in libc. We can patch that bug by
+[00:06:47 -> 00:06:51] just installing a new version of libc on the machine, and I don't have to patch every program
+[00:06:51 -> 00:06:56] on the machine that uses libc. So that's a huge advantage in terms of maintenance. But all those
+[00:06:56 -> 00:07:00] advantages aside, let's say you still don't want to go the shared route, and you really want that
+[00:07:00 -> 00:07:04] that code from your library to be part of the binary, so you don't need to worry about
+[00:07:04 -> 00:07:08] whether the shared library is there, whether it's installed properly. Then what you want is a static
+[00:07:08 -> 00:07:13] library. And as I mentioned before, .o files can kind of be thought of as a static library,
+[00:07:13 -> 00:07:17] but usually when we talk about static libraries, when we're packaging up static code that's going
+[00:07:17 -> 00:07:22] to be linked statically, the more typical approach is to use a .a file. A .a file is
+[00:07:22 -> 00:07:26] made with the ar command that stands for archive. So let's add one more option to our
+[00:07:26 -> 00:07:31] makefile, and this is going to compile our code into a static library. Now I'm going to
+[00:07:31 -> 00:07:35] give it a different name so we don't confuse the linker. If I didn't have the shared one in here,
+[00:07:35 -> 00:07:40] we could just name it libmycode.a. But we do have the shared library in here with the same name,
+[00:07:40 -> 00:07:44] so I'm going to use a different name. And then we can just use the ar command to make this .a
+[00:07:44 -> 00:07:49] file using the following options. So r means replace. It means it's going to replace any
+[00:07:49 -> 00:07:54] existing files that exist in the archive with the same name. c means create, and that means
+[00:07:54 -> 00:07:58] we're going to create the archive if it doesn't already exist. And s means we're going
+[00:07:58 -> 00:08:00] we're gonna generate an index that's gonna be used
+[00:08:00 -> 00:08:03] by the compiler to make sense of this library.
+[00:08:03 -> 00:08:06] Why s is for index, I have no idea.
+[00:08:06 -> 00:08:08] And in this example, I'm giving it one .o file,
+[00:08:08 -> 00:08:10] but if I had a bunch of .o files,
+[00:08:10 -> 00:08:11] I could just list them at the end,
+[00:08:11 -> 00:08:13] and then they would all be bundled up
+[00:08:13 -> 00:08:15] in this new static library.
+[00:08:15 -> 00:08:17] So let's compile it, and there it is,
+[00:08:17 -> 00:08:19] our beautiful new static library.
+[00:08:19 -> 00:08:21] And let's also add a rule to our make file
+[00:08:21 -> 00:08:24] that compiles our program with the new static library.
+[00:08:24 -> 00:08:26] It's basically the same as it was
+[00:08:26 -> 00:08:28] with our shared library.
+[00:08:28 -> 00:08:32] The linker just looks for what kind of library you're using, and then if it's a static library,
+[00:08:32 -> 00:08:36] it stuffs all that code into the final binary, and if it's a shared library, then it won't.
+[00:08:36 -> 00:08:40] Okay, so let's add our new static library to the list of things we want to make,
+[00:08:40 -> 00:08:45] and compile, and there it is.
+[00:08:45 -> 00:08:51] Notice again that the static version is bigger, the dynamic version is smaller.
+[00:08:51 -> 00:08:54] But the bigger static version doesn't need the library anymore.
+[00:08:54 -> 00:08:57] All the code is inside of it, so I could just throw the library away at this point,
+[00:08:57 -> 00:09:01] the static binary is still gonna work just fine.
+[00:09:01 -> 00:09:03] And if we run it, oops, sorry.
+[00:09:03 -> 00:09:07] If we run it, okay, it works.
+[00:09:07 -> 00:09:08] And so now you know how to write
+[00:09:08 -> 00:09:11] static and shared libraries in C for Linux.
+[00:09:11 -> 00:09:13] The process in Mac OS and Windows
+[00:09:13 -> 00:09:14] is gonna be a little bit different.
+[00:09:14 -> 00:09:16] You're gonna have some different compilers,
+[00:09:16 -> 00:09:17] different compiler flags.
+[00:09:17 -> 00:09:18] The extension's gonna be different.
+[00:09:18 -> 00:09:21] You're gonna have .dll or .dylib.
+[00:09:21 -> 00:09:23] But the idea is the same.
+[00:09:23 -> 00:09:24] The concepts are the same.
+[00:09:24 -> 00:09:27] Really what you're doing here is the same.
+[00:09:27 -> 00:09:28] All of these libraries are just different ways
+[00:09:28 -> 00:09:31] to fundamentally accomplish the same thing,
+[00:09:31 -> 00:09:33] which is help you to package up code
+[00:09:33 -> 00:09:35] so that you can reuse it and you can share it.
+[00:09:35 -> 00:09:35] And I hope that helps
+[00:09:35 -> 00:09:37] because that's all I got for you today.
+[00:09:37 -> 00:09:39] Tune in next time for my next video when I,
+[00:09:39 -> 00:09:40] well, I don't know what it's gonna be about,
+[00:09:40 -> 00:09:42] but I'm sure it will change your life.
+[00:09:42 -> 00:09:44] So happy coding and I'll see you later.
+[00:09:44 -> 00:09:46] You

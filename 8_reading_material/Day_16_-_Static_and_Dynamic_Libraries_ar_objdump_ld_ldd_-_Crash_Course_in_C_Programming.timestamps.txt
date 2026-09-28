@@ -1,0 +1,1332 @@
+Title: [Day 16] - Static and Dynamic Libraries (ar, objdump, ld, ldd) - Crash Course in C Programming
+Video ID: YtiPCPtmZrs
+Detected language: en
+------------------------------------------------------------
+
+[00:00:01 -> 00:00:05] Hey, what's going on, folks? It's Mike here and welcome to the next lesson in our C programming
+[00:00:05 -> 00:00:09] language series. In this lesson, we're going to talk about how to create your own libraries
+[00:00:09 -> 00:00:12] in the C programming language. I'm going to talk about static libraries that you can
+[00:00:12 -> 00:00:18] link in statically, as well as shared object files or sometimes known as DLLs on Windows
+[00:00:18 -> 00:00:24] and dynamic libraries on Mac, but shared object files or dynamically loaded libraries
+[00:00:24 -> 00:00:27] on the Linux platform. So with that said, let's go ahead and look at an example and
+[00:00:27 -> 00:00:30] some of the tools that we're going to need to use to understand how to exactly
+[00:00:30 -> 00:00:35] build libraries in the C programming language. So what I've got here on the right side is
+[00:00:35 -> 00:00:41] just a standard sort of bare bones C project here. So I'm going to go ahead and compile
+[00:00:41 -> 00:00:46] this and let's just go ahead and compile it as our program here. Now, a tool that
+[00:00:46 -> 00:00:50] I want to go ahead and show you is called LDD. And what it's going to do here is
+[00:00:50 -> 00:00:55] print out the shared object dependencies. Okay. So what does that mean? Well, let's
+[00:00:55 -> 00:01:02] just go ahead and take a look here. If I run this, I'll do LDD on our program. And
+[00:01:02 -> 00:01:07] wow, all of a sudden we see all these different files or all this information that's spit
+[00:01:07 -> 00:01:12] out to us here on the terminal. And the main thing that I want you to see here is
+[00:01:12 -> 00:01:17] that even just to create this one program, there's lots of other libraries or shared
+[00:01:17 -> 00:01:23] object as indicated by the extension SO here being added to our executable. And
+[00:01:23 -> 00:01:26] GCC is doing this behind the scenes so that we don't have to do this. And especially
+[00:01:26 -> 00:01:31] for very common libraries, these are the ones that are available for instance. So
+[00:01:31 -> 00:01:35] one in particular that's relatively important that we've been using a lot in this
+[00:01:35 -> 00:01:40] series, if we look carefully through the list is libc or the C standard library that
+[00:01:40 -> 00:01:45] as you imagine, when we do standard input outputs or work with strings or math
+[00:01:45 -> 00:01:49] functions would be brought in. Okay. So we don't have to link that into our
+[00:01:49 -> 00:01:55] program. So behind the scenes, again, there is this stage that's performed after
+[00:01:55 -> 00:02:00] compiling our code where we have to link in these dependencies into our actual
+[00:02:01 -> 00:02:07] binary file that we're executing. That is this dot slash prog here. That's
+[00:02:07 -> 00:02:10] what's going on. Okay. So we want to understand what's going on there and how
+[00:02:10 -> 00:02:14] to build our own libraries is how we're going to understand this process. So
+[00:02:14 -> 00:02:19] what I'm going to go ahead and do, here's my structure here, let's go ahead and
+[00:02:19 -> 00:02:24] create a library here. Now, typically how we like to do this and organize our
+[00:02:24 -> 00:02:29] projects is to create some include directory and a source directory as well.
+[00:02:29 -> 00:02:32] And maybe even a library directory or these types of things. For now, I'm
+[00:02:32 -> 00:02:36] going to just go ahead and keep things relatively simple here. I'm going to
+[00:02:36 -> 00:02:41] move our main file into source, and then here's what our project will look
+[00:02:41 -> 00:02:44] like here. So inside the source directory is where my source files will
+[00:02:44 -> 00:02:49] be. And then I'll have my include here. Okay. So where this discussion
+[00:02:49 -> 00:02:54] goes is about how we one organize our projects into, you know, the actual
+[00:02:54 -> 00:02:57] physical structure here of our project, but also, you know, why we're
+[00:02:57 -> 00:03:01] going to want to build things out as libraries. Why would one do this?
+[00:03:01 -> 00:03:04] Well, let's go ahead and start building a library here. So I'll get
+[00:03:04 -> 00:03:10] rid of that file here and I'm just going to call it my math dot H and
+[00:03:10 -> 00:03:17] let's go ahead and say, uh, if not defined my math H then define my math
+[00:03:17 -> 00:03:21] H and then end if here. So these are our header guards to ensure that we
+[00:03:21 -> 00:03:24] only include this file once. And then let's go ahead and provide some
+[00:03:24 -> 00:03:29] functions here, something like an ad function. I get to keep this a
+[00:03:29 -> 00:03:33] really simple library here. So that's all I have. And let's just go
+[00:03:33 -> 00:03:37] ahead and split this file here. Uh, and in the source directory, I'll
+[00:03:37 -> 00:03:46] create my math dot C and include, uh, my math dot H. And then we'll have
+[00:03:46 -> 00:03:51] the actual definition of this ad function here where we understand how
+[00:03:51 -> 00:03:56] to actually do the work here. Okay. So that's the idea. Here is our
+[00:03:56 -> 00:03:59] structure, two source files. Um, and then we'll have one in the
+[00:03:59 -> 00:04:03] include, uh, directory here, which let me go ahead and move this one
+[00:04:03 -> 00:04:09] appropriately here. So move my math into include, and there we go.
+[00:04:09 -> 00:04:12] Here's our structure here. Okay. Now let's actually make use of this
+[00:04:12 -> 00:04:16] actual project here. So again, just so you can see everything going
+[00:04:16 -> 00:04:21] on, we have the my math file here and then in our, uh, main,
+[00:04:23 -> 00:04:29] let's go ahead and, uh, open this up and our source directory and
+[00:04:29 -> 00:04:35] I'll go ahead and include my math dot H. Okay. And now we can also
+[00:04:35 -> 00:04:38] make use of the, uh, add function here. Now let's just go ahead and
+[00:04:38 -> 00:04:42] do one instance of it. Uh, we'll just go ahead and add some numbers
+[00:04:42 -> 00:04:48] here. Let's do add four and seven equals. And in order to
+[00:04:48 -> 00:04:52] compete that result, let's use our ad function of four and seven.
+[00:04:53 -> 00:04:57] And there it is. Okay. So if we want to compile this program,
+[00:04:57 -> 00:05:01] well, how do we do it? Well, we need to do GCC, and then we need all
+[00:05:01 -> 00:05:06] of our C files in the source directory, and then we'll output
+[00:05:06 -> 00:05:09] our program. But will this work? Well, let's go ahead and
+[00:05:09 -> 00:05:13] see. Uh, well, not quite cause we can't find this include file
+[00:05:13 -> 00:05:17] here. So we do have to tell our compiler on the command line
+[00:05:17 -> 00:05:21] to do include the stuff that's in our include path here. So
+[00:05:21 -> 00:05:26] dot slash include, and that's it here. And now it compiles
+[00:05:26 -> 00:05:28] here. So I'll make this a little bit smaller so you can see the
+[00:05:28 -> 00:05:30] difference there. Okay. So that's the idea again, we're
+[00:05:30 -> 00:05:33] feeding the compiler some information about where to find
+[00:05:33 -> 00:05:37] our actual files. And now I can actually run this and we'll
+[00:05:37 -> 00:05:40] go ahead and see the result. So again, this is one way of
+[00:05:40 -> 00:05:44] sort of modularizing or breaking our program into
+[00:05:44 -> 00:05:47] smaller pieces, right? We build things in different files,
+[00:05:47 -> 00:05:49] but now here's where the library part comes in, where
+[00:05:49 -> 00:05:52] we say, Hey, I want to actually share this math library
+[00:05:52 -> 00:05:55] because it's very useful with my friends. So how do we do
+[00:05:55 -> 00:05:58] that? Well, in order to do that, we're going to go ahead
+[00:05:58 -> 00:06:02] and start breaking apart, uh, how we compile our software.
+[00:06:02 -> 00:06:05] So rather than just compiling all of our files, uh, in
+[00:06:05 -> 00:06:09] this way, I want to break this down into some smaller
+[00:06:09 -> 00:06:12] steps here. And so you can actually see the actual object
+[00:06:12 -> 00:06:16] files that we put together. Okay. So what I can do here
+[00:06:17 -> 00:06:21] is just instead of, uh, compiling everything together.
+[00:06:21 -> 00:06:23] And again, GCC is doing a little bit of magic as we saw
+[00:06:23 -> 00:06:26] compiling and linking and gluing together all these files.
+[00:06:26 -> 00:06:29] Let's just do one at a time. So I could do dash C here.
+[00:06:29 -> 00:06:33] And then our, uh, main file, which is in the source
+[00:06:33 -> 00:06:36] directory. So like this, and then I'll hit enter here.
+[00:06:37 -> 00:06:38] And again, it's going to give me that error. Cause we're
+[00:06:38 -> 00:06:41] including something here that it doesn't know about.
+[00:06:41 -> 00:06:45] So I do need to do that, uh, dash, uh, capital I
+[00:06:45 -> 00:06:50] include, and then it compiles. And now if I look,
+[00:06:50 -> 00:06:53] we have a main object file here. Okay.
+[00:06:53 -> 00:06:55] And that's just the object file.
+[00:06:55 -> 00:06:59] So let's go ahead and do this for our, uh, math, uh,
+[00:06:59 -> 00:07:04] library here. So my math dot C do the same
+[00:07:04 -> 00:07:07] thing. And now we have my math, uh, dot O here.
+[00:07:08 -> 00:07:11] So this itself is the library. It's a piece
+[00:07:11 -> 00:07:14] of code, a block of code that contains the
+[00:07:14 -> 00:07:17] information of how to actually implement or the
+[00:07:17 -> 00:07:20] definition, the actual logic here of how to perform
+[00:07:20 -> 00:07:23] addition here, a plus B and that itself is a
+[00:07:23 -> 00:07:25] library. And then anybody who wants to use our
+[00:07:25 -> 00:07:29] library just has to include this header file
+[00:07:29 -> 00:07:31] here, which would be publicly available. It
+[00:07:31 -> 00:07:34] says, Hey, uh, to our actual code, we have
+[00:07:34 -> 00:07:37] these declarations here, these functions that
+[00:07:37 -> 00:07:40] exist. Uh, but, um, you know, so you can
+[00:07:40 -> 00:07:43] use them, but you'll have to link in the
+[00:07:43 -> 00:07:45] my math dot O file in order to do this.
+[00:07:45 -> 00:07:47] So let's go ahead and try to do it just from
+[00:07:48 -> 00:07:50] these object files and see if this works.
+[00:07:50 -> 00:07:53] I'll use GCC this time, the main, Oh, my
+[00:07:53 -> 00:07:57] math dash, uh, dot O and include program.
+[00:07:57 -> 00:08:00] And again, I'm going to do this, but try to
+[00:08:00 -> 00:08:01] think about what I'm forgetting here. So I'll
+[00:08:01 -> 00:08:05] hit enter and, uh, we're good to go here.
+[00:08:05 -> 00:08:10] Okay. Um, and now I'm able to, uh, run
+[00:08:10 -> 00:08:12] here. Okay. Just the same as before I have
+[00:08:12 -> 00:08:15] my program here. In fact, let me remove it
+[00:08:15 -> 00:08:16] just to ensure that that's not what we had
+[00:08:17 -> 00:08:19] recompile it. And we have it. They actually
+[00:08:19 -> 00:08:22] don't need to include anymore. Once this is,
+[00:08:22 -> 00:08:24] once these files have been successfully,
+[00:08:24 -> 00:08:27] um, compiled, then they're ready to link
+[00:08:27 -> 00:08:30] together. Okay. So, um, I don't need to do,
+[00:08:30 -> 00:08:33] for instance, here dash I include or
+[00:08:33 -> 00:08:35] anything of that nature here. Okay. It's
+[00:08:35 -> 00:08:37] just going to, again, once these are
+[00:08:37 -> 00:08:39] object files, they've been successfully
+[00:08:40 -> 00:08:42] built here. Okay. So now in theory, you
+[00:08:42 -> 00:08:47] can give this my math dot O to anybody
+[00:08:47 -> 00:08:49] in the world who's on a Linux system
+[00:08:49 -> 00:08:51] like mine and wants to take advantage
+[00:08:51 -> 00:08:53] of this object file here. Okay. So
+[00:08:53 -> 00:08:55] that's pretty cool that we can actually
+[00:08:55 -> 00:08:57] do that. Uh, and this is an example
+[00:08:57 -> 00:09:01] of a static library. Okay. So my
+[00:09:01 -> 00:09:04] math dot O is going to get compiled
+[00:09:04 -> 00:09:07] in with our other code, which is
+[00:09:07 -> 00:09:09] just the main file right here in
+[00:09:09 -> 00:09:11] build a executable. So we would say
+[00:09:11 -> 00:09:13] that this is statically linking in
+[00:09:13 -> 00:09:15] this library when we do this. Okay.
+[00:09:15 -> 00:09:17] Uh, so let's go ahead and look at
+[00:09:17 -> 00:09:20] the size of our actual program.
+[00:09:20 -> 00:09:22] When we do this, well, here
+[00:09:22 -> 00:09:24] is the actual size here. One five
+[00:09:24 -> 00:09:26] nine five two. So we'll just kind
+[00:09:26 -> 00:09:27] of keep that in mind here. If we
+[00:09:27 -> 00:09:29] want to compare that with a hello
+[00:09:29 -> 00:09:30] world or something, well, we
+[00:09:30 -> 00:09:31] can go ahead and see that, but
+[00:09:31 -> 00:09:32] this is just added a little bit of
+[00:09:32 -> 00:09:35] code here, uh, for our library,
+[00:09:35 -> 00:09:36] which we can see again, how big,
+[00:09:37 -> 00:09:39] uh, this library is, and it looks
+[00:09:39 -> 00:09:41] like, right. And just to make
+[00:09:41 -> 00:09:42] this a little bit easier, let's
+[00:09:42 -> 00:09:44] go ahead and, um, just so you
+[00:09:44 -> 00:09:46] could see the actual, uh, file
+[00:09:46 -> 00:09:49] sizes here in terms of, um,
+[00:09:49 -> 00:09:50] kilobytes, just so you can
+[00:09:50 -> 00:09:53] have a range there. Okay. So,
+[00:09:53 -> 00:09:55] uh, let's go ahead and see how
+[00:09:55 -> 00:09:57] we can, again, add to this
+[00:09:57 -> 00:09:58] library or maybe write some
+[00:09:58 -> 00:10:00] other functions here. So again,
+[00:10:00 -> 00:10:02] I've got my math library here,
+[00:10:02 -> 00:10:04] uh, and let's go ahead and say
+[00:10:04 -> 00:10:05] that, you know, we have, um,
+[00:10:05 -> 00:10:07] other, uh, libraries that we
+[00:10:07 -> 00:10:09] want to add in here. So I'm
+[00:10:09 -> 00:10:10] going to go ahead and create
+[00:10:10 -> 00:10:11] another one here. I'm going to
+[00:10:11 -> 00:10:14] call it my math too. And I'm
+[00:10:14 -> 00:10:15] essentially just going to copy
+[00:10:15 -> 00:10:17] these files here in our source
+[00:10:17 -> 00:10:18] directory here. So let's make
+[00:10:18 -> 00:10:21] a copy of my math, uh, too.
+[00:10:22 -> 00:10:24] And I'll make a copy of in
+[00:10:24 -> 00:10:27] our include directory, my
+[00:10:27 -> 00:10:30] math too for the header file.
+[00:10:30 -> 00:10:32] And the purpose of this is
+[00:10:32 -> 00:10:33] just to add a little bit more
+[00:10:33 -> 00:10:35] functionality into our program.
+[00:10:35 -> 00:10:36] So I'll go ahead and show you
+[00:10:36 -> 00:10:38] on the code screen. What I'm
+[00:10:38 -> 00:10:39] going to do here. Let's open
+[00:10:39 -> 00:10:42] up my math to here. And again,
+[00:10:42 -> 00:10:43] I want to update our header
+[00:10:43 -> 00:10:45] guards. And I'm just going to
+[00:10:45 -> 00:10:47] call this, uh, multiply here,
+[00:10:47 -> 00:10:50] something like that. And we'll
+[00:10:50 -> 00:10:51] split this window in the
+[00:10:51 -> 00:10:54] source directory. My math too
+[00:10:55 -> 00:10:57] will include my math too,
+[00:10:58 -> 00:11:01] and the multiply function here.
+[00:11:01 -> 00:11:03] And we'll also implement it
+[00:11:03 -> 00:11:05] appropriately. And then
+[00:11:05 -> 00:11:07] finally in our main file,
+[00:11:07 -> 00:11:10] let's go ahead and just make
+[00:11:10 -> 00:11:11] sure that we test this out to
+[00:11:11 -> 00:11:12] make sure that it's working.
+[00:11:13 -> 00:11:14] And we expect four times seven
+[00:11:14 -> 00:11:16] to be a 28 this time. Okay.
+[00:11:17 -> 00:11:19] So again, now that we have
+[00:11:19 -> 00:11:20] this code, it's relatively
+[00:11:20 -> 00:11:22] trivial. Let's see how to
+[00:11:22 -> 00:11:23] again, build a library out of
+[00:11:23 -> 00:11:24] it. Okay. So I'm going to go
+[00:11:24 -> 00:11:26] back here and then I'm going
+[00:11:26 -> 00:11:28] to do GCC dash C the file
+[00:11:28 -> 00:11:30] that I want to compile my
+[00:11:30 -> 00:11:34] math, uh, two dot C on.
+[00:11:34 -> 00:11:35] Let's see. So again, I'll
+[00:11:35 -> 00:11:36] hit enter. It's going to give
+[00:11:36 -> 00:11:37] us an error because we need
+[00:11:37 -> 00:11:41] to include, uh, our
+[00:11:41 -> 00:11:42] include directory here.
+[00:11:43 -> 00:11:44] There we have it. And now
+[00:11:44 -> 00:11:45] we have our other file
+[00:11:45 -> 00:11:48] here. And now I can just
+[00:11:48 -> 00:11:49] go ahead and do again,
+[00:11:49 -> 00:11:52] GCC, our main file, my
+[00:11:52 -> 00:11:55] math to, uh, my math,
+[00:11:55 -> 00:11:57] uh, dot O here. And then
+[00:11:57 -> 00:11:58] whatever I want to output
+[00:11:58 -> 00:11:59] it as program here. Okay.
+[00:11:59 -> 00:12:00] I'm going to compile
+[00:12:00 -> 00:12:01] this. Let's see what
+[00:12:01 -> 00:12:03] happens. If I run it.
+[00:12:04 -> 00:12:05] Uh, well, it didn't
+[00:12:05 -> 00:12:08] update this, uh, here,
+[00:12:08 -> 00:12:09] uh, right. We're supposed
+[00:12:09 -> 00:12:09] to be doing a
+[00:12:09 -> 00:12:11] multiplication here.
+[00:12:11 -> 00:12:11] Okay. So what was the
+[00:12:11 -> 00:12:12] problem? Well, again, we
+[00:12:12 -> 00:12:13] need to go back in our
+[00:12:13 -> 00:12:15] compilation step here.
+[00:12:15 -> 00:12:17] And what did I change?
+[00:12:17 -> 00:12:19] Well, I changed this main
+[00:12:19 -> 00:12:21] dot C file. So that's
+[00:12:21 -> 00:12:22] where I need to say,
+[00:12:22 -> 00:12:23] okay, I need to actually
+[00:12:23 -> 00:12:25] rebuild that part of the
+[00:12:25 -> 00:12:27] project. Okay. So GCC
+[00:12:27 -> 00:12:29] dash C for our main
+[00:12:29 -> 00:12:32] file. And again, uh, by
+[00:12:32 -> 00:12:33] now, you know, the
+[00:12:33 -> 00:12:33] mistake that we're always
+[00:12:33 -> 00:12:34] going to make, uh, we
+[00:12:34 -> 00:12:35] needed to include
+[00:12:35 -> 00:12:36] everything and now it
+[00:12:36 -> 00:12:38] compiles. Okay. So now
+[00:12:38 -> 00:12:39] I've updated main dot C
+[00:12:39 -> 00:12:40] here. Now let's go
+[00:12:40 -> 00:12:41] ahead and try our
+[00:12:41 -> 00:12:43] command here where we
+[00:12:43 -> 00:12:43] are linking in
+[00:12:43 -> 00:12:45] everything together and
+[00:12:45 -> 00:12:46] I'll go ahead and run
+[00:12:46 -> 00:12:47] it here. Okay. So now
+[00:12:47 -> 00:12:49] we can actually see our
+[00:12:49 -> 00:12:51] update. Now, what was
+[00:12:51 -> 00:12:51] the point of that
+[00:12:51 -> 00:12:53] exercise or again,
+[00:12:53 -> 00:12:54] motivating this idea of
+[00:12:54 -> 00:12:56] libraries? Well, what
+[00:12:56 -> 00:12:58] was really cool here is
+[00:12:58 -> 00:12:59] I didn't change any of
+[00:12:59 -> 00:13:00] this code here, right?
+[00:13:00 -> 00:13:02] From our my math, the
+[00:13:02 -> 00:13:03] first iteration with
+[00:13:03 -> 00:13:04] just the add function.
+[00:13:04 -> 00:13:05] So because I have
+[00:13:05 -> 00:13:06] broken my program down
+[00:13:06 -> 00:13:08] into smaller components,
+[00:13:08 -> 00:13:09] I don't need to recompile
+[00:13:09 -> 00:13:10] the whole thing. Now,
+[00:13:10 -> 00:13:12] in this tiny example,
+[00:13:12 -> 00:13:13] it's not really going
+[00:13:13 -> 00:13:13] to make a difference.
+[00:13:13 -> 00:13:14] It's still going to
+[00:13:14 -> 00:13:15] compile relatively fast,
+[00:13:15 -> 00:13:16] but it can imagine code
+[00:13:16 -> 00:13:18] bases in games or
+[00:13:18 -> 00:13:19] engines or, you know,
+[00:13:19 -> 00:13:20] really large
+[00:13:20 -> 00:13:21] distributed systems.
+[00:13:21 -> 00:13:22] This really starts to
+[00:13:22 -> 00:13:23] matter when your
+[00:13:23 -> 00:13:24] compile times are
+[00:13:25 -> 00:13:27] minutes or hours or
+[00:13:27 -> 00:13:28] maybe even longer in
+[00:13:28 -> 00:13:29] terms of times of
+[00:13:29 -> 00:13:30] compute that you have
+[00:13:30 -> 00:13:31] to spend. So this is
+[00:13:31 -> 00:13:32] where we really start
+[00:13:32 -> 00:13:33] getting some advantages
+[00:13:33 -> 00:13:35] by modularizing our
+[00:13:35 -> 00:13:36] code in this way.
+[00:13:36 -> 00:13:37] Okay. So that's a
+[00:13:37 -> 00:13:38] little lesson there.
+[00:13:38 -> 00:13:40] Now, what can I do
+[00:13:40 -> 00:13:41] here? If I have a
+[00:13:41 -> 00:13:42] set of common
+[00:13:42 -> 00:13:43] components here?
+[00:13:43 -> 00:13:44] So I've got my math
+[00:13:44 -> 00:13:45] and my math too.
+[00:13:46 -> 00:13:46] And those are sort
+[00:13:46 -> 00:13:47] of related, but again,
+[00:13:47 -> 00:13:48] for whatever reason,
+[00:13:48 -> 00:13:49] I wanted to split
+[00:13:49 -> 00:13:50] these up and we could
+[00:13:50 -> 00:13:51] imagine there being
+[00:13:51 -> 00:13:52] many functions in
+[00:13:52 -> 00:13:53] each of these
+[00:13:53 -> 00:13:55] libraries. So in
+[00:13:55 -> 00:13:56] order to create a
+[00:13:56 -> 00:13:57] library, because again,
+[00:13:58 -> 00:13:58] if I want to send
+[00:13:58 -> 00:13:59] these to my friends
+[00:13:59 -> 00:14:00] rather than send them
+[00:14:00 -> 00:14:01] to files, wouldn't it
+[00:14:01 -> 00:14:02] be nice if I could
+[00:14:02 -> 00:14:03] just sort of collect
+[00:14:03 -> 00:14:04] a bunch of related
+[00:14:04 -> 00:14:05] components in this
+[00:14:05 -> 00:14:06] instance, math
+[00:14:06 -> 00:14:07] functions. So what
+[00:14:07 -> 00:14:08] I'm going to do is
+[00:14:08 -> 00:14:09] use a tool called
+[00:14:09 -> 00:14:11] archive and archive
+[00:14:11 -> 00:14:13] is exactly what it
+[00:14:13 -> 00:14:13] sounds like. It's
+[00:14:13 -> 00:14:14] sort of like building
+[00:14:14 -> 00:14:16] a zip file. If
+[00:14:16 -> 00:14:17] you've ever done
+[00:14:17 -> 00:14:18] that of collecting
+[00:14:18 -> 00:14:18] these components
+[00:14:18 -> 00:14:20] together in a nice
+[00:14:20 -> 00:14:21] sort of indexable
+[00:14:21 -> 00:14:22] way. So let's go
+[00:14:22 -> 00:14:23] ahead and just look
+[00:14:23 -> 00:14:24] at the man page for
+[00:14:24 -> 00:14:25] it. And we have this
+[00:14:25 -> 00:14:27] tool AR on Linux
+[00:14:27 -> 00:14:28] and there would be
+[00:14:28 -> 00:14:29] equivalent tools on
+[00:14:29 -> 00:14:31] windows and Mac for
+[00:14:31 -> 00:14:33] creating, modifying
+[00:14:33 -> 00:14:34] and extracting from
+[00:14:34 -> 00:14:35] an archive, which is
+[00:14:35 -> 00:14:36] just a single file
+[00:14:36 -> 00:14:37] holding a collection
+[00:14:37 -> 00:14:38] of other files.
+[00:14:38 -> 00:14:40] Okay. So let's go
+[00:14:40 -> 00:14:41] ahead and do this.
+[00:14:41 -> 00:14:43] Now, the options
+[00:14:43 -> 00:14:43] that I'm going to
+[00:14:43 -> 00:14:44] pass here, I'm just
+[00:14:44 -> 00:14:44] going to tell you.
+[00:14:44 -> 00:14:46] So are for replacing
+[00:14:46 -> 00:14:48] if this archive file
+[00:14:48 -> 00:14:50] already exists, C for
+[00:14:50 -> 00:14:51] creating it because
+[00:14:51 -> 00:14:51] we'll have to create
+[00:14:51 -> 00:14:53] it and then S for
+[00:14:53 -> 00:14:54] building the index
+[00:14:54 -> 00:14:55] here. And then what
+[00:14:55 -> 00:14:55] I'm going to go
+[00:14:55 -> 00:14:57] ahead and do, and
+[00:14:57 -> 00:14:57] let's, let's look at
+[00:14:57 -> 00:15:00] our options again. We
+[00:15:00 -> 00:15:01] are going to want to
+[00:15:02 -> 00:15:03] output the name here
+[00:15:04 -> 00:15:06] and, uh, that, that
+[00:15:06 -> 00:15:07] should be it. So AR
+[00:15:07 -> 00:15:09] RCS, the files that
+[00:15:09 -> 00:15:11] we want to index.
+[00:15:11 -> 00:15:12] And we'll also have
+[00:15:12 -> 00:15:13] to give this a name
+[00:15:13 -> 00:15:13] here. So I'm just
+[00:15:13 -> 00:15:14] going to call it,
+[00:15:14 -> 00:15:17] uh, my math and by
+[00:15:17 -> 00:15:19] convention dot a for
+[00:15:19 -> 00:15:20] archive. Okay. And
+[00:15:20 -> 00:15:20] then each of our
+[00:15:20 -> 00:15:22] files, my math dot
+[00:15:22 -> 00:15:24] O and my math two
+[00:15:24 -> 00:15:25] dot. Oh, I'll hit
+[00:15:25 -> 00:15:27] enter. And just like
+[00:15:27 -> 00:15:28] that, let's see, we've
+[00:15:28 -> 00:15:29] got our, my math
+[00:15:29 -> 00:15:31] archive here. Okay.
+[00:15:31 -> 00:15:32] So now let's go ahead
+[00:15:32 -> 00:15:33] and look at how do we
+[00:15:33 -> 00:15:35] build this static
+[00:15:35 -> 00:15:36] library. And again,
+[00:15:36 -> 00:15:37] this is our actual
+[00:15:37 -> 00:15:38] archive, which
+[00:15:38 -> 00:15:40] consists of these two
+[00:15:40 -> 00:15:42] files here. All
+[00:15:42 -> 00:15:44] right. So this time,
+[00:15:44 -> 00:15:45] let's go ahead and
+[00:15:45 -> 00:15:47] use GCC. We've got
+[00:15:47 -> 00:15:49] our main file here.
+[00:15:50 -> 00:15:51] And let's go ahead
+[00:15:51 -> 00:15:53] and try to include
+[00:15:53 -> 00:15:55] in, uh, my math dot
+[00:15:55 -> 00:15:56] a here and output the
+[00:15:56 -> 00:15:57] program here. Let's
+[00:15:57 -> 00:15:58] see what happens. Go
+[00:15:58 -> 00:16:00] ahead and hit enter.
+[00:16:00 -> 00:16:02] And just like that
+[00:16:02 -> 00:16:03] works just the same
+[00:16:03 -> 00:16:05] here. Okay. And we
+[00:16:05 -> 00:16:05] could go ahead and
+[00:16:05 -> 00:16:07] see, uh, our file
+[00:16:07 -> 00:16:08] here, our file size,
+[00:16:09 -> 00:16:10] uh, still relatively,
+[00:16:11 -> 00:16:12] um, unchanged here
+[00:16:12 -> 00:16:13] might've grown a
+[00:16:13 -> 00:16:14] little bit bigger when
+[00:16:14 -> 00:16:14] we added in the
+[00:16:14 -> 00:16:16] second library here.
+[00:16:16 -> 00:16:17] Uh, but that's the
+[00:16:17 -> 00:16:19] tool. So now if we
+[00:16:19 -> 00:16:19] want to distribute our
+[00:16:19 -> 00:16:20] actual application,
+[00:16:20 -> 00:16:21] again, all we need to
+[00:16:21 -> 00:16:22] distribute is this
+[00:16:22 -> 00:16:24] actual program file.
+[00:16:24 -> 00:16:25] And that's it. So
+[00:16:25 -> 00:16:26] just, uh, Prague
+[00:16:26 -> 00:16:27] here and that's got
+[00:16:27 -> 00:16:28] everything bundled
+[00:16:28 -> 00:16:29] together. And then we
+[00:16:29 -> 00:16:30] also have the added
+[00:16:30 -> 00:16:32] advantage. Again, if we
+[00:16:32 -> 00:16:32] look at all of our
+[00:16:32 -> 00:16:34] contents, we're now
+[00:16:34 -> 00:16:35] I've got this archived
+[00:16:35 -> 00:16:37] file here or this
+[00:16:37 -> 00:16:38] static library, which
+[00:16:38 -> 00:16:40] is a collection of my
+[00:16:40 -> 00:16:41] math to, and my math
+[00:16:41 -> 00:16:42] dot O that we can
+[00:16:42 -> 00:16:43] distribute to our
+[00:16:43 -> 00:16:45] friends. Okay. Now for
+[00:16:45 -> 00:16:46] the library owners
+[00:16:46 -> 00:16:46] and own all this
+[00:16:46 -> 00:16:47] code, then, you
+[00:16:47 -> 00:16:48] know, part of our
+[00:16:48 -> 00:16:49] build process will be
+[00:16:49 -> 00:16:51] compiling, uh, my
+[00:16:51 -> 00:16:52] math, my math too,
+[00:16:52 -> 00:16:53] and then building it
+[00:16:53 -> 00:16:54] into this archive here.
+[00:16:55 -> 00:16:56] Now the question that
+[00:16:56 -> 00:16:57] I want to give to you
+[00:16:57 -> 00:16:59] is to think about
+[00:16:59 -> 00:17:00] how expensive is
+[00:17:00 -> 00:17:02] this? So in the sense
+[00:17:02 -> 00:17:05] of size, so what if,
+[00:17:05 -> 00:17:06] for instance, we're
+[00:17:06 -> 00:17:09] doing add or multiply
+[00:17:09 -> 00:17:10] or even something
+[00:17:10 -> 00:17:11] like print F, which
+[00:17:11 -> 00:17:12] you can imagine pretty
+[00:17:12 -> 00:17:13] much every C program
+[00:17:13 -> 00:17:15] does over and over
+[00:17:15 -> 00:17:16] and over again, you
+[00:17:16 -> 00:17:16] have hundreds or
+[00:17:16 -> 00:17:18] thousands of programs
+[00:17:18 -> 00:17:18] on your actual
+[00:17:18 -> 00:17:19] operating system,
+[00:17:19 -> 00:17:20] however big or small
+[00:17:20 -> 00:17:21] that they are that
+[00:17:21 -> 00:17:22] are using this
+[00:17:22 -> 00:17:23] functionality. Well,
+[00:17:23 -> 00:17:24] the answer to that
+[00:17:24 -> 00:17:25] is this is probably
+[00:17:25 -> 00:17:26] pretty expensive,
+[00:17:26 -> 00:17:27] meaning that we're
+[00:17:27 -> 00:17:29] duplicating this
+[00:17:29 -> 00:17:31] library, whether,
+[00:17:31 -> 00:17:31] you know, both of
+[00:17:31 -> 00:17:32] these libraries or
+[00:17:32 -> 00:17:33] even just one of them
+[00:17:33 -> 00:17:34] over and over and
+[00:17:34 -> 00:17:35] over again for every
+[00:17:35 -> 00:17:36] program. So in order
+[00:17:36 -> 00:17:37] to solve this, we
+[00:17:37 -> 00:17:38] have another tool
+[00:17:38 -> 00:17:39] known as a shared
+[00:17:39 -> 00:17:41] object file S O.
+[00:17:41 -> 00:17:42] And again, these go
+[00:17:42 -> 00:17:43] by different names and
+[00:17:43 -> 00:17:43] different operating
+[00:17:43 -> 00:17:44] systems like
+[00:17:44 -> 00:17:45] dynamically linked
+[00:17:45 -> 00:17:46] library on windows
+[00:17:46 -> 00:17:47] or dialybs on Mac.
+[00:17:47 -> 00:17:48] So these are files
+[00:17:48 -> 00:17:49] that you can link
+[00:17:49 -> 00:17:51] in at runtime when
+[00:17:51 -> 00:17:52] your compilers, um,
+[00:17:52 -> 00:17:53] or rather your
+[00:17:53 -> 00:17:54] operating systems about
+[00:17:54 -> 00:17:55] to run your program
+[00:17:56 -> 00:17:56] and I'll link in the
+[00:17:56 -> 00:17:58] correct library code,
+[00:17:58 -> 00:17:59] uh, kind of patch
+[00:17:59 -> 00:18:00] things together to
+[00:18:00 -> 00:18:01] make sure that these
+[00:18:01 -> 00:18:02] functions from the
+[00:18:02 -> 00:18:03] libraries are able to
+[00:18:03 -> 00:18:03] be called from
+[00:18:03 -> 00:18:05] executable. Okay.
+[00:18:05 -> 00:18:05] So let's go ahead
+[00:18:05 -> 00:18:07] and see how we can
+[00:18:07 -> 00:18:08] now, instead of
+[00:18:08 -> 00:18:09] making this a static
+[00:18:09 -> 00:18:11] library, build a
+[00:18:11 -> 00:18:12] library, that's a
+[00:18:12 -> 00:18:13] shared object file.
+[00:18:14 -> 00:18:14] So in order to do
+[00:18:14 -> 00:18:16] this, let's go ahead
+[00:18:16 -> 00:18:18] and, um, compile
+[00:18:18 -> 00:18:19] each of our libraries
+[00:18:20 -> 00:18:21] as a, uh, shared
+[00:18:21 -> 00:18:22] library here. So I'm
+[00:18:22 -> 00:18:23] going to go to GCC
+[00:18:23 -> 00:18:24] again, and I'll
+[00:18:24 -> 00:18:25] explain these
+[00:18:25 -> 00:18:25] arguments in a
+[00:18:25 -> 00:18:27] moment, but dash F for
+[00:18:27 -> 00:18:29] a flag here, PIC
+[00:18:29 -> 00:18:30] for position
+[00:18:30 -> 00:18:31] independent code
+[00:18:31 -> 00:18:33] dash shared. And
+[00:18:33 -> 00:18:34] then, uh, what I
+[00:18:34 -> 00:18:35] want to output my
+[00:18:35 -> 00:18:39] library as, um, uh,
+[00:18:39 -> 00:18:40] I'll call it, um,
+[00:18:41 -> 00:18:41] actually let me see,
+[00:18:42 -> 00:18:42] uh, I think it'll
+[00:18:42 -> 00:18:44] choose for us. Uh,
+[00:18:44 -> 00:18:44] and let's actually
+[00:18:44 -> 00:18:46] put in, uh, my math,
+[00:18:46 -> 00:18:48] uh, see here, or
+[00:18:48 -> 00:18:48] actually it's in the
+[00:18:49 -> 00:18:50] source directory, my
+[00:18:50 -> 00:18:51] math dot C. Let's
+[00:18:51 -> 00:18:52] see how far we get
+[00:18:52 -> 00:18:54] with this. Uh, well,
+[00:18:54 -> 00:18:55] again, the same thing
+[00:18:55 -> 00:18:56] we're compiling.
+[00:18:56 -> 00:18:57] Sorry, had to do
+[00:18:57 -> 00:18:57] that for you one more
+[00:18:57 -> 00:18:58] time. Let's put our
+[00:18:58 -> 00:18:59] include path here
+[00:19:00 -> 00:19:00] and well, it
+[00:19:00 -> 00:19:02] compiles. And what
+[00:19:02 -> 00:19:03] was generated for us
+[00:19:03 -> 00:19:04] when we did this?
+[00:19:04 -> 00:19:05] Well, here it looks
+[00:19:05 -> 00:19:06] like we got an A dot
+[00:19:06 -> 00:19:07] out, uh, because
+[00:19:07 -> 00:19:08] we didn't specify
+[00:19:08 -> 00:19:09] any names. So I
+[00:19:09 -> 00:19:10] mean, let's, let's
+[00:19:10 -> 00:19:10] see, does that do
+[00:19:10 -> 00:19:12] anything for us? Uh,
+[00:19:12 -> 00:19:14] that slash Ada out,
+[00:19:14 -> 00:19:15] uh, now it looks
+[00:19:15 -> 00:19:16] like we're getting
+[00:19:16 -> 00:19:16] some sort of
+[00:19:16 -> 00:19:17] segmentation fault.
+[00:19:17 -> 00:19:18] Okay. So maybe we
+[00:19:18 -> 00:19:19] didn't do that quite
+[00:19:19 -> 00:19:20] right here. So let's
+[00:19:20 -> 00:19:21] try again here. Let's
+[00:19:21 -> 00:19:22] actually give it an
+[00:19:22 -> 00:19:23] output and I'll call
+[00:19:23 -> 00:19:26] my math dot S O
+[00:19:26 -> 00:19:27] because this is meant
+[00:19:27 -> 00:19:28] to be a shared object
+[00:19:28 -> 00:19:29] file. Okay. So there
+[00:19:29 -> 00:19:31] we are. Okay. And
+[00:19:31 -> 00:19:32] let's do the same
+[00:19:32 -> 00:19:34] thing, uh, for my
+[00:19:34 -> 00:19:35] math too, just so
+[00:19:35 -> 00:19:36] we have both of these
+[00:19:36 -> 00:19:37] ready here. And I've
+[00:19:37 -> 00:19:40] got two, uh, shared
+[00:19:40 -> 00:19:41] object files here.
+[00:19:42 -> 00:19:45] Okay. So now we're
+[00:19:45 -> 00:19:46] building our shared
+[00:19:46 -> 00:19:47] library. And again,
+[00:19:47 -> 00:19:47] I'm going to remove
+[00:19:48 -> 00:19:49] our program here just
+[00:19:49 -> 00:19:51] so we can, um, uh,
+[00:19:51 -> 00:19:52] make sure that we're
+[00:19:52 -> 00:19:53] doing a clean build
+[00:19:53 -> 00:19:54] here. And in fact,
+[00:19:54 -> 00:19:55] let's remove all
+[00:19:55 -> 00:19:56] the static libraries
+[00:19:56 -> 00:19:58] here. So my math, my
+[00:19:58 -> 00:20:01] math too, and, uh, my
+[00:20:01 -> 00:20:03] math, uh, dot a here.
+[00:20:03 -> 00:20:05] Okay. Just to show
+[00:20:05 -> 00:20:05] you what our
+[00:20:05 -> 00:20:06] project looks like.
+[00:20:06 -> 00:20:06] Okay. So I've got
+[00:20:06 -> 00:20:08] these two, uh, shared
+[00:20:08 -> 00:20:09] object files. Oops.
+[00:20:09 -> 00:20:13] One more here and
+[00:20:13 -> 00:20:13] that's it. We don't
+[00:20:13 -> 00:20:14] have our actual
+[00:20:14 -> 00:20:15] executable. I can't
+[00:20:15 -> 00:20:17] do dot slash prog.
+[00:20:17 -> 00:20:18] It doesn't exist.
+[00:20:18 -> 00:20:20] Okay. Um, okay. So
+[00:20:20 -> 00:20:21] how am I going to
+[00:20:21 -> 00:20:22] compile this now?
+[00:20:22 -> 00:20:23] Well, let's try GCC.
+[00:20:23 -> 00:20:25] I've got my main
+[00:20:25 -> 00:20:26] file and the source
+[00:20:26 -> 00:20:27] directory that I want
+[00:20:27 -> 00:20:30] to run here and let's
+[00:20:30 -> 00:20:31] try to output the
+[00:20:31 -> 00:20:33] program here. So I'll
+[00:20:33 -> 00:20:34] go ahead and hit
+[00:20:34 -> 00:20:36] enter. And again, no
+[00:20:36 -> 00:20:37] include path. Okay.
+[00:20:37 -> 00:20:38] So we need to do
+[00:20:38 -> 00:20:40] that. And now I'm
+[00:20:40 -> 00:20:40] getting really
+[00:20:40 -> 00:20:41] interesting error
+[00:20:41 -> 00:20:42] messages here, and
+[00:20:42 -> 00:20:43] they're not coming
+[00:20:43 -> 00:20:44] from the compiler,
+[00:20:44 -> 00:20:44] but they're coming
+[00:20:44 -> 00:20:46] from the linker
+[00:20:46 -> 00:20:47] here. Anytime you
+[00:20:47 -> 00:20:47] get this sort of
+[00:20:47 -> 00:20:48] undefined reference,
+[00:20:48 -> 00:20:49] it says undefined
+[00:20:49 -> 00:20:51] reference to add.
+[00:20:51 -> 00:20:52] Okay. Because we're
+[00:20:52 -> 00:20:52] trying to use this
+[00:20:52 -> 00:20:54] add function, but it
+[00:20:54 -> 00:20:55] doesn't really know
+[00:20:55 -> 00:20:55] about it. It knows
+[00:20:55 -> 00:20:57] that we've included
+[00:20:57 -> 00:20:58] it. We've got a
+[00:20:58 -> 00:20:59] declaration here that
+[00:20:59 -> 00:21:01] says, Hey, this thing
+[00:21:01 -> 00:21:03] exists, but we don't
+[00:21:03 -> 00:21:06] know exactly, uh, the
+[00:21:06 -> 00:21:07] actual implementation
+[00:21:07 -> 00:21:08] that's from here,
+[00:21:08 -> 00:21:09] right? Our actual
+[00:21:09 -> 00:21:10] implementation file,
+[00:21:10 -> 00:21:11] the dot, uh, see a
+[00:21:11 -> 00:21:13] file here. So, uh,
+[00:21:13 -> 00:21:14] how do we fix this
+[00:21:14 -> 00:21:16] for both add and
+[00:21:16 -> 00:21:17] multiply? Well, lucky
+[00:21:17 -> 00:21:19] for us, we do have
+[00:21:20 -> 00:21:21] again, if I look at
+[00:21:21 -> 00:21:22] our directory here,
+[00:21:22 -> 00:21:24] this shared library
+[00:21:24 -> 00:21:25] file that has the
+[00:21:25 -> 00:21:26] actual compiled, uh,
+[00:21:26 -> 00:21:27] code with the
+[00:21:27 -> 00:21:28] implementation, right?
+[00:21:28 -> 00:21:29] If I wind back my
+[00:21:29 -> 00:21:31] commands here, uh, we
+[00:21:31 -> 00:21:32] created these shared
+[00:21:32 -> 00:21:33] libraries. Again, let
+[00:21:33 -> 00:21:34] me go back here with
+[00:21:34 -> 00:21:35] this command here,
+[00:21:35 -> 00:21:36] which basically said,
+[00:21:36 -> 00:21:37] Hey, I want to build
+[00:21:37 -> 00:21:38] this shared library,
+[00:21:38 -> 00:21:39] something that I can
+[00:21:39 -> 00:21:40] link in, uh, when
+[00:21:40 -> 00:21:41] my program is about
+[00:21:41 -> 00:21:43] to run. And, uh, this
+[00:21:43 -> 00:21:44] is the actual file.
+[00:21:44 -> 00:21:45] And then this is the
+[00:21:45 -> 00:21:46] library and then any,
+[00:21:46 -> 00:21:47] you know, sort of
+[00:21:47 -> 00:21:48] includes to set up that
+[00:21:48 -> 00:21:49] actual code. Now
+[00:21:49 -> 00:21:50] position independent
+[00:21:50 -> 00:21:51] code. I'll talk about
+[00:21:51 -> 00:21:52] again in a moment,
+[00:21:52 -> 00:21:54] but first, um, you
+[00:21:54 -> 00:21:55] know, I still want to,
+[00:21:56 -> 00:21:58] um, try to, uh, let
+[00:21:58 -> 00:21:59] me go back to our,
+[00:21:59 -> 00:22:00] uh, compilation that
+[00:22:00 -> 00:22:01] we try to do here and
+[00:22:01 -> 00:22:02] show you these errors.
+[00:22:02 -> 00:22:03] Well, let me try to
+[00:22:03 -> 00:22:04] show you a tool on
+[00:22:04 -> 00:22:05] Linux, just to give you
+[00:22:05 -> 00:22:06] an idea of what's
+[00:22:06 -> 00:22:07] happening here. So
+[00:22:07 -> 00:22:07] there's a really neat
+[00:22:07 -> 00:22:09] tool called object dump,
+[00:22:09 -> 00:22:10] uh, which I may have
+[00:22:10 -> 00:22:11] mentioned before in
+[00:22:11 -> 00:22:12] this series or other,
+[00:22:12 -> 00:22:14] uh, videos, uh, which
+[00:22:14 -> 00:22:14] will display some
+[00:22:14 -> 00:22:15] information about this
+[00:22:15 -> 00:22:17] actual, uh, executable
+[00:22:17 -> 00:22:18] here. So object dump
+[00:22:19 -> 00:22:21] dash T and I'll run,
+[00:22:21 -> 00:22:22] uh, it on the actual
+[00:22:22 -> 00:22:25] program here. Um, and
+[00:22:25 -> 00:22:26] oops, it didn't actually
+[00:22:26 -> 00:22:27] make it, but that's
+[00:22:27 -> 00:22:29] okay. Let me, let me
+[00:22:29 -> 00:22:30] do that step next to
+[00:22:30 -> 00:22:30] show you, let me show
+[00:22:30 -> 00:22:31] you how to actually
+[00:22:31 -> 00:22:32] link things and then
+[00:22:32 -> 00:22:33] I'll show you a jump.
+[00:22:34 -> 00:22:35] Um, but how do I, I
+[00:22:35 -> 00:22:36] guess the question is
+[00:22:36 -> 00:22:38] glue in the code.
+[00:22:38 -> 00:22:39] Well, I actually link
+[00:22:39 -> 00:22:40] in those libraries
+[00:22:40 -> 00:22:43] here. So my math, uh,
+[00:22:44 -> 00:22:47] my math. So, and then
+[00:22:47 -> 00:22:49] I link in my math,
+[00:22:49 -> 00:22:52] uh, do that as so
+[00:22:52 -> 00:22:54] here. Okay. So let me
+[00:22:54 -> 00:22:56] try that. Uh, now it
+[00:22:56 -> 00:22:57] says it can't find
+[00:22:57 -> 00:22:58] these directories
+[00:22:58 -> 00:23:00] here. Okay. So let's
+[00:23:00 -> 00:23:00] try again. I think
+[00:23:00 -> 00:23:01] we're going to have to
+[00:23:01 -> 00:23:02] do, uh, at least two
+[00:23:02 -> 00:23:03] steps here. Uh, now
+[00:23:03 -> 00:23:04] it looks like they're
+[00:23:04 -> 00:23:06] right in the, you
+[00:23:06 -> 00:23:06] know, directory that
+[00:23:06 -> 00:23:08] we have, but again,
+[00:23:08 -> 00:23:08] we have to tell our
+[00:23:09 -> 00:23:10] compiler or in this
+[00:23:10 -> 00:23:10] case, a tool called
+[00:23:10 -> 00:23:12] the linker, where
+[00:23:12 -> 00:23:12] exactly these
+[00:23:12 -> 00:23:14] libraries are. So
+[00:23:14 -> 00:23:14] with that, I use
+[00:23:14 -> 00:23:16] dash capital L and
+[00:23:16 -> 00:23:17] then it's just this
+[00:23:17 -> 00:23:18] current directory
+[00:23:18 -> 00:23:19] here. So I'll do
+[00:23:19 -> 00:23:21] that. And well, this
+[00:23:21 -> 00:23:22] is kind of weird. It
+[00:23:22 -> 00:23:24] still says, Hey, can't
+[00:23:24 -> 00:23:26] find these actual
+[00:23:26 -> 00:23:27] libraries here. Now
+[00:23:27 -> 00:23:28] there's two things I
+[00:23:28 -> 00:23:29] can try here to fix
+[00:23:29 -> 00:23:30] this one. I can put
+[00:23:30 -> 00:23:32] these in quotation
+[00:23:32 -> 00:23:33] marks. Let me try
+[00:23:33 -> 00:23:36] this here and still
+[00:23:36 -> 00:23:37] doesn't work. Darn.
+[00:23:37 -> 00:23:38] Uh, well, the
+[00:23:38 -> 00:23:40] convention is whenever
+[00:23:40 -> 00:23:41] we try to do this is
+[00:23:41 -> 00:23:42] that these actual, uh,
+[00:23:42 -> 00:23:44] shared libraries, uh,
+[00:23:44 -> 00:23:45] should actually start
+[00:23:45 -> 00:23:47] with lib in front of
+[00:23:47 -> 00:23:48] them. Okay. So, uh,
+[00:23:48 -> 00:23:49] I want to move my
+[00:23:49 -> 00:23:52] math SO to live my
+[00:23:52 -> 00:23:54] math.so, and I'll do
+[00:23:54 -> 00:23:56] the same thing for my
+[00:23:56 -> 00:23:58] math too. And let's
+[00:23:58 -> 00:23:59] go ahead and try it
+[00:23:59 -> 00:24:02] again. And oops. Uh,
+[00:24:02 -> 00:24:03] let me go ahead and
+[00:24:04 -> 00:24:05] look at this for just
+[00:24:05 -> 00:24:06] one more time here.
+[00:24:06 -> 00:24:07] And again, this is
+[00:24:07 -> 00:24:07] going to be a little
+[00:24:07 -> 00:24:09] bit weird. Uh, if
+[00:24:09 -> 00:24:09] you haven't done this
+[00:24:09 -> 00:24:10] before, but you'll
+[00:24:10 -> 00:24:11] get used to it. It's
+[00:24:11 -> 00:24:13] to say, uh, well,
+[00:24:13 -> 00:24:13] it can't find this
+[00:24:13 -> 00:24:14] library. Well, we
+[00:24:14 -> 00:24:15] actually have to
+[00:24:15 -> 00:24:16] understand what this
+[00:24:16 -> 00:24:17] dash L is doing
+[00:24:17 -> 00:24:18] here. I'm going to
+[00:24:18 -> 00:24:18] show you the fix now.
+[00:24:18 -> 00:24:19] It's just to get
+[00:24:19 -> 00:24:20] rid of the end here,
+[00:24:20 -> 00:24:21] the dot SO. So
+[00:24:21 -> 00:24:23] again, just by
+[00:24:23 -> 00:24:24] convention, uh, let
+[00:24:24 -> 00:24:25] me show you what
+[00:24:25 -> 00:24:25] the working command
+[00:24:25 -> 00:24:26] is, uh, by
+[00:24:26 -> 00:24:29] convention dash L
+[00:24:29 -> 00:24:29] stands for the
+[00:24:29 -> 00:24:30] library that you're
+[00:24:30 -> 00:24:31] going to link. And
+[00:24:31 -> 00:24:33] on this, um, again,
+[00:24:33 -> 00:24:34] our, our linker is
+[00:24:34 -> 00:24:35] going to assume that
+[00:24:35 -> 00:24:36] lib is in front of
+[00:24:36 -> 00:24:38] this and dot SO is
+[00:24:38 -> 00:24:39] at the end. So if
+[00:24:39 -> 00:24:40] it finds those things,
+[00:24:40 -> 00:24:41] it's going to, um,
+[00:24:41 -> 00:24:44] essentially append
+[00:24:44 -> 00:24:45] and prepend, uh,
+[00:24:45 -> 00:24:46] live to this at the
+[00:24:46 -> 00:24:48] front and dot SO at
+[00:24:48 -> 00:24:49] the end. Okay. So
+[00:24:49 -> 00:24:50] that's what you're
+[00:24:50 -> 00:24:50] going to get here.
+[00:24:50 -> 00:24:52] Okay. So at this
+[00:24:52 -> 00:24:54] point, we have our
+[00:24:54 -> 00:24:55] program executable.
+[00:24:55 -> 00:24:55] This is great here.
+[00:24:55 -> 00:24:56] Now let's go ahead
+[00:24:56 -> 00:24:57] and try to run it.
+[00:24:57 -> 00:24:57] Let's see what it
+[00:24:57 -> 00:25:00] does. And then yet
+[00:25:00 -> 00:25:01] another error here.
+[00:25:01 -> 00:25:02] And at this point,
+[00:25:02 -> 00:25:02] maybe you're saying,
+[00:25:02 -> 00:25:03] Mike, I'm frustrated
+[00:25:03 -> 00:25:05] with, uh, to take
+[00:25:05 -> 00:25:06] care of these, uh,
+[00:25:06 -> 00:25:07] shared libraries here.
+[00:25:07 -> 00:25:08] It's saying lib my
+[00:25:08 -> 00:25:09] math dot SO cannot
+[00:25:09 -> 00:25:10] open shared object
+[00:25:10 -> 00:25:12] file, no such, uh,
+[00:25:12 -> 00:25:14] file or directory.
+[00:25:14 -> 00:25:16] Okay. But you know,
+[00:25:16 -> 00:25:17] it's clear that it
+[00:25:17 -> 00:25:19] is right here, um,
+[00:25:19 -> 00:25:20] in this actual
+[00:25:20 -> 00:25:22] location here. Uh,
+[00:25:22 -> 00:25:22] so what do we
+[00:25:22 -> 00:25:23] actually have to do
+[00:25:23 -> 00:25:24] here? Well, this
+[00:25:24 -> 00:25:25] is going to seem
+[00:25:25 -> 00:25:25] a little bit silly
+[00:25:25 -> 00:25:27] again, but what
+[00:25:27 -> 00:25:28] actually needs to
+[00:25:28 -> 00:25:29] happen is we need to
+[00:25:29 -> 00:25:31] tell our, uh,
+[00:25:31 -> 00:25:31] linker at the
+[00:25:31 -> 00:25:32] runtime. Where do
+[00:25:32 -> 00:25:33] we actually find
+[00:25:33 -> 00:25:34] these libraries?
+[00:25:34 -> 00:25:34] I'm going to say,
+[00:25:34 -> 00:25:35] well, if it was
+[00:25:35 -> 00:25:35] able to compile it,
+[00:25:35 -> 00:25:36] why weren't we
+[00:25:36 -> 00:25:36] able to find it?
+[00:25:36 -> 00:25:38] But the truth is we
+[00:25:38 -> 00:25:39] need to know or
+[00:25:39 -> 00:25:40] have some common
+[00:25:40 -> 00:25:41] directory for where to
+[00:25:41 -> 00:25:42] find our, our
+[00:25:42 -> 00:25:43] libraries that can
+[00:25:43 -> 00:25:44] be loaded here.
+[00:25:44 -> 00:25:45] So we've got a
+[00:25:45 -> 00:25:46] environment variable
+[00:25:46 -> 00:25:48] for this load
+[00:25:48 -> 00:25:49] library path, uh,
+[00:25:49 -> 00:25:50] that we can set
+[00:25:50 -> 00:25:51] here. And then we'll
+[00:25:51 -> 00:25:52] set our path and
+[00:25:52 -> 00:25:53] then try to run our
+[00:25:53 -> 00:25:54] program, something
+[00:25:54 -> 00:25:55] like this here.
+[00:25:55 -> 00:25:56] Okay. So now we
+[00:25:56 -> 00:25:56] can actually try
+[00:25:56 -> 00:25:58] something like, um,
+[00:25:58 -> 00:25:59] this, which is
+[00:25:59 -> 00:26:00] just saying, Hey,
+[00:26:00 -> 00:26:01] look in the
+[00:26:01 -> 00:26:02] actual, uh, current
+[00:26:02 -> 00:26:04] directory. So
+[00:26:04 -> 00:26:05] whenever you click
+[00:26:05 -> 00:26:06] on some shortcut,
+[00:26:06 -> 00:26:07] for instance, if
+[00:26:07 -> 00:26:07] you're on another
+[00:26:07 -> 00:26:09] system or, you
+[00:26:09 -> 00:26:10] know, execute some
+[00:26:10 -> 00:26:10] program, it might
+[00:26:10 -> 00:26:11] actually be a pending
+[00:26:11 -> 00:26:12] something like this
+[00:26:13 -> 00:26:14] current library
+[00:26:14 -> 00:26:15] directory. So you
+[00:26:15 -> 00:26:16] could find whatever
+[00:26:16 -> 00:26:17] your path is, or just
+[00:26:17 -> 00:26:18] put in the current
+[00:26:18 -> 00:26:20] path here, um, in
+[00:26:20 -> 00:26:20] order to get your
+[00:26:20 -> 00:26:21] code to run. Now
+[00:26:21 -> 00:26:22] this is actually
+[00:26:22 -> 00:26:23] using the library
+[00:26:23 -> 00:26:24] code here, which is
+[00:26:24 -> 00:26:25] really, really
+[00:26:25 -> 00:26:26] cool. Okay. Now
+[00:26:26 -> 00:26:27] let me back up and
+[00:26:27 -> 00:26:27] show you that
+[00:26:27 -> 00:26:28] object dump tool
+[00:26:28 -> 00:26:29] here with the
+[00:26:29 -> 00:26:31] table, um, the
+[00:26:31 -> 00:26:32] symbol table for
+[00:26:32 -> 00:26:33] our actual program
+[00:26:33 -> 00:26:35] here. And what's
+[00:26:35 -> 00:26:36] really neat or what
+[00:26:36 -> 00:26:37] I think is neat,
+[00:26:37 -> 00:26:37] and I've got to
+[00:26:37 -> 00:26:37] make this just a
+[00:26:37 -> 00:26:39] little bit smaller so
+[00:26:39 -> 00:26:39] you can see it
+[00:26:39 -> 00:26:42] reasonably here is
+[00:26:42 -> 00:26:42] if we actually
+[00:26:42 -> 00:26:43] find some of these
+[00:26:44 -> 00:26:45] functions here and
+[00:26:45 -> 00:26:46] let's go ahead and
+[00:26:46 -> 00:26:47] see, here's the
+[00:26:47 -> 00:26:48] multiply function,
+[00:26:48 -> 00:26:48] which was in our
+[00:26:48 -> 00:26:50] library. Uh, here's
+[00:26:50 -> 00:26:51] add, and I'll just
+[00:26:51 -> 00:26:52] bring up this one
+[00:26:52 -> 00:26:53] since you have it
+[00:26:53 -> 00:26:54] on the right side of
+[00:26:54 -> 00:26:55] the screen here. This
+[00:26:55 -> 00:26:56] tool is actually
+[00:26:56 -> 00:26:57] telling me the
+[00:26:57 -> 00:26:58] actual symbols that
+[00:26:58 -> 00:26:59] it's finding in that
+[00:26:59 -> 00:27:00] object file, this
+[00:27:00 -> 00:27:01] executable object
+[00:27:01 -> 00:27:03] file program. And
+[00:27:03 -> 00:27:04] we can see that F in
+[00:27:04 -> 00:27:05] this column is for
+[00:27:05 -> 00:27:06] function and that
+[00:27:06 -> 00:27:07] it's undefined.
+[00:27:07 -> 00:27:08] Okay. So that's why
+[00:27:08 -> 00:27:08] we were getting the
+[00:27:08 -> 00:27:09] error sort of saying,
+[00:27:09 -> 00:27:10] Hey, we don't know
+[00:27:10 -> 00:27:10] what to do with this
+[00:27:10 -> 00:27:11] thing. We know that
+[00:27:11 -> 00:27:13] you have, you know,
+[00:27:13 -> 00:27:14] uh, included the
+[00:27:14 -> 00:27:15] header file, you've
+[00:27:15 -> 00:27:17] linked things together,
+[00:27:17 -> 00:27:17] but at the actual
+[00:27:17 -> 00:27:18] runtime, we're going
+[00:27:18 -> 00:27:19] to actually have to
+[00:27:19 -> 00:27:21] sort of patch in this
+[00:27:21 -> 00:27:22] symbol, right? This
+[00:27:22 -> 00:27:24] named thing called,
+[00:27:24 -> 00:27:26] uh, add here. And
+[00:27:26 -> 00:27:27] that's actually what
+[00:27:27 -> 00:27:28] uh, needs to happen
+[00:27:28 -> 00:27:29] before we can run
+[00:27:29 -> 00:27:30] this program. Uh, so
+[00:27:30 -> 00:27:31] that's just a little
+[00:27:31 -> 00:27:32] uh, preview of this
+[00:27:32 -> 00:27:34] tool here. All right.
+[00:27:34 -> 00:27:35] So with that said,
+[00:27:35 -> 00:27:36] folks, I'm going to
+[00:27:36 -> 00:27:37] go ahead and start,
+[00:27:37 -> 00:27:38] uh, wrapping us up
+[00:27:38 -> 00:27:39] here and just want to
+[00:27:39 -> 00:27:40] summarize what we've
+[00:27:40 -> 00:27:41] learned here. And
+[00:27:41 -> 00:27:42] here is our final
+[00:27:42 -> 00:27:43] structure for our
+[00:27:43 -> 00:27:44] shared libraries. So
+[00:27:44 -> 00:27:45] we've learned how to,
+[00:27:46 -> 00:27:47] uh, if I wind back
+[00:27:47 -> 00:27:49] here, uh, create our
+[00:27:49 -> 00:27:51] actual, uh, libraries.
+[00:27:51 -> 00:27:52] Okay. So let me go
+[00:27:52 -> 00:27:53] back. Uh, let me just
+[00:27:53 -> 00:27:54] show you how to do
+[00:27:54 -> 00:27:56] that. GCC, uh,
+[00:27:57 -> 00:27:58] generate the position,
+[00:27:58 -> 00:28:00] independent code shared
+[00:28:00 -> 00:28:01] here, and then the
+[00:28:01 -> 00:28:03] actual, uh, file that
+[00:28:03 -> 00:28:04] we are trying to build
+[00:28:04 -> 00:28:06] here. Source my math,
+[00:28:06 -> 00:28:08] uh, dot C for
+[00:28:08 -> 00:28:09] instance. And let's
+[00:28:09 -> 00:28:10] just get this on one
+[00:28:10 -> 00:28:12] line here. I can close
+[00:28:12 -> 00:28:13] these out because
+[00:28:13 -> 00:28:14] they're relatively
+[00:28:14 -> 00:28:15] trivial. And then
+[00:28:15 -> 00:28:17] the, uh, include here.
+[00:28:18 -> 00:28:18] Uh, so this was an
+[00:28:18 -> 00:28:20] example of building
+[00:28:20 -> 00:28:22] our, uh, lib. I'll
+[00:28:22 -> 00:28:22] name it appropriately
+[00:28:22 -> 00:28:23] this time. My math
+[00:28:23 -> 00:28:25] thought, uh, so,
+[00:28:26 -> 00:28:27] and there we have it,
+[00:28:27 -> 00:28:28] uh, overriding this
+[00:28:28 -> 00:28:29] here. Now again,
+[00:28:29 -> 00:28:30] why do we need the
+[00:28:30 -> 00:28:31] position independent
+[00:28:31 -> 00:28:32] code? Well, imagine
+[00:28:32 -> 00:28:33] if I'm linking in
+[00:28:33 -> 00:28:33] lots of different
+[00:28:33 -> 00:28:34] libraries here,
+[00:28:34 -> 00:28:35] basically what the
+[00:28:35 -> 00:28:36] linkers job is,
+[00:28:37 -> 00:28:37] uh, this tool that's
+[00:28:37 -> 00:28:38] sort of running
+[00:28:38 -> 00:28:39] behind the scenes.
+[00:28:39 -> 00:28:40] That's actually called
+[00:28:40 -> 00:28:41] LD. Uh, if you
+[00:28:41 -> 00:28:42] want to read about
+[00:28:42 -> 00:28:44] this is it's has to
+[00:28:44 -> 00:28:46] patch in code. Uh,
+[00:28:46 -> 00:28:46] so the code that's
+[00:28:46 -> 00:28:48] being generated here
+[00:28:48 -> 00:28:49] is sort of, um,
+[00:28:50 -> 00:28:51] validating that this
+[00:28:51 -> 00:28:53] code is real with
+[00:28:53 -> 00:28:54] the compiler, right?
+[00:28:54 -> 00:28:54] There's no syntax
+[00:28:54 -> 00:28:55] errors or these types
+[00:28:55 -> 00:28:56] of things, but also
+[00:28:56 -> 00:28:57] generate it in a
+[00:28:57 -> 00:28:58] way that again,
+[00:28:58 -> 00:28:59] depending on where
+[00:28:59 -> 00:29:00] this library gets
+[00:29:00 -> 00:29:00] loaded and how many
+[00:29:00 -> 00:29:01] libraries are, it
+[00:29:01 -> 00:29:02] can be sort of
+[00:29:02 -> 00:29:03] patched in. That's
+[00:29:03 -> 00:29:03] sort of the linkers
+[00:29:03 -> 00:29:05] job. Okay. So we
+[00:29:05 -> 00:29:05] learned about this
+[00:29:05 -> 00:29:06] idea of shared
+[00:29:06 -> 00:29:08] libraries. Now what,
+[00:29:08 -> 00:29:09] what's interesting,
+[00:29:09 -> 00:29:10] uh, the last thing
+[00:29:10 -> 00:29:10] that we really need
+[00:29:10 -> 00:29:11] to do to, to, to
+[00:29:11 -> 00:29:13] bring us full circle
+[00:29:13 -> 00:29:14] is to look at,
+[00:29:14 -> 00:29:15] uh, maybe the size
+[00:29:15 -> 00:29:17] of this executable
+[00:29:17 -> 00:29:17] here. And for this
+[00:29:17 -> 00:29:19] example, I don't
+[00:29:19 -> 00:29:19] think we're getting
+[00:29:19 -> 00:29:20] a great sense here
+[00:29:20 -> 00:29:21] of how much code
+[00:29:21 -> 00:29:23] we saved last time
+[00:29:23 -> 00:29:24] with our static
+[00:29:24 -> 00:29:24] library, it was
+[00:29:24 -> 00:29:26] greater than 16 K.
+[00:29:26 -> 00:29:27] Uh, now it's a
+[00:29:27 -> 00:29:28] little bit smaller.
+[00:29:28 -> 00:29:29] So again, this is
+[00:29:29 -> 00:29:30] just showing you
+[00:29:30 -> 00:29:30] that with a shared
+[00:29:30 -> 00:29:31] library, you can
+[00:29:31 -> 00:29:32] save a lot of space,
+[00:29:32 -> 00:29:33] uh, by doing this
+[00:29:33 -> 00:29:35] process. Okay. So
+[00:29:35 -> 00:29:35] anyway, let's go
+[00:29:35 -> 00:29:36] ahead and summarize
+[00:29:36 -> 00:29:37] by saying, here's how
+[00:29:37 -> 00:29:38] we make a shared
+[00:29:38 -> 00:29:40] library. Uh, we
+[00:29:40 -> 00:29:41] can just make this
+[00:29:41 -> 00:29:42] a regular static
+[00:29:42 -> 00:29:43] library by go ahead
+[00:29:43 -> 00:29:45] and, uh, compile
+[00:29:45 -> 00:29:47] my math dot C and
+[00:29:47 -> 00:29:47] I'll just do these
+[00:29:47 -> 00:29:48] for one of them
+[00:29:48 -> 00:29:49] here with our
+[00:29:49 -> 00:29:51] include. Uh, and
+[00:29:51 -> 00:29:52] that'll just, um,
+[00:29:53 -> 00:29:54] oops, uh, that'll
+[00:29:54 -> 00:29:56] just, uh, compile
+[00:29:56 -> 00:29:57] the one file.
+[00:29:57 -> 00:29:57] And since we're
+[00:29:57 -> 00:29:58] just compiling one
+[00:29:58 -> 00:30:00] dash C here, so
+[00:30:00 -> 00:30:00] we can go ahead
+[00:30:00 -> 00:30:03] and, um, see our
+[00:30:03 -> 00:30:05] my math dot O
+[00:30:05 -> 00:30:07] file here, right
+[00:30:07 -> 00:30:08] here. Uh, and that
+[00:30:08 -> 00:30:09] would give us the
+[00:30:09 -> 00:30:10] static library.
+[00:30:10 -> 00:30:10] And if we have a
+[00:30:10 -> 00:30:11] collection of these,
+[00:30:11 -> 00:30:11] we can use the
+[00:30:11 -> 00:30:13] archive tool. Uh,
+[00:30:13 -> 00:30:13] and I'll just do
+[00:30:13 -> 00:30:15] this for, uh, my
+[00:30:15 -> 00:30:16] math. So we're
+[00:30:16 -> 00:30:17] going to, uh,
+[00:30:18 -> 00:30:19] create or replace
+[00:30:19 -> 00:30:20] the index. If
+[00:30:20 -> 00:30:21] it doesn't exist,
+[00:30:21 -> 00:30:22] create it and then
+[00:30:22 -> 00:30:23] set up the
+[00:30:23 -> 00:30:24] index here, my
+[00:30:24 -> 00:30:25] math dot O and
+[00:30:25 -> 00:30:25] let's go ahead
+[00:30:25 -> 00:30:26] and give it, uh,
+[00:30:26 -> 00:30:28] I don't know our
+[00:30:28 -> 00:30:29] math dot A or
+[00:30:29 -> 00:30:30] whatever we want
+[00:30:30 -> 00:30:30] to call that
+[00:30:30 -> 00:30:32] archive file. And
+[00:30:32 -> 00:30:32] then we can see
+[00:30:32 -> 00:30:34] that that's file
+[00:30:34 -> 00:30:35] here is now
+[00:30:35 -> 00:30:35] something that we can
+[00:30:35 -> 00:30:36] share with our
+[00:30:36 -> 00:30:37] friends and
+[00:30:37 -> 00:30:38] statically link in
+[00:30:38 -> 00:30:39] or glue together
+[00:30:39 -> 00:30:39] our code. So
+[00:30:39 -> 00:30:40] we might again
+[00:30:40 -> 00:30:40] think about this.
+[00:30:40 -> 00:30:41] If we want our
+[00:30:41 -> 00:30:42] distribution to
+[00:30:42 -> 00:30:42] be really
+[00:30:42 -> 00:30:44] easy, sometimes
+[00:30:44 -> 00:30:44] it's nice to
+[00:30:44 -> 00:30:44] just package
+[00:30:44 -> 00:30:46] everything together.
+[00:30:46 -> 00:30:46] If we think
+[00:30:46 -> 00:30:47] that this library
+[00:30:47 -> 00:30:48] is something that
+[00:30:48 -> 00:30:48] we are going
+[00:30:48 -> 00:30:50] to update over
+[00:30:50 -> 00:30:51] time on an
+[00:30:51 -> 00:30:51] application that
+[00:30:51 -> 00:30:52] we're going to
+[00:30:52 -> 00:30:52] distribute, then
+[00:30:52 -> 00:30:53] that's where we
+[00:30:53 -> 00:30:53] might want to
+[00:30:53 -> 00:30:54] think more about
+[00:30:54 -> 00:30:55] this shared
+[00:30:55 -> 00:30:56] library strategy,
+[00:30:56 -> 00:30:57] which again is
+[00:30:57 -> 00:30:58] another advantage
+[00:30:58 -> 00:30:59] of, I can just
+[00:30:59 -> 00:31:00] update this
+[00:31:00 -> 00:31:01] library that's
+[00:31:01 -> 00:31:02] not glued
+[00:31:02 -> 00:31:03] into an
+[00:31:03 -> 00:31:03] executable or
+[00:31:03 -> 00:31:04] anything. Uh,
+[00:31:04 -> 00:31:05] and that will
+[00:31:05 -> 00:31:06] effectively be a
+[00:31:06 -> 00:31:07] way that we
+[00:31:07 -> 00:31:08] can update
+[00:31:08 -> 00:31:09] our system.
+[00:31:09 -> 00:31:09] Now there's
+[00:31:09 -> 00:31:10] one other thing.
+[00:31:10 -> 00:31:10] If you do
+[00:31:10 -> 00:31:11] want to see it
+[00:31:11 -> 00:31:11] post in the
+[00:31:11 -> 00:31:12] comments below
+[00:31:12 -> 00:31:13] and I can
+[00:31:13 -> 00:31:14] talk about it.
+[00:31:14 -> 00:31:14] That's also
+[00:31:14 -> 00:31:15] pretty interesting.
+[00:31:16 -> 00:31:17] These this
+[00:31:17 -> 00:31:17] way that you
+[00:31:17 -> 00:31:18] can also
+[00:31:19 -> 00:31:19] through the
+[00:31:19 -> 00:31:21] C API open
+[00:31:21 -> 00:31:21] and close
+[00:31:21 -> 00:31:22] a shared object.
+[00:31:22 -> 00:31:22] So at
+[00:31:22 -> 00:31:23] runtime of
+[00:31:23 -> 00:31:23] your actual
+[00:31:23 -> 00:31:24] application,
+[00:31:24 -> 00:31:24] you can
+[00:31:24 -> 00:31:25] load in code
+[00:31:25 -> 00:31:25] and this is
+[00:31:25 -> 00:31:26] how you would
+[00:31:26 -> 00:31:26] sort of
+[00:31:26 -> 00:31:27] build a
+[00:31:27 -> 00:31:28] plugin system.
+[00:31:28 -> 00:31:29] If you
+[00:31:29 -> 00:31:29] wanted to
+[00:31:29 -> 00:31:30] use this.
+[00:31:30 -> 00:31:30] So I'll
+[00:31:30 -> 00:31:31] just kind of
+[00:31:31 -> 00:31:31] leave this here
+[00:31:31 -> 00:31:32] as a teaser.
+[00:31:32 -> 00:31:32] If it's
+[00:31:32 -> 00:31:32] something that
+[00:31:32 -> 00:31:33] you're
+[00:31:33 -> 00:31:33] interested in
+[00:31:33 -> 00:31:34] seeing, I'll
+[00:31:37 -> 00:31:38] monster lesson
+[00:31:38 -> 00:31:38] and I want to
+[00:31:38 -> 00:31:39] just go ahead
+[00:31:39 -> 00:31:41] and leave this here
+[00:31:41 -> 00:31:42] with the
+[00:31:42 -> 00:31:43] working command
+[00:31:43 -> 00:31:43] lines here,
+[00:31:45 -> 00:31:45] how to create
+[00:31:45 -> 00:31:46] our shared
+[00:31:46 -> 00:31:47] object file here,
+[00:31:48 -> 00:31:48] how to
+[00:31:48 -> 00:31:49] create our
+[00:31:49 -> 00:31:50] static object
+[00:31:50 -> 00:31:51] and then,
+[00:31:52 -> 00:31:52] or static
+[00:31:52 -> 00:31:53] library
+[00:31:53 -> 00:31:53] and then how
+[00:31:53 -> 00:31:55] to archive
+[00:31:55 -> 00:31:56] it into
+[00:31:56 -> 00:31:56] one place
+[00:31:56 -> 00:31:57] here.
+[00:31:57 -> 00:31:57] So with
+[00:31:57 -> 00:31:57] the archive
+[00:31:57 -> 00:32:00] RCS name of
+[00:32:00 -> 00:32:00] our library,
+[00:32:01 -> 00:32:02] our math
+[00:32:02 -> 00:32:03] that a and
+[00:32:03 -> 00:32:03] my math
+[00:32:03 -> 00:32:04] that O or
+[00:32:04 -> 00:32:05] you know,
+[00:32:05 -> 00:32:06] my math,
+[00:32:06 -> 00:32:06] you know,
+[00:32:07 -> 00:32:07] we had
+[00:32:07 -> 00:32:08] my math
+[00:32:08 -> 00:32:08] two here,
+[00:32:08 -> 00:32:09] for example,
+[00:32:09 -> 00:32:09] and that'll
+[00:32:09 -> 00:32:10] do the
+[00:32:10 -> 00:32:10] trick here.
+[00:32:11 -> 00:32:11] All right,
+[00:32:11 -> 00:32:11] folks,
+[00:32:11 -> 00:32:12] so hopefully
+[00:32:12 -> 00:32:13] that was
+[00:32:13 -> 00:32:13] useful.
+[00:32:13 -> 00:32:14] Hopefully
+[00:32:14 -> 00:32:14] enjoyed this
+[00:32:14 -> 00:32:15] lesson,
+[00:32:15 -> 00:32:15] a bit of
+[00:32:15 -> 00:32:15] a monster
+[00:32:15 -> 00:32:16] lesson,
+[00:32:16 -> 00:32:16] kind of
+[00:32:16 -> 00:32:16] fun to
+[00:32:16 -> 00:32:17] follow along with
+[00:32:18 -> 00:32:18] and try
+[00:32:18 -> 00:32:19] doing this
+[00:32:19 -> 00:32:19] and try to
+[00:32:19 -> 00:32:20] do,
+[00:32:20 -> 00:32:20] you know,
+[00:32:20 -> 00:32:20] with one
+[00:32:20 -> 00:32:21] file at
+[00:32:21 -> 00:32:21] first,
+[00:32:21 -> 00:32:22] then try
+[00:32:22 -> 00:32:22] with two
+[00:32:22 -> 00:32:23] and see how
+[00:32:23 -> 00:32:23] you can link
+[00:32:23 -> 00:32:24] things together.
+[00:32:24 -> 00:32:24] I've
+[00:32:24 -> 00:32:25] got some
+[00:32:25 -> 00:32:25] other talks
+[00:32:25 -> 00:32:26] on my
+[00:32:26 -> 00:32:26] channel,
+[00:32:26 -> 00:32:27] if you'd
+[00:32:27 -> 00:32:27] like to
+[00:32:27 -> 00:32:27] check out
+[00:32:27 -> 00:32:28] about the
+[00:32:28 -> 00:32:28] whole
+[00:32:28 -> 00:32:29] compilation process
+[00:32:29 -> 00:32:29] that can
+[00:32:29 -> 00:32:30] hopefully
+[00:32:30 -> 00:32:30] make this
+[00:32:30 -> 00:32:31] also make
+[00:32:31 -> 00:32:32] sense.
+[00:32:32 -> 00:32:32] But with
+[00:32:32 -> 00:32:32] that said,
+[00:32:32 -> 00:32:34] let me know if this was useful.
+[00:32:34 -> 00:32:37] If you have questions below or want to see us dig further into these types of things,
+[00:32:37 -> 00:32:38] happy to do that.
+[00:32:38 -> 00:32:39] With that said though,
+[00:32:39 -> 00:32:42] we'll see you in the next lesson very, very soon.
