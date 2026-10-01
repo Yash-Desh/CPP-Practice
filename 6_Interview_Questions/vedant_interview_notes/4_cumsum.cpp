@@ -227,6 +227,12 @@ int main() {
     return 0;
 }
 
+
+// ============================================================================
+// Claude Analysis -> Not given in the question
+// ============================================================================
+
+
 /*
 
 // What claude thinks needs to be done in this qs ? 
@@ -269,5 +275,87 @@ taking the block width to the full row is strictly better, because now the inner
   capture — each element is read once, added once, written once. There's no tile to hold in cache
   across iterations. So the usual justification for picking a block size that fits L1 or L2 simply
   doesn't apply, and the only thing block width controls is how many times you sweep the array.
+
+
+--------------------------------------------------------------------------------
+Further notes
+--------------------------------------------------------------------------------
+
+LOOP-CARRIED DEPENDENCE
+  Iteration N needs a value iteration N-1 produced, so the iterations cannot be
+  reordered, threaded, or packed into a SIMD register.
+
+  axis=1: out[j] = out[j-1] + in[j]   -> dependence is in the INNER loop. Serial
+          chain of adds, one per element. Cannot vectorize.
+  axis=0: out[i][j] = in[i][j] + out[i-1][j]  -> the inner loop over j is
+          dependence-free (each column is independent); the dependence sits on
+          the OUTER loop over i, which is only `rows` long. Inner loop
+          vectorizes fully.
+
+  General trick: push the dependence out to an outer loop and leave the inner
+  loop a clean contiguous stream.
+
+ACCUMULATOR INSTEAD OF RE-READING output[]
+  for (j...) { acc += in[i*cols + j]; out[i*cols + j] = acc; }
+
+  Drops the j==0 branch and keeps the running sum in a register. The win is
+  LATENCY, not memory traffic -- out[j-1] was just written and is still in the
+  store buffer / L1, so it never costs a DRAM access. But a register-to-register
+  add closes the dependence chain in ~1 cycle vs ~5 for store-to-load
+  forwarding, and that chain is the entire critical path for axis=1.
+
+  Does not apply to axis=0: the dependence there is on an entire row above
+  (`cols` values), which no single register can hold.
+
+BREAKING THE DEPENDENCE VIA ASSOCIATIVITY (the `4 processor` sketch at the top)
+  Three phases, for 1 2 3 4 5 6 7 8 on 4 cores:
+
+    1. Each core prefix-sums its own chunk, in parallel, no cross-talk:
+         [1 2] [3 4] [5 6] [7 8]  ->  [1 3] [3 7] [5 11] [7 15]
+       Chunk totals: 3, 7, 11, 15.
+    2. Exclusive scan of the chunk totals (serial, but only `ncores` numbers):
+         offsets: 0, 3, 10, 21
+    3. Each core adds its single offset to every element of its chunk, in
+       parallel:
+         [1 3]+0  [3 7]+3  [5 11]+10  [7 15]+21
+         -> 1 3 6 10 15 21 28 36
+
+  Legal because (a+b)+c == a+(b+c): core 2 computes 5 locally and is handed
+  1+2+3+4 = 10, i.e. the same sum regrouped. ~2x the total additions, but
+  phases 1 and 3 are fully parallel and phase 2 stays tiny.
+
+  Same structure inside one SIMD register = log-step shift-and-add scan
+  (zeros shift in from the left):
+
+    input:            1  2  3  4  5  6  7  8
+    shift 1, add:     1  3  5  7  9 11 13 15
+    shift 2, add:     1  3  6 10 14 18 22 26
+    shift 4, add:     1  3  6 10 15 21 28 36
+
+  log2(8) = 3 vector ops instead of 8 serial adds; 4 ops for a 16-wide AVX-512
+  register. NOTE: only valid for associative operators (+, *, min, max).
+  Floating-point + is not strictly associative, so the compiler will not do this
+  reassociation for float/double without -ffast-math.
+
+MEMORY-BANDWIDTH-BOUND
+  Arithmetic intensity of the axis=0 kernel:
+    bytes per element = 4 (read in) + 4 (read row above) + 4 (write out) = 12
+    ops   per element = 1 add
+    -> ~0.083 ops/byte
+
+  A desktop CPU (~50 GB/s DRAM, ~200 G int-adds/s with AVX-512) needs roughly
+  4 ops/byte to stay busy -- about 50x more than this kernel supplies. The adder
+  finishes a vector in a cycle and then waits for the next 64 bytes.
+
+  Consequences:
+    - Wider SIMD (AVX2 -> AVX-512) buys almost nothing at large sizes.
+    - Extra cores buy little once 2-3 of them saturate the memory controller.
+    - The only real lever is REDUCING BYTES MOVED. That is exactly why full-row
+      blocking beat B=16: same arithmetic, one sweep instead of cols/16 sweeps.
+    - Other traffic cuts: compute in place (in == out) saves 4 bytes/elt;
+      non-temporal stores skip the read-for-ownership on the write, another 4.
+
+  Quick test: replace the kernel body with a plain copy out[x] = in[x]. If the
+  runtime barely moves, you are memory-bound and SIMD cleverness will not help.
 
 */

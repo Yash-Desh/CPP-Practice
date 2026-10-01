@@ -1,0 +1,1169 @@
+Title: L2. Must Know Tricks in Bit Manipulation | Swap two numbers without third variable
+Video ID: nttpF8kwgd4
+Detected language: en
+------------------------------------------------------------
+
+[00:00:02 -> 00:00:07] So, we will be continuing with the bit manipulation playlist, but before that, hey, welcome back
+[00:00:07 -> 00:00:08] to the channel.
+[00:00:08 -> 00:00:09] I hope you guys are doing extremely well.
+[00:00:09 -> 00:00:13] So, in this video, I'll be covering up a lot of problems, yes.
+[00:00:13 -> 00:00:17] And the first problem will be swap two numbers.
+[00:00:17 -> 00:00:20] So, the problem statement is swap two numbers.
+[00:00:20 -> 00:00:27] So, you'll be given two numbers, A and B. So, assume A is given as 5, B is given
+[00:00:27 -> 00:00:28] as 6.
+[00:00:28 -> 00:00:30] Now, your task is to swap them.
+[00:00:30 -> 00:00:36] So, after swapping, A will be having 6, B will be having 5.
+[00:00:36 -> 00:00:37] How can I do it?
+[00:00:37 -> 00:00:38] It's very simple.
+[00:00:38 -> 00:00:43] I can say, I'll take a third variable temp, I'll store the value of A into it.
+[00:00:43 -> 00:00:49] So, temporary will be having the value 5 initially when we start with this state.
+[00:00:49 -> 00:00:50] Done.
+[00:00:50 -> 00:00:56] After that, I say, okay, A equal to B. So, I take the value of B, which is 6
+[00:00:56 -> 00:00:58] and I put it into A.
+[00:00:58 -> 00:01:02] After that, I say B equal to, can I say B equal to A?
+[00:01:02 -> 00:01:03] I cannot.
+[00:01:03 -> 00:01:04] Why?
+[00:01:04 -> 00:01:07] Because if I say B equal to A, A's value is 6.
+[00:01:07 -> 00:01:10] So, B will still stay as 6.
+[00:01:10 -> 00:01:12] This is the reason I took a third variable temporary.
+[00:01:12 -> 00:01:18] So, basically, I'll say B equal to temp, B will be taking the value 5.
+[00:01:18 -> 00:01:20] So, it'll be 5.
+[00:01:20 -> 00:01:21] Done and dusted.
+[00:01:21 -> 00:01:24] But over here, I'm using a third variable.
+[00:01:25 -> 00:01:28] Now, in an interview, the interviewer might ask you, can you solve this without using
+[00:01:28 -> 00:01:30] the third variable?
+[00:01:30 -> 00:01:33] That is where the XOR operator will come in.
+[00:01:33 -> 00:01:35] What is the XOR operator?
+[00:01:35 -> 00:01:37] Quick recap.
+[00:01:37 -> 00:01:46] Even number of 1's will be 0, odd number of 1's will be 1.
+[00:01:46 -> 00:01:52] Can I say that, if I XOR two same numbers, 5 XOR 5, the value will be 0.
+[00:01:52 -> 00:01:53] Why?
+[00:01:53 -> 00:01:59] 5 is 1, 0, 1 in binary, and again, 5 is 1, 0, 1 in binary.
+[00:01:59 -> 00:02:07] If I'm doing a XOR, since they are same numbers, every row will have even number of 1's,
+[00:02:07 -> 00:02:11] and wherever there is 0, there will be even number of 1's, that is 0 number of
+[00:02:11 -> 00:02:12] 1's.
+[00:02:12 -> 00:02:14] So, everything will be 0, 0, 0.
+[00:02:14 -> 00:02:17] So, thereby, XOR of same numbers will be 0.
+[00:02:17 -> 00:02:21] So, I will be using the XOR operator in order to swap two numbers.
+[00:02:21 -> 00:02:22] Let us see how.
+[00:02:22 -> 00:02:28] So, what I will write is, A equal to A XOR B, and this will be my step number 1.
+[00:02:28 -> 00:02:33] After this, I will write B equal to A XOR B again, right?
+[00:02:33 -> 00:02:40] So, if I write this, what will happen is, this A, what is the value of this A?
+[00:02:40 -> 00:02:41] Can I say this much?
+[00:02:41 -> 00:02:44] It is, because this is what I did in step 1.
+[00:02:44 -> 00:02:49] So, I can write A XOR B is what A is, and then XOR of B.
+[00:02:49 -> 00:02:51] Now, what is B XOR B?
+[00:02:51 -> 00:02:52] That is 0.
+[00:02:52 -> 00:02:56] So, eventually, B is equal to A.
+[00:02:56 -> 00:02:57] Agreed or not?
+[00:02:57 -> 00:02:58] Agreed.
+[00:02:58 -> 00:03:02] After this, I will again write A equal to A XOR B.
+[00:03:02 -> 00:03:04] Now, tell me one thing.
+[00:03:04 -> 00:03:05] What is the value of A?
+[00:03:05 -> 00:03:08] The value of A is this much, right?
+[00:03:08 -> 00:03:10] So, I will write this again.
+[00:03:10 -> 00:03:15] A XOR B XOR of B.
+[00:03:15 -> 00:03:17] This time, what is the value of B?
+[00:03:17 -> 00:03:18] It's A.
+[00:03:18 -> 00:03:20] It is A, right?
+[00:03:20 -> 00:03:22] So, I can just write it as A.
+[00:03:22 -> 00:03:23] It is not B anymore.
+[00:03:23 -> 00:03:24] It is A.
+[00:03:24 -> 00:03:29] So, A XOR A will go off as 0, and eventually, it will be left out with B.
+[00:03:29 -> 00:03:35] So, if you see, what we did was B equal to A, A equal to B.
+[00:03:35 -> 00:03:38] The XOR operation will do it for you.
+[00:03:38 -> 00:03:39] So, this is how you can easily swap.
+[00:03:39 -> 00:03:41] So, it's very simple.
+[00:03:41 -> 00:03:46] Three lines, and you can easily swap two numbers without using the third variable.
+[00:03:46 -> 00:03:50] So, time for the next problem, which is check if the i-th bit is set or not.
+[00:03:50 -> 00:03:52] So, what is the problem stating?
+[00:03:52 -> 00:03:55] It's stating that you will be given a value n, imagine 13,
+[00:03:55 -> 00:03:57] and you will be given a value i, imagine 2.
+[00:03:57 -> 00:04:02] Now, your task is to check if the second bit in the number 13 is set or not.
+[00:04:02 -> 00:04:04] So, what is 13 in binary?
+[00:04:04 -> 00:04:07] 1, 1, 0, 1.
+[00:04:07 -> 00:04:08] Agreed.
+[00:04:08 -> 00:04:10] This is what 13 is in binary.
+[00:04:10 -> 00:04:13] Now, your task is to check if the second bit,
+[00:04:13 -> 00:04:16] and you count the bits from the right to left.
+[00:04:16 -> 00:04:19] So, 0, first, second.
+[00:04:19 -> 00:04:21] Is the second bit set?
+[00:04:21 -> 00:04:22] It will be like, yes, it is set.
+[00:04:22 -> 00:04:24] So, it will have to return a true.
+[00:04:24 -> 00:04:25] Got it?
+[00:04:25 -> 00:04:27] Imagine I change the value.
+[00:04:27 -> 00:04:30] I change this to, let's say, 1.
+[00:04:30 -> 00:04:33] In that case, this is the 0-th bit.
+[00:04:33 -> 00:04:35] This is the first bit, and it is not set.
+[00:04:35 -> 00:04:38] So, it will be returning false.
+[00:04:38 -> 00:04:41] I can probably ask you 10-th bit as well.
+[00:04:41 -> 00:04:43] If I ask you if the 10-th bit is set or not.
+[00:04:43 -> 00:04:46] In that case, it will have hypothetical zeros.
+[00:04:46 -> 00:04:48] So, it will never be set.
+[00:04:48 -> 00:04:49] Got it?
+[00:04:49 -> 00:04:50] So, how do you solve this problem?
+[00:04:50 -> 00:04:53] The brute force that I can think of is,
+[00:04:53 -> 00:04:55] I take the number 13,
+[00:04:55 -> 00:04:57] convert it into its binary equivalent.
+[00:04:57 -> 00:04:59] We have already done it.
+[00:04:59 -> 00:05:02] After that, I start traversing from the back,
+[00:05:02 -> 00:05:06] and I figure out if the i-th bit is 1 or 0.
+[00:05:06 -> 00:05:08] And then I can return a true or false.
+[00:05:08 -> 00:05:11] But for that, I will have to convert a number into its binary.
+[00:05:11 -> 00:05:12] I don't want to do it.
+[00:05:12 -> 00:05:15] How can I do it with using bitwise operators?
+[00:05:15 -> 00:05:16] So, there are two ways.
+[00:05:16 -> 00:05:18] One is the left-shift operator,
+[00:05:18 -> 00:05:20] while the other one is the right-shift operator.
+[00:05:20 -> 00:05:25] I have already told you about this in the last video, right?
+[00:05:25 -> 00:05:29] So, let's understand how can I use the left-shift operator.
+[00:05:29 -> 00:05:34] So, value 13, that's 1, 1, 0, 1, technically, in binary, right?
+[00:05:34 -> 00:05:38] I've been asked for i equal to 2, which is the second bit.
+[00:05:38 -> 00:05:40] So, where is the second bit?
+[00:05:40 -> 00:05:42] Here?
+[00:05:42 -> 00:05:44] So, can I write something like,
+[00:05:44 -> 00:05:50] 1 left-shift of 2, which is basically i.
+[00:05:50 -> 00:05:54] 1 left-shift of i.
+[00:05:54 -> 00:05:56] So, what will happen is,
+[00:05:56 -> 00:05:59] if I write this, this is 1.
+[00:05:59 -> 00:06:02] So, on shifting it by one place to the left,
+[00:06:02 -> 00:06:05] you will get something as 1 here and then a 0.
+[00:06:05 -> 00:06:09] And if you try to again shift it, you will get 1, 0, 0.
+[00:06:09 -> 00:06:11] So, this is the number that you will get
+[00:06:11 -> 00:06:14] if you try to shift 1 by two places.
+[00:06:14 -> 00:06:15] Got it?
+[00:06:15 -> 00:06:16] So, what you will do is,
+[00:06:16 -> 00:06:20] you will take one left-shift of i places.
+[00:06:20 -> 00:06:23] So, what you will get is, 1, 0, 0.
+[00:06:23 -> 00:06:25] Once you have this,
+[00:06:25 -> 00:06:29] what you can do is, you can simply do the AND operation.
+[00:06:29 -> 00:06:31] So, if you do an AND operation,
+[00:06:31 -> 00:06:33] you know one thing for sure.
+[00:06:33 -> 00:06:35] Apart from this 1,
+[00:06:35 -> 00:06:37] everything else is a 0.
+[00:06:37 -> 00:06:39] Apart from this 1,
+[00:06:39 -> 00:06:41] everything else is a 0.
+[00:06:41 -> 00:06:43] So, if you are doing an AND,
+[00:06:43 -> 00:06:47] all of these places will be 0 for sure
+[00:06:47 -> 00:06:49] because you have a 0 and if you do an AND with 0,
+[00:06:49 -> 00:06:51] you get a 0.
+[00:06:51 -> 00:06:53] But for this 1,
+[00:06:53 -> 00:06:56] if this is 1,
+[00:06:56 -> 00:06:58] you will end up writing 1.
+[00:06:58 -> 00:07:00] If this is 0, you will end up writing 0.
+[00:07:00 -> 00:07:01] Right?
+[00:07:01 -> 00:07:03] So, you will basically get a number,
+[00:07:03 -> 00:07:05] a number which is greater than 0.
+[00:07:05 -> 00:07:07] Right?
+[00:07:07 -> 00:07:09] So, I can say one thing. Okay?
+[00:07:09 -> 00:07:11] If
+[00:07:11 -> 00:07:13] n and
+[00:07:13 -> 00:07:16] 1 left-shift of i,
+[00:07:16 -> 00:07:22] if this is a non-zero number,
+[00:07:22 -> 00:07:24] I am very sure it is set.
+[00:07:24 -> 00:07:27] Else, it is unset.
+[00:07:27 -> 00:07:29] Super simple.
+[00:07:29 -> 00:07:32] Let me take an example where it is unset.
+[00:07:32 -> 00:07:34] So, if I take the number 13,
+[00:07:34 -> 00:07:36] we will use some other color.
+[00:07:36 -> 00:07:38] n equal to 13 and i equal to 1.
+[00:07:38 -> 00:07:40] What will happen in this case is
+[00:07:40 -> 00:07:42] 13 is 1, 1, 0, 1.
+[00:07:42 -> 00:07:44] Correct?
+[00:07:44 -> 00:07:46] i is 1. So, I am saying 1
+[00:07:46 -> 00:07:48] left-shift of 1 place.
+[00:07:48 -> 00:07:50] That is basically here.
+[00:07:50 -> 00:07:52] And then there is a 0. So, everything else is 0.
+[00:07:52 -> 00:07:54] So, everyone else will go 0
+[00:07:54 -> 00:07:56] and this is a 0.
+[00:07:56 -> 00:07:58] So, thereby this will also go 0.
+[00:07:58 -> 00:08:00] So, you will eventually get 0. Got it?
+[00:08:00 -> 00:08:02] So, if you say n and
+[00:08:02 -> 00:08:04] 1 left-shift of i,
+[00:08:04 -> 00:08:06] i is the number,
+[00:08:06 -> 00:08:08] like the bit that you want to check.
+[00:08:08 -> 00:08:10] If that is non-zero, that means it is set.
+[00:08:10 -> 00:08:12] Otherwise, it is unset.
+[00:08:12 -> 00:08:14] So, this is how you can easily do it
+[00:08:14 -> 00:08:16] by using the left-shift operator.
+[00:08:16 -> 00:08:18] So, let's now understand how can I do it
+[00:08:18 -> 00:08:20] by using the right-shift operator.
+[00:08:20 -> 00:08:22] So, what is 13?
+[00:08:22 -> 00:08:24] 1, 1, 0, 1.
+[00:08:24 -> 00:08:26] I have to check the second bit.
+[00:08:26 -> 00:08:28] That's basically 0, 1, 2.
+[00:08:28 -> 00:08:30] This is the bit that I want to check.
+[00:08:30 -> 00:08:32] So, what I will do is,
+[00:08:32 -> 00:08:34] I will try to take this bit
+[00:08:34 -> 00:08:36] to the extreme right.
+[00:08:36 -> 00:08:38] I will try to take this bit to the extreme right.
+[00:08:38 -> 00:08:40] So, I will say,
+[00:08:40 -> 00:08:42] right-shift by 2 places.
+[00:08:42 -> 00:08:44] Right-shift by 2 places.
+[00:08:44 -> 00:08:46] So, what will happen is, this 0
+[00:08:46 -> 00:08:48] and this 1 will go off the clip.
+[00:08:48 -> 00:08:50] And this 1
+[00:08:50 -> 00:08:52] will be here. This 1
+[00:08:52 -> 00:08:54] will be here and everything else will be 0.
+[00:08:54 -> 00:08:56] After shifting it
+[00:08:56 -> 00:08:58] right by 2 places.
+[00:08:58 -> 00:09:00] Done. So, this
+[00:09:00 -> 00:09:02] is the bit that you want to
+[00:09:02 -> 00:09:04] check, if it is set or not.
+[00:09:04 -> 00:09:06] So, what you will do is, you will do an AND
+[00:09:06 -> 00:09:08] with 1. You will do an AND with 1.
+[00:09:08 -> 00:09:10] So, if this
+[00:09:10 -> 00:09:12] is set, it will automatically
+[00:09:12 -> 00:09:14] give you 1 and all
+[00:09:14 -> 00:09:16] the other things will be 0. So, they will be 0.
+[00:09:18 -> 00:09:20] So, if this number is 1,
+[00:09:20 -> 00:09:22] if this number is, because this is 1,
+[00:09:22 -> 00:09:24] in decimal this is 1, if this
+[00:09:24 -> 00:09:26] number is 1, it is set. Otherwise,
+[00:09:26 -> 00:09:28] it is unset. Let me take one more
+[00:09:28 -> 00:09:30] example.
+[00:09:30 -> 00:09:32] Imagine if N is
+[00:09:32 -> 00:09:34] 13 and I
+[00:09:34 -> 00:09:36] is 1. In this case,
+[00:09:36 -> 00:09:38] 13 is 1, 1, 0,
+[00:09:38 -> 00:09:40] 1. You have to shift it right by
+[00:09:40 -> 00:09:42] 1 place. That means,
+[00:09:42 -> 00:09:44] this will go
+[00:09:44 -> 00:09:46] off the clip. This 0 will be
+[00:09:46 -> 00:09:48] here, this 1 will be here, this
+[00:09:48 -> 00:09:50] 1 will be here and everything else will be
+[00:09:50 -> 00:09:52] 0. Now, what you do is,
+[00:09:52 -> 00:09:54] AND with 1, so we do an
+[00:09:54 -> 00:09:56] AND with 1, everything else is
+[00:09:56 -> 00:09:58] 0. So, 0, 0, 0
+[00:09:58 -> 00:10:00] and this will also be 0.
+[00:10:00 -> 00:10:02] So, what you basically write is,
+[00:10:02 -> 00:10:04] if N right-shift
+[00:10:04 -> 00:10:06] by I places
+[00:10:06 -> 00:10:08] with an AND of 1,
+[00:10:08 -> 00:10:10] if that is equal to 0, that means it is
+[00:10:10 -> 00:10:12] unset, else
+[00:10:12 -> 00:10:14] it is set.
+[00:10:14 -> 00:10:16] So, either you right-shift,
+[00:10:16 -> 00:10:18] either you right-shift
+[00:10:18 -> 00:10:20] and bring this one to the extreme
+[00:10:20 -> 00:10:22] right, either you can do that
+[00:10:22 -> 00:10:24] or you can left-shift
+[00:10:24 -> 00:10:26] and place a 1
+[00:10:26 -> 00:10:28] and place a 1
+[00:10:28 -> 00:10:30] right below that bit.
+[00:10:30 -> 00:10:32] Simple, by left-shift
+[00:10:32 -> 00:10:34] or by right-shift. So, the time
+[00:10:34 -> 00:10:36] complexity and the space complexity will
+[00:10:36 -> 00:10:38] be big of 1. It is extremely
+[00:10:38 -> 00:10:40] fast because the computer
+[00:10:40 -> 00:10:42] performs bitwise operations much
+[00:10:42 -> 00:10:44] much faster than all the other operations.
+[00:10:44 -> 00:10:46] So, the next problem is
+[00:10:46 -> 00:10:48] setting the i-th bit.
+[00:10:48 -> 00:10:50] So, the problem is stating that, it will be given
+[00:10:50 -> 00:10:52] a value of N, imagine 9,
+[00:10:52 -> 00:10:54] it will be given a value of i, imagine 2.
+[00:10:54 -> 00:10:56] So, if I try to write 9
+[00:10:56 -> 00:10:58] in its binary, it will be 1,
+[00:10:58 -> 00:11:00] 0, 0, 1.
+[00:11:00 -> 00:11:02] Now, the second bit from the right
+[00:11:02 -> 00:11:04] is 0, 1, 2.
+[00:11:04 -> 00:11:06] This is 0.
+[00:11:06 -> 00:11:08] Your task is to
+[00:11:08 -> 00:11:10] set it to 1.
+[00:11:10 -> 00:11:12] Your task is to set the i-th bit
+[00:11:12 -> 00:11:14] to 1 and keep all
+[00:11:14 -> 00:11:16] the other bits as it is.
+[00:11:16 -> 00:11:18] Once you have done it, the value will be
+[00:11:18 -> 00:11:20] 13.
+[00:11:20 -> 00:11:22] Now, what if this was 1?
+[00:11:22 -> 00:11:24] You still keep it as 1, doesn't matter.
+[00:11:24 -> 00:11:26] You have to make that bit as 1.
+[00:11:26 -> 00:11:28] So, the number is 13.
+[00:11:28 -> 00:11:30] Now, what if I ask you the brute force?
+[00:11:30 -> 00:11:32] The brute force is very simple.
+[00:11:32 -> 00:11:34] You convert it into its binary
+[00:11:34 -> 00:11:36] which is 1, 0, 0, 1.
+[00:11:36 -> 00:11:38] You figure out the second bit.
+[00:11:38 -> 00:11:40] You make it 1 and then you
+[00:11:40 -> 00:11:42] convert it back
+[00:11:42 -> 00:11:44] into its decimal.
+[00:11:44 -> 00:11:46] A long process.
+[00:11:46 -> 00:11:48] Can I do it in a better way?
+[00:11:48 -> 00:11:50] Probably yes.
+[00:11:50 -> 00:11:52] Let's try to write 9 in its binary.
+[00:11:52 -> 00:11:54] 1, 0, 0, 1.
+[00:11:54 -> 00:11:56] I'm trying to convert this bit
+[00:11:56 -> 00:11:58] which is the second bit.
+[00:11:58 -> 00:12:00] So, what if I can place a 1
+[00:12:00 -> 00:12:02] over here?
+[00:12:02 -> 00:12:04] Can I place a 1
+[00:12:04 -> 00:12:06] right underneath it?
+[00:12:06 -> 00:12:08] Probably I can.
+[00:12:08 -> 00:12:10] What I'll try to do is, I'll take a 1
+[00:12:10 -> 00:12:12] which is technically something like
+[00:12:12 -> 00:12:14] 0, 0, 0, 0, like dot dot dot
+[00:12:14 -> 00:12:16] 32 bits.
+[00:12:16 -> 00:12:18] That's 1. If I say
+[00:12:18 -> 00:12:20] left shift by
+[00:12:20 -> 00:12:22] 2 places.
+[00:12:22 -> 00:12:24] This number will be
+[00:12:24 -> 00:12:26] so this 1 will go here.
+[00:12:26 -> 00:12:28] Left shift.
+[00:12:28 -> 00:12:30] And this will be 0.
+[00:12:30 -> 00:12:32] You know the left shift operator, right?
+[00:12:32 -> 00:12:34] This is what you will get.
+[00:12:34 -> 00:12:36] Something like this, right? Agreed?
+[00:12:36 -> 00:12:38] After this,
+[00:12:38 -> 00:12:40] if you try to do a
+[00:12:40 -> 00:12:42] OR operation.
+[00:12:42 -> 00:12:44] OR operation.
+[00:12:44 -> 00:12:46] So this is 1.
+[00:12:46 -> 00:12:48] If you do an OR with 0 or 1
+[00:12:48 -> 00:12:50] doesn't matter. It will always be 1.
+[00:12:50 -> 00:12:52] This is 0.
+[00:12:52 -> 00:12:54] And you're sure that the underneath value
+[00:12:54 -> 00:12:56] is 0 as well. So this will always
+[00:12:56 -> 00:12:58] be 0. Now this is 0.
+[00:12:58 -> 00:13:00] But the underneath value
+[00:13:00 -> 00:13:02] is 1 because you have
+[00:13:02 -> 00:13:04] done it. You have done it.
+[00:13:04 -> 00:13:06] That's why this will be 1 because you're doing an OR operator.
+[00:13:06 -> 00:13:08] After that, this is 1.
+[00:13:08 -> 00:13:10] So it will just be 1.
+[00:13:10 -> 00:13:12] Apart from this,
+[00:13:12 -> 00:13:14] whatever the bits were,
+[00:13:14 -> 00:13:16] they will get
+[00:13:16 -> 00:13:18] they will basically get
+[00:13:18 -> 00:13:20] transferred.
+[00:13:20 -> 00:13:22] And this 0 will turn into 1
+[00:13:22 -> 00:13:24] because you're doing an OR with 1. Got it?
+[00:13:24 -> 00:13:26] So this is how I can do it.
+[00:13:26 -> 00:13:28] Quite simple. I'll write
+[00:13:28 -> 00:13:30] N
+[00:13:30 -> 00:13:32] OR which is the pipe operator.
+[00:13:32 -> 00:13:34] And 1
+[00:13:34 -> 00:13:36] left shift of I.
+[00:13:36 -> 00:13:38] This is how I can
+[00:13:38 -> 00:13:40] set the ith bit.
+[00:13:40 -> 00:13:42] Got it? Even if it is 1.
+[00:13:42 -> 00:13:44] Let's take that example as well.
+[00:13:44 -> 00:13:46] So if I take N equal to
+[00:13:46 -> 00:13:48] 13, I ask you to set
+[00:13:48 -> 00:13:50] the second bit again. So what is 13?
+[00:13:50 -> 00:13:52] That's 1, 1, 0,
+[00:13:52 -> 00:13:54] 1. Now this is the second
+[00:13:54 -> 00:13:56] bit. Right? I'll try to place
+[00:13:56 -> 00:13:58] a 1 here which is basically
+[00:13:58 -> 00:14:00] 1 left shift of 2 places.
+[00:14:00 -> 00:14:02] So I'll get something like this. And then I do
+[00:14:02 -> 00:14:04] an OR. What will happen?
+[00:14:04 -> 00:14:06] 1, 0, 1
+[00:14:06 -> 00:14:08] or 1. That's 1.
+[00:14:08 -> 00:14:10] 1 or 0. That's 1.
+[00:14:10 -> 00:14:12] So you'll still get the same number.
+[00:14:12 -> 00:14:14] If it is set, you'll get the same number.
+[00:14:14 -> 00:14:16] If it is not set,
+[00:14:16 -> 00:14:18] in that case, what you'll get is
+[00:14:20 -> 00:14:22] in this case, you got the number, right?
+[00:14:22 -> 00:14:24] So this is how you can easily set the ith bit
+[00:14:24 -> 00:14:26] using the bitwise operator.
+[00:14:26 -> 00:14:28] So the next question is clearing
+[00:14:28 -> 00:14:30] the ith bit. Now the problem states
+[00:14:30 -> 00:14:32] it'll be given a value N.
+[00:14:32 -> 00:14:34] Let's take 13.
+[00:14:34 -> 00:14:36] It'll be given I. Let's take 2.
+[00:14:36 -> 00:14:38] Now your task is to
+[00:14:38 -> 00:14:40] basically 13 in binary is
+[00:14:40 -> 00:14:42] 1, 1, 0, 1.
+[00:14:42 -> 00:14:44] Now your task is to clear the ith bit
+[00:14:44 -> 00:14:46] which is 0, 1, 2.
+[00:14:46 -> 00:14:48] Your task is to clear the
+[00:14:48 -> 00:14:50] second bit. Clearing means
+[00:14:50 -> 00:14:52] turn the 1 to 0. And if it is 0,
+[00:14:52 -> 00:14:54] keep it as 0. So if you clear
+[00:14:54 -> 00:14:56] this, this will
+[00:14:56 -> 00:14:58] turn to 0. And the rest will stay
+[00:14:58 -> 00:15:00] as it is. So the number
+[00:15:00 -> 00:15:02] will be 9. Again,
+[00:15:02 -> 00:15:04] the brute force will be
+[00:15:04 -> 00:15:06] convert this into its
+[00:15:06 -> 00:15:08] binary. Once you've done
+[00:15:08 -> 00:15:10] it, go to the second bit,
+[00:15:10 -> 00:15:12] put a 0, and again reconvert
+[00:15:12 -> 00:15:14] it into its decimal.
+[00:15:14 -> 00:15:16] That is a long process, so
+[00:15:16 -> 00:15:18] what will be the brute force?
+[00:15:18 -> 00:15:20] Rather, what will be the
+[00:15:20 -> 00:15:22] process using bitwise operators?
+[00:15:22 -> 00:15:24] It's going to be very simple.
+[00:15:24 -> 00:15:26] What is 13? 1, 1,
+[00:15:26 -> 00:15:28] 0, 1, right?
+[00:15:28 -> 00:15:30] I want to turn it
+[00:15:30 -> 00:15:32] so can I
+[00:15:32 -> 00:15:34] say, if I put a 0
+[00:15:34 -> 00:15:36] here, if I put a 0 here
+[00:15:36 -> 00:15:38] and I put 1 across all
+[00:15:38 -> 00:15:40] the numbers, all the 32 bits,
+[00:15:40 -> 00:15:42] I put a 1.
+[00:15:42 -> 00:15:44] And after that, if I do an AND,
+[00:15:44 -> 00:15:46] will it work?
+[00:15:46 -> 00:15:48] It will, because if I put a AND
+[00:15:48 -> 00:15:50] because of the 0,
+[00:15:50 -> 00:15:52] because of the 0, this will turn
+[00:15:52 -> 00:15:54] out to be 0. And all the other numbers,
+[00:15:54 -> 00:15:56] if this is 1, and there's a
+[00:15:56 -> 00:15:58] 1, so AND
+[00:15:58 -> 00:16:00] will give you 1. And if this is a 0,
+[00:16:00 -> 00:16:02] 0 AND with anything
+[00:16:02 -> 00:16:04] will give you a 0. Agreed?
+[00:16:04 -> 00:16:06] 0 AND with a
+[00:16:06 -> 00:16:08] anything will give you a 0. Again, 1
+[00:16:08 -> 00:16:10] will always be AND with a 1, so 1,
+[00:16:10 -> 00:16:12] again 0, 0, so you will
+[00:16:12 -> 00:16:14] actually turn it off.
+[00:16:14 -> 00:16:16] You'll actually turn it off. The only thing
+[00:16:16 -> 00:16:18] that you need to do is, you need to somehow,
+[00:16:18 -> 00:16:20] yes, you need to somehow
+[00:16:20 -> 00:16:22] make sure that this
+[00:16:22 -> 00:16:24] ith bit is 0
+[00:16:24 -> 00:16:26] and your job will be done.
+[00:16:26 -> 00:16:28] Again, it is very, very simple.
+[00:16:28 -> 00:16:30] Just think, how
+[00:16:30 -> 00:16:32] can you do it?
+[00:16:32 -> 00:16:34] I'll give you a hint.
+[00:16:34 -> 00:16:36] First step is, try to
+[00:16:36 -> 00:16:38] place a 1 over here
+[00:16:38 -> 00:16:40] and rest all 0s.
+[00:16:40 -> 00:16:42] Can you do that? Can you do that?
+[00:16:42 -> 00:16:44] Probably, yes, we can do that. How can I
+[00:16:44 -> 00:16:46] do that? It's going to be very simple.
+[00:16:46 -> 00:16:48] I say 1, left shift
+[00:16:48 -> 00:16:50] of I, which is 2,
+[00:16:50 -> 00:16:52] so I'll get this value something like 1, 0, 0,
+[00:16:52 -> 00:16:54] and all 0s, because 1,
+[00:16:54 -> 00:16:56] left shift by 2 places,
+[00:16:56 -> 00:16:58] will put the 1 over here, right?
+[00:16:58 -> 00:17:00] I'll do a negation
+[00:17:00 -> 00:17:02] of it. I'll do a NOT operator
+[00:17:02 -> 00:17:04] of it. So once I put the NOT operator,
+[00:17:04 -> 00:17:06] what will happen is, this was
+[00:17:06 -> 00:17:08] something like 0, 1, 0,
+[00:17:08 -> 00:17:10] 0, I'm not writing all
+[00:17:10 -> 00:17:12] the 32 bits, I'll do a NOT
+[00:17:12 -> 00:17:14] of it. So this,
+[00:17:14 -> 00:17:16] this will turn out to be 1,
+[00:17:16 -> 00:17:18] 0, 1, 1,
+[00:17:18 -> 00:17:20] and rest all our 1s. So basically,
+[00:17:20 -> 00:17:22] 1, 1, 0,
+[00:17:22 -> 00:17:24] 1, 1, 1, and all
+[00:17:24 -> 00:17:26] our 1s.
+[00:17:26 -> 00:17:28] And you do an AND
+[00:17:28 -> 00:17:30] with it. So 1 and 1 is 1,
+[00:17:30 -> 00:17:32] 0 and 1 is 0,
+[00:17:32 -> 00:17:34] 1 and 0,
+[00:17:34 -> 00:17:36] will turn it off.
+[00:17:36 -> 00:17:38] 1, 0, 0, so you basically
+[00:17:38 -> 00:17:40] turn off that bit. So how you
+[00:17:40 -> 00:17:42] can do it is,
+[00:17:42 -> 00:17:44] N and
+[00:17:44 -> 00:17:46] negation of
+[00:17:46 -> 00:17:48] 1, left shift
+[00:17:48 -> 00:17:50] of i, very, very
+[00:17:50 -> 00:17:52] simple, none understood.
+[00:17:52 -> 00:17:54] So the next question is,
+[00:17:54 -> 00:17:56] toggling the i-th bit. Now the problem
+[00:17:56 -> 00:17:58] is stating that it will be given
+[00:17:58 -> 00:18:00] a value n, again let's take
+[00:18:00 -> 00:18:02] 13, and let's take i
+[00:18:02 -> 00:18:04] equal to 2.
+[00:18:04 -> 00:18:06] So basically 13 in its
+[00:18:06 -> 00:18:08] binary is 1, 1,
+[00:18:08 -> 00:18:10] 0, 1, which is the second
+[00:18:10 -> 00:18:12] bit, that is
+[00:18:12 -> 00:18:14] 1. You'll have to toggle it,
+[00:18:14 -> 00:18:16] change it. So this will become
+[00:18:16 -> 00:18:18] 0, this will be 1, this will be 0,
+[00:18:18 -> 00:18:20] this will be 1, so that's 9.
+[00:18:20 -> 00:18:22] Now I'm asking you
+[00:18:22 -> 00:18:24] to toggle, not clear.
+[00:18:24 -> 00:18:26] Toggling is different. Imagine
+[00:18:26 -> 00:18:28] I give you
+[00:18:28 -> 00:18:30] n equal to 13,
+[00:18:30 -> 00:18:32] i equal to 1.
+[00:18:32 -> 00:18:34] So in this case,
+[00:18:34 -> 00:18:36] 1, 1, 0,
+[00:18:36 -> 00:18:38] 1. First bit is this one.
+[00:18:38 -> 00:18:40] So after toggling, it will be
+[00:18:40 -> 00:18:42] 1, 1, 1, 1.
+[00:18:42 -> 00:18:44] So you make a 0 to 1,
+[00:18:44 -> 00:18:46] and you make a 1 to 0.
+[00:18:46 -> 00:18:48] Reverse it. Whatever is
+[00:18:48 -> 00:18:50] the bit at the i-th
+[00:18:50 -> 00:18:52] position or index,
+[00:18:52 -> 00:18:54] whatever you can call it. How can I do it?
+[00:18:54 -> 00:18:56] It's again
+[00:18:56 -> 00:18:58] very simple.
+[00:18:58 -> 00:19:00] Hint is
+[00:19:00 -> 00:19:02] ZOR operator.
+[00:19:02 -> 00:19:04] Like again, the brute force is
+[00:19:04 -> 00:19:06] take this number,
+[00:19:06 -> 00:19:08] convert it into its
+[00:19:08 -> 00:19:10] binary equivalent, which is
+[00:19:10 -> 00:19:12] 1, 1, 0, 1, figure out
+[00:19:12 -> 00:19:14] the second bit. If it is 1, make it 0,
+[00:19:14 -> 00:19:16] or vice-versa, and
+[00:19:16 -> 00:19:18] convert it into its decimal.
+[00:19:18 -> 00:19:20] But how can you do it with using
+[00:19:20 -> 00:19:22] bitwise operator? The hint
+[00:19:22 -> 00:19:24] is ZOR. You can try it out.
+[00:19:24 -> 00:19:26] So what you will do is, you'll take the
+[00:19:26 -> 00:19:28] number 1, 1, 0, 1,
+[00:19:28 -> 00:19:30] and write it in its binary.
+[00:19:30 -> 00:19:32] Written. After that,
+[00:19:32 -> 00:19:34] you try to think, okay, this
+[00:19:34 -> 00:19:36] is the bit that I'm looking forward
+[00:19:36 -> 00:19:38] to change. If I'm
+[00:19:38 -> 00:19:40] able to put a 1 underneath it,
+[00:19:40 -> 00:19:42] again, it's very simple. You know how to do it?
+[00:19:42 -> 00:19:44] One left shift of I,
+[00:19:44 -> 00:19:46] if I do this,
+[00:19:46 -> 00:19:48] I will be able to put
+[00:19:48 -> 00:19:50] a 1 underneath
+[00:19:50 -> 00:19:52] it, okay? And
+[00:19:52 -> 00:19:54] all the other things as 0.
+[00:19:54 -> 00:19:56] Now, can I say, if I do a ZOR,
+[00:19:56 -> 00:20:00] if I do a ZOR,
+[00:20:00 -> 00:20:02] what will happen is, 1s
+[00:20:02 -> 00:20:04] or 1, because it is
+[00:20:04 -> 00:20:06] even number of 1s,
+[00:20:06 -> 00:20:08] will turn out to be 0. It will toggle
+[00:20:08 -> 00:20:10] it. And the rest,
+[00:20:10 -> 00:20:12] 1s or 0, 1,
+[00:20:12 -> 00:20:14] odd number of 1s, so 1,
+[00:20:14 -> 00:20:16] 0s or 0 is 0,
+[00:20:16 -> 00:20:18] 1s or 0 is 1,
+[00:20:18 -> 00:20:20] right? So you actually toggled
+[00:20:20 -> 00:20:22] it, and you kept all the bits
+[00:20:22 -> 00:20:24] same.
+[00:20:24 -> 00:20:26] Will it work for the other case?
+[00:20:26 -> 00:20:28] Which is, if it is unset,
+[00:20:28 -> 00:20:30] let's take the example.
+[00:20:30 -> 00:20:32] N equal to 13, I equal
+[00:20:32 -> 00:20:34] to 1. Let's try to write it.
+[00:20:34 -> 00:20:36] 1, 1, 0, 1.
+[00:20:36 -> 00:20:38] I'm trying to toggle this.
+[00:20:38 -> 00:20:40] So I'll again put a 1 over here, which is
+[00:20:40 -> 00:20:42] 1, left shift of
+[00:20:42 -> 00:20:44] 1, okay?
+[00:20:44 -> 00:20:46] And put a 0 at all the other
+[00:20:46 -> 00:20:48] places. I'll try doing
+[00:20:48 -> 00:20:50] a ZOR. So
+[00:20:50 -> 00:20:52] 1s or 0, again odd number of 1s,
+[00:20:52 -> 00:20:54] so 1s. 0s
+[00:20:54 -> 00:20:56] or 1, again odd number of 1, so
+[00:20:56 -> 00:20:58] 1, 1s or 0, 1,
+[00:20:58 -> 00:21:00] 1s or 0, 1.
+[00:21:00 -> 00:21:02] So you actually toggled this 0
+[00:21:02 -> 00:21:04] to a 1. You actually toggled this 1
+[00:21:04 -> 00:21:06] to a 0. You were able
+[00:21:06 -> 00:21:08] to do it. Super simple.
+[00:21:08 -> 00:21:10] You see N
+[00:21:10 -> 00:21:12] ZOR 1
+[00:21:12 -> 00:21:14] left shift of I.
+[00:21:14 -> 00:21:16] That's it. That is
+[00:21:16 -> 00:21:18] how you can easily toggle the Ith
+[00:21:18 -> 00:21:20] bit. So time for the next problem,
+[00:21:20 -> 00:21:22] which is removing the last
+[00:21:22 -> 00:21:24] set bit. So in this
+[00:21:24 -> 00:21:26] problem, you'll be given a value
+[00:21:26 -> 00:21:28] N. And your task
+[00:21:28 -> 00:21:30] is to remove the last
+[00:21:30 -> 00:21:32] set bit, or the right
+[00:21:32 -> 00:21:34] most set bit. So
+[00:21:34 -> 00:21:36] if I try to write 12 in binary, it'll be
+[00:21:36 -> 00:21:38] 1, 1, 0, 0.
+[00:21:38 -> 00:21:40] And if I ask you which is the last
+[00:21:40 -> 00:21:42] set bit, can I say
+[00:21:42 -> 00:21:44] the right most set bit is this
+[00:21:44 -> 00:21:46] one? Yes. You have to turn this,
+[00:21:46 -> 00:21:48] like remove it, or just
+[00:21:48 -> 00:21:50] clear it. So after clearing,
+[00:21:50 -> 00:21:52] it'll be 0, and the rest
+[00:21:52 -> 00:21:54] will be 0. So this is what
+[00:21:54 -> 00:21:56] you will get. So if I ask you for
+[00:21:56 -> 00:21:58] 13, if I have to remove
+[00:21:58 -> 00:22:00] the last set bit, it'll be 1,
+[00:22:00 -> 00:22:02] 1, 0, 1.
+[00:22:02 -> 00:22:04] So the last set bit is this one, so you'll get
+[00:22:04 -> 00:22:06] it as 1, 1, 0,
+[00:22:06 -> 00:22:08] 0. Got it? If I give you a value
+[00:22:08 -> 00:22:10] as 16,
+[00:22:10 -> 00:22:12] that is 1, 0, 0,
+[00:22:12 -> 00:22:14] 0. Another 0.
+[00:22:14 -> 00:22:16] Now which one is the last set bit?
+[00:22:16 -> 00:22:18] This one. So the number will be 0, 0,
+[00:22:18 -> 00:22:20] 0, 0, which is technically
+[00:22:20 -> 00:22:22] 0. How can you remove the last
+[00:22:22 -> 00:22:24] set bit? Again, if I have
+[00:22:24 -> 00:22:26] to do the brute force way, it's super simple.
+[00:22:26 -> 00:22:28] Convert this into its
+[00:22:28 -> 00:22:30] binary, traverse, and
+[00:22:30 -> 00:22:32] reject the last set bit,
+[00:22:32 -> 00:22:34] make it 0, and
+[00:22:34 -> 00:22:36] again, convert it back into its
+[00:22:36 -> 00:22:38] decimal equivalent.
+[00:22:38 -> 00:22:40] Obviously, we don't want to do it like that,
+[00:22:40 -> 00:22:42] so we'll think of a bitwise
+[00:22:42 -> 00:22:44] operation that will help us
+[00:22:44 -> 00:22:46] to do it. So before I move on to the
+[00:22:46 -> 00:22:48] solution, which will be a one-liner,
+[00:22:48 -> 00:22:50] let us observe something.
+[00:22:50 -> 00:22:52] So n is 16, right?
+[00:22:52 -> 00:22:54] That's basically 1, 0,
+[00:22:54 -> 00:22:56] 0, 0, and probably one more
+[00:22:56 -> 00:22:58] 0, yeah. This is 16.
+[00:22:58 -> 00:23:00] If I say
+[00:23:00 -> 00:23:02] n15, which is basically
+[00:23:02 -> 00:23:04] n-1. If I take 15,
+[00:23:04 -> 00:23:06] that may be
+[00:23:06 -> 00:23:08] 0, 1, 1, 1,
+[00:23:08 -> 00:23:10] 1. This is 15.
+[00:23:10 -> 00:23:12] Okay. So n is
+[00:23:12 -> 00:23:14] 40. If I try to write it, it will be
+[00:23:14 -> 00:23:16] 32 plus 8,
+[00:23:16 -> 00:23:18] so 32, 16
+[00:23:18 -> 00:23:20] will go as 0, and
+[00:23:20 -> 00:23:22] then there's 8, so this
+[00:23:22 -> 00:23:24] is 8, and then this one.
+[00:23:24 -> 00:23:26] I think this is 40.
+[00:23:26 -> 00:23:28] This is 40, right? If I take the number
+[00:23:28 -> 00:23:30] 39,
+[00:23:30 -> 00:23:32] I can actually write 39
+[00:23:32 -> 00:23:34] without thinking, and that will be
+[00:23:34 -> 00:23:36] 1, 0,
+[00:23:36 -> 00:23:38] 0, 1, 1,
+[00:23:38 -> 00:23:40] 1.
+[00:23:40 -> 00:23:42] Yes, this is 39 for sure.
+[00:23:42 -> 00:23:44] So let's write the binary for 84.
+[00:23:44 -> 00:23:46] It'll be 1, 0,
+[00:23:46 -> 00:23:48] 1, 0, 1, double 0.
+[00:23:48 -> 00:23:50] So this is for 84.
+[00:23:50 -> 00:23:52] If I ask you to write for
+[00:23:52 -> 00:23:54] 83, it
+[00:23:54 -> 00:23:56] will be 1, 0,
+[00:23:56 -> 00:23:58] 1, 0, a 0,
+[00:23:58 -> 00:24:00] and then a 1, 1.
+[00:24:00 -> 00:24:02] Time to observe something.
+[00:24:02 -> 00:24:04] The rightmost set bit is this one.
+[00:24:04 -> 00:24:06] The moment you do
+[00:24:06 -> 00:24:08] n-1, the moment
+[00:24:08 -> 00:24:10] you do n-1, the
+[00:24:10 -> 00:24:12] rightmost set bit is converted
+[00:24:12 -> 00:24:14] to 0, and all
+[00:24:14 -> 00:24:16] the right bits that were there
+[00:24:16 -> 00:24:18] because all of them will be 0.
+[00:24:18 -> 00:24:20] Because I'm talking about rightmost
+[00:24:20 -> 00:24:22] set bit, so everything to the
+[00:24:22 -> 00:24:24] right will be 0s. All of them will get
+[00:24:24 -> 00:24:26] converted into 1.
+[00:24:26 -> 00:24:28] Again, let's try to observe.
+[00:24:28 -> 00:24:30] So this
+[00:24:30 -> 00:24:32] is the rightmost set bit.
+[00:24:32 -> 00:24:34] I'm converting n to
+[00:24:34 -> 00:24:36] n-1. What will happen is
+[00:24:36 -> 00:24:38] 1, 0 is 1, 0.
+[00:24:38 -> 00:24:40] This one gets converted into
+[00:24:40 -> 00:24:42] 0, and all the 0s to the right
+[00:24:42 -> 00:24:44] will get converted into 1.
+[00:24:44 -> 00:24:46] Works. Let's look at 84.
+[00:24:46 -> 00:24:48] So when I take 84,
+[00:24:48 -> 00:24:50] this is the rightmost bit.
+[00:24:50 -> 00:24:52] So I'll reduce 84
+[00:24:52 -> 00:24:54] by 1. What will happen
+[00:24:54 -> 00:24:56] is 1, 0,
+[00:24:56 -> 00:24:58] 1, 0. And this one gets
+[00:24:58 -> 00:25:00] converted into 0.
+[00:25:00 -> 00:25:02] And the rightmost 0s
+[00:25:02 -> 00:25:04] will be 1 and 1.
+[00:25:04 -> 00:25:06] Yes. This is
+[00:25:06 -> 00:25:08] what happens.
+[00:25:08 -> 00:25:10] Why does it happen? Let's
+[00:25:10 -> 00:25:12] understand that. So I'm saying
+[00:25:12 -> 00:25:14] 16. Now what was
+[00:25:14 -> 00:25:16] 16? 16 was nothing but
+[00:25:16 -> 00:25:18] 2 to the power of 4.
+[00:25:18 -> 00:25:20] 2 to the power of 4 was 16.
+[00:25:20 -> 00:25:22] 15 will be
+[00:25:22 -> 00:25:24] all the powers
+[00:25:24 -> 00:25:26] of 2 lesser than it.
+[00:25:26 -> 00:25:28] Which is basically 8
+[00:25:28 -> 00:25:30] plus 4 plus 2
+[00:25:30 -> 00:25:32] plus 1. Whereas this was straight away
+[00:25:32 -> 00:25:34] 16. Okay.
+[00:25:34 -> 00:25:36] Let's look at 40. What was 40?
+[00:25:36 -> 00:25:38] 40 was
+[00:25:38 -> 00:25:40] 32 plus 8 which is basically
+[00:25:40 -> 00:25:42] 2 to the power
+[00:25:42 -> 00:25:44] 5 plus 2 to the power 3.
+[00:25:44 -> 00:25:46] Right?
+[00:25:46 -> 00:25:48] So what happens is 32 stays
+[00:25:48 -> 00:25:50] and when you convert it
+[00:25:50 -> 00:25:52] into 39 which is
+[00:25:52 -> 00:25:54] 1 reduction. So this
+[00:25:54 -> 00:25:56] 8 goes to the
+[00:25:56 -> 00:25:58] nearest number down which is 7.
+[00:25:58 -> 00:26:00] And 7 you know is 4 plus
+[00:26:00 -> 00:26:02] 2 plus 1. Because
+[00:26:02 -> 00:26:04] of this 4 plus 2 plus 1, all of
+[00:26:04 -> 00:26:06] them are set as 1.
+[00:26:06 -> 00:26:08] Got it? Have you
+[00:26:08 -> 00:26:10] understood what happens?
+[00:26:10 -> 00:26:12] So the observation that we will draw from
+[00:26:12 -> 00:26:14] here is the rightmost bit
+[00:26:14 -> 00:26:16] is turned to 0.
+[00:26:16 -> 00:26:18] And everything else on the right
+[00:26:18 -> 00:26:20] is turned to 1111.
+[00:26:20 -> 00:26:22] If you take
+[00:26:22 -> 00:26:24] a number down. If you take a number down.
+[00:26:24 -> 00:26:26] Remember this.
+[00:26:26 -> 00:26:28] So I've been asked to remove
+[00:26:28 -> 00:26:30] the last set bit.
+[00:26:30 -> 00:26:32] How can I do it? It's super
+[00:26:32 -> 00:26:34] simple. All you need to write
+[00:26:34 -> 00:26:36] is I'll probably erase this. Yeah.
+[00:26:36 -> 00:26:38] All you need to do is you have to write
+[00:26:38 -> 00:26:40] N and
+[00:26:40 -> 00:26:42] N minus 1. Why does it work?
+[00:26:42 -> 00:26:44] Let's take 40. So what is
+[00:26:44 -> 00:26:46] 40? That's
+[00:26:46 -> 00:26:48] 1 0 1 0
+[00:26:48 -> 00:26:50] 0 0. Which is
+[00:26:50 -> 00:26:52] the rightmost set bit? You'll have to
+[00:26:52 -> 00:26:54] remove it. So you take an AND.
+[00:26:54 -> 00:26:57] Right? Remember
+[00:26:57 -> 00:26:59] you need to remove this only.
+[00:26:59 -> 00:27:01] So you'll just turn it to 0.
+[00:27:01 -> 00:27:03] And everything else stays as 0.
+[00:27:03 -> 00:27:05] And you copy paste this
+[00:27:05 -> 00:27:07] on the left whatever it is. You just copy paste
+[00:27:07 -> 00:27:09] as it is.
+[00:27:09 -> 00:27:11] So what you need to do is if you take
+[00:27:11 -> 00:27:13] N minus 1 which is basically
+[00:27:13 -> 00:27:15] 1 0.
+[00:27:15 -> 00:27:17] This will be 0 and all the other things will be 1.
+[00:27:17 -> 00:27:19] So what happens is if you're doing an AND
+[00:27:19 -> 00:27:21] this 1 and 0 will be 0.
+[00:27:21 -> 00:27:23] Everything else will be 0.
+[00:27:23 -> 00:27:25] And since you're taking the same numbers
+[00:27:25 -> 00:27:27] because on the left there is no change.
+[00:27:27 -> 00:27:29] If you do an AND you exactly
+[00:27:29 -> 00:27:31] get the same numbers.
+[00:27:31 -> 00:27:33] Got it? Let's take one more example.
+[00:27:33 -> 00:27:37] Let's take N as
+[00:27:37 -> 00:27:39] What's that?
+[00:27:39 -> 00:27:41] 84.
+[00:27:41 -> 00:27:43] So if I take N as 84
+[00:27:43 -> 00:27:45] that's basically
+[00:27:45 -> 00:27:47] 1 0 1 0
+[00:27:47 -> 00:27:49] 1 double 0. Right?
+[00:27:49 -> 00:27:51] Again what do I need to do?
+[00:27:51 -> 00:27:53] I need to turn off this bit. So which is basically
+[00:27:53 -> 00:27:55] I'll have to make a 0 here
+[00:27:55 -> 00:27:57] 0 and everything else
+[00:27:57 -> 00:27:59] on the left
+[00:27:59 -> 00:28:01] stays as it is. So again
+[00:28:01 -> 00:28:03] the same thing. If I take this is N
+[00:28:03 -> 00:28:05] and I take N minus 1 which is you know
+[00:28:05 -> 00:28:07] this is 0 this is 1 this is 1 and everything
+[00:28:07 -> 00:28:09] else stays as it is.
+[00:28:09 -> 00:28:11] If I do an AND the 0 1 will be 0
+[00:28:11 -> 00:28:13] 0 1 will be 0
+[00:28:13 -> 00:28:15] and this 1 and 0 will be 0
+[00:28:15 -> 00:28:17] and since these are same
+[00:28:17 -> 00:28:19] they stay the same. So if you do N
+[00:28:19 -> 00:28:21] and N minus 1
+[00:28:21 -> 00:28:23] that will be
+[00:28:23 -> 00:28:25] removing the last set bit.
+[00:28:25 -> 00:28:27] So time for the next question that is
+[00:28:27 -> 00:28:29] checking if the number is a power
+[00:28:29 -> 00:28:31] of 2 or not. So
+[00:28:31 -> 00:28:33] the problem statement will be giving
+[00:28:33 -> 00:28:35] you a number N
+[00:28:35 -> 00:28:37] imagine it is 16. Is it the power
+[00:28:37 -> 00:28:39] of 2? Yes it is 2 to the power 4.
+[00:28:39 -> 00:28:41] Imagine you are given a number N
+[00:28:41 -> 00:28:43] equal to 13. Is it a power of 2?
+[00:28:43 -> 00:28:45] No it is not. Imagine you are given
+[00:28:45 -> 00:28:47] a number N equal to 32. Is it
+[00:28:47 -> 00:28:49] a power of 2? Yes it is.
+[00:28:49 -> 00:28:51] How can you say this? Now the
+[00:28:51 -> 00:28:53] easiest like the brute force is very simple
+[00:28:53 -> 00:28:55] you take 16 convert
+[00:28:55 -> 00:28:57] it into its binary
+[00:28:57 -> 00:28:59] done
+[00:28:59 -> 00:29:01] once you have converted it into
+[00:29:01 -> 00:29:03] its binary you check the number of
+[00:29:03 -> 00:29:05] 1s. So you just get
+[00:29:05 -> 00:29:07] 1 set bit
+[00:29:07 -> 00:29:09] so you can say that
+[00:29:09 -> 00:29:11] there is 1 set bit
+[00:29:11 -> 00:29:13] so yes it is a power of 2.
+[00:29:13 -> 00:29:15] If you take 13 convert it
+[00:29:15 -> 00:29:17] into its binary which is 1 1 0 1
+[00:29:17 -> 00:29:19] how many set bits?
+[00:29:19 -> 00:29:21] 3 set bits. So this is not
+[00:29:21 -> 00:29:23] a power of 2. If you again look at
+[00:29:23 -> 00:29:25] 32 how many set bits?
+[00:29:25 -> 00:29:27] 1 0 0 0 0 0
+[00:29:27 -> 00:29:29] I think that is
+[00:29:29 -> 00:29:31] probably that is 32. Again
+[00:29:31 -> 00:29:33] 1 set bit. So technically
+[00:29:33 -> 00:29:35] I know one thing there must be 1
+[00:29:35 -> 00:29:37] set bit but I cannot do the brute
+[00:29:37 -> 00:29:39] force where I convert this into its binary
+[00:29:39 -> 00:29:41] and then figure it out.
+[00:29:41 -> 00:29:43] So can I have a different way?
+[00:29:43 -> 00:29:45] Probably yes. I know that
+[00:29:45 -> 00:29:47] every power of 2
+[00:29:47 -> 00:29:49] will have 1 set bit in it
+[00:29:49 -> 00:29:51] 1 set bit in it. So can I do
+[00:29:51 -> 00:29:53] this? N
+[00:29:53 -> 00:29:55] and
+[00:29:55 -> 00:29:57] N minus 1
+[00:29:57 -> 00:29:59] and this is equivalent to 0
+[00:29:59 -> 00:30:01] it is a power of
+[00:30:01 -> 00:30:03] 2 or else
+[00:30:03 -> 00:30:08] it is not. Yes
+[00:30:08 -> 00:30:10] I have already told you what happens
+[00:30:10 -> 00:30:12] when you do N minus 1. So
+[00:30:12 -> 00:30:14] 16 is 1 0 0
+[00:30:14 -> 00:30:16] 0 0. If you do
+[00:30:16 -> 00:30:18] N minus 1 the right most bit
+[00:30:18 -> 00:30:20] that is turned off and everything
+[00:30:20 -> 00:30:22] on the right is turned into 1.
+[00:30:22 -> 00:30:24] Now since
+[00:30:24 -> 00:30:26] for power of 2's there is only
+[00:30:26 -> 00:30:28] one set bit
+[00:30:28 -> 00:30:30] there will be nothing on the left. So when you do an
+[00:30:30 -> 00:30:32] and everything turns out
+[00:30:32 -> 00:30:34] to be 0. Everything turns out to be 0.
+[00:30:34 -> 00:30:36] Got it?
+[00:30:36 -> 00:30:38] In the same case when you take 13 what happens
+[00:30:38 -> 00:30:40] is 13 is 1 1
+[00:30:40 -> 00:30:42] 0 1. Right?
+[00:30:42 -> 00:30:44] So when I say 12
+[00:30:44 -> 00:30:46] that is nothing but 1 1
+[00:30:46 -> 00:30:48] 0 0 because I am taking N
+[00:30:48 -> 00:30:50] and N minus 1 and I am doing
+[00:30:50 -> 00:30:52] an and with it. So what happens
+[00:30:52 -> 00:30:54] is when you do an and this is
+[00:30:54 -> 00:30:56] 0 this is 0 but because
+[00:30:56 -> 00:30:58] of the left bits because of the left
+[00:30:58 -> 00:31:00] bits to the right most set bit
+[00:31:00 -> 00:31:02] there are left bits there are numbers
+[00:31:02 -> 00:31:04] there are numbers formed. So this will never
+[00:31:04 -> 00:31:06] be 0 this will never be 0.
+[00:31:06 -> 00:31:08] So can I say this that if I write
+[00:31:08 -> 00:31:10] N and N minus 1
+[00:31:10 -> 00:31:12] because every power of 2
+[00:31:12 -> 00:31:14] only has one set bit and if I am
+[00:31:14 -> 00:31:16] turning it off everything will be 0.
+[00:31:16 -> 00:31:18] So this is how you can easily
+[00:31:18 -> 00:31:20] check if a number is a power of 2
+[00:31:20 -> 00:31:22] using bitwise operator
+[00:31:22 -> 00:31:24] 1 9.
+[00:31:24 -> 00:31:26] So time for the next problem that is
+[00:31:26 -> 00:31:28] counting the number of set bits
+[00:31:28 -> 00:31:30] in a given number. So imagine you are
+[00:31:30 -> 00:31:32] given a number 16
+[00:31:32 -> 00:31:34] so you have to write it
+[00:31:34 -> 00:31:36] in its binary
+[00:31:36 -> 00:31:38] so that will be 1 0 0 0
+[00:31:38 -> 00:31:40] how many number of set bits?
+[00:31:40 -> 00:31:42] Only 1. So you will return
+[00:31:42 -> 00:31:44] me 1. Imagine
+[00:31:44 -> 00:31:46] again you are given 13
+[00:31:46 -> 00:31:49] so what
+[00:31:49 -> 00:31:51] will it be in its binary?
+[00:31:51 -> 00:31:53] 1 1 0 1
+[00:31:53 -> 00:31:55] 1 2 3
+[00:31:55 -> 00:31:57] so you will return me 3
+[00:31:57 -> 00:31:59] Got it? How can I do it?
+[00:31:59 -> 00:32:01] Is there a 1 9? Now there is no
+[00:32:01 -> 00:32:03] 1 9. It will be pure
+[00:32:03 -> 00:32:05] brute force. So let us write
+[00:32:05 -> 00:32:07] the brute force. What I will do is
+[00:32:07 -> 00:32:09] I have to count so I will take
+[00:32:09 -> 00:32:11] counter equal to 0
+[00:32:11 -> 00:32:13] I will take counter equal to 0.
+[00:32:13 -> 00:32:15] I will start with the number 13
+[00:32:15 -> 00:32:17] so in order to convert
+[00:32:17 -> 00:32:19] a decimal to its binary I divide
+[00:32:19 -> 00:32:21] by 2. So when I divide by 2
+[00:32:21 -> 00:32:23] I get a remainder of 1. So I will just
+[00:32:23 -> 00:32:25] increase the counter by 1
+[00:32:25 -> 00:32:27] so there is 6
+[00:32:27 -> 00:32:29] again divide by 2
+[00:32:29 -> 00:32:31] so this time
+[00:32:31 -> 00:32:33] the remainder is 0. So I will not increase
+[00:32:33 -> 00:32:35] the counter. Again
+[00:32:35 -> 00:32:37] divide by 2. This time the remainder
+[00:32:37 -> 00:32:39] is 1. So please increase the
+[00:32:39 -> 00:32:41] counter by 1. Again
+[00:32:41 -> 00:32:43] divide by 2 so you will get 1. So when you
+[00:32:43 -> 00:32:45] get 1 you stop then and there
+[00:32:45 -> 00:32:47] so when you stop
+[00:32:47 -> 00:32:49] at the end you had 1. So
+[00:32:49 -> 00:32:51] you will increase the counter by 1
+[00:32:51 -> 00:32:53] simple as that
+[00:32:53 -> 00:32:55] So can I write down the function?
+[00:32:55 -> 00:32:57] Probably yes. I will say
+[00:32:57 -> 00:32:59] integer count
+[00:32:59 -> 00:33:01] set
+[00:33:01 -> 00:33:03] bits
+[00:33:03 -> 00:33:05] and I can take the number int n
+[00:33:05 -> 00:33:07] perfect
+[00:33:07 -> 00:33:09] What is the first thing that I will do?
+[00:33:09 -> 00:33:11] I will take a variable counter
+[00:33:11 -> 00:33:13] and then I know I will
+[00:33:13 -> 00:33:15] have to write a wine loop while
+[00:33:15 -> 00:33:17] n greater than 1
+[00:33:17 -> 00:33:19] because that is when we stop
+[00:33:19 -> 00:33:21] So can I say
+[00:33:21 -> 00:33:27] if n modulo 2 equal to 0
+[00:33:27 -> 00:33:29] if n modulo 2 equal to 0
+[00:33:29 -> 00:33:31] I don't count anything because the remainder
+[00:33:31 -> 00:33:33] is not there
+[00:33:33 -> 00:33:35] So can I write if the remainder is 1
+[00:33:35 -> 00:33:37] then I say counter plus
+[00:33:37 -> 00:33:39] equal to 1. Can I say this? I can
+[00:33:39 -> 00:33:41] and after this
+[00:33:41 -> 00:33:43] I can say n equal to
+[00:33:43 -> 00:33:45] n divided by 2
+[00:33:45 -> 00:33:47] Done and dusted. At the end of the day
+[00:33:47 -> 00:33:49] if
+[00:33:49 -> 00:33:51] the n is equal to equal to 1
+[00:33:51 -> 00:33:53] you increase the counter by 1
+[00:33:53 -> 00:34:04] and then you return that
+[00:34:04 -> 00:34:07] Done. Looks ok
+[00:34:07 -> 00:34:09] Right? But can I do
+[00:34:09 -> 00:34:11] something else? Probably yes
+[00:34:11 -> 00:34:13] Now this is checking for odd
+[00:34:13 -> 00:34:15] Right? If there is
+[00:34:15 -> 00:34:17] a remainder it means it is checking for odd
+[00:34:17 -> 00:34:19] So can I write something as
+[00:34:19 -> 00:34:21] n and 1
+[00:34:21 -> 00:34:23] instead of writing n
+[00:34:23 -> 00:34:25] modulo 2? Can I write
+[00:34:25 -> 00:34:27] n and 1?
+[00:34:27 -> 00:34:29] Probably yes. Now let's take
+[00:34:29 -> 00:34:31] an odd number. 13 for that reason
+[00:34:31 -> 00:34:33] is an odd number. So 1, 1
+[00:34:33 -> 00:34:35] 0, 1. So if I do
+[00:34:35 -> 00:34:37] and with 1
+[00:34:37 -> 00:34:39] I'll get 1 and rest of all of them
+[00:34:39 -> 00:34:41] will be 0s. Right?
+[00:34:41 -> 00:34:43] Why? Why did I get a 1? Because
+[00:34:43 -> 00:34:45] the last bit of an odd number
+[00:34:45 -> 00:34:47] will always be 1
+[00:34:47 -> 00:34:49] The last bit of an odd number
+[00:34:49 -> 00:34:51] will always be 1. Let's take
+[00:34:51 -> 00:34:53] for that reason 6. So if I try to write
+[00:34:53 -> 00:34:55] 6 that will be
+[00:34:55 -> 00:34:57] 4 plus 2 right? 1, 1, 0
+[00:34:57 -> 00:34:59] That is 6. Last bit
+[00:34:59 -> 00:35:01] is not set. So if I do an and
+[00:35:01 -> 00:35:03] with 1 I'll get 0, 0, 0
+[00:35:03 -> 00:35:05] Why
+[00:35:05 -> 00:35:07] is the last bit set? Because
+[00:35:07 -> 00:35:09] if I have to write 13
+[00:35:09 -> 00:35:11] 13 is
+[00:35:11 -> 00:35:13] 8 plus 4
+[00:35:13 -> 00:35:15] plus 1. Only the last
+[00:35:15 -> 00:35:17] bit will give you 1. Only the last
+[00:35:17 -> 00:35:19] bit will give you 1.
+[00:35:19 -> 00:35:21] Apart from that all of them will be
+[00:35:21 -> 00:35:23] even numbers. Even
+[00:35:23 -> 00:35:25] plus even will be even.
+[00:35:25 -> 00:35:27] And then if you add an odd number which is 1
+[00:35:27 -> 00:35:29] you actually get 13.
+[00:35:29 -> 00:35:31] For 6 it is 4 plus 2
+[00:35:31 -> 00:35:33] For 7 it is 4 plus 2 plus
+[00:35:33 -> 00:35:35] 1. For every odd number
+[00:35:35 -> 00:35:37] you'll have to add a 1. So the last
+[00:35:37 -> 00:35:39] bit for all the odd numbers
+[00:35:39 -> 00:35:41] will always be set. Will always
+[00:35:41 -> 00:35:43] be set. Remember this.
+[00:35:43 -> 00:35:45] So if it is set
+[00:35:45 -> 00:35:47] can I replace this
+[00:35:47 -> 00:35:49] by
+[00:35:49 -> 00:35:51] if n and 1
+[00:35:51 -> 00:35:53] I can. Or can I say
+[00:35:53 -> 00:35:58] counter
+[00:35:58 -> 00:36:00] plus equal to n and 1
+[00:36:00 -> 00:36:02] because this will return 1 if it
+[00:36:02 -> 00:36:04] is odd and this will return 0 if
+[00:36:04 -> 00:36:06] it is even. Bitwise.
+[00:36:06 -> 00:36:08] And what about this? You know
+[00:36:08 -> 00:36:10] it. Which operator?
+[00:36:10 -> 00:36:12] Yes, right shift.
+[00:36:12 -> 00:36:14] So can I write
+[00:36:14 -> 00:36:16] n equal to n right
+[00:36:16 -> 00:36:18] shift of 1 because this is
+[00:36:18 -> 00:36:20] equivalent to writing
+[00:36:20 -> 00:36:22] n by 2 to the power 1 or
+[00:36:22 -> 00:36:24] n by 2. Remember
+[00:36:24 -> 00:36:26] right shift operator. So
+[00:36:26 -> 00:36:28] I did the same thing. I just
+[00:36:28 -> 00:36:30] converted this into a bit stuff.
+[00:36:30 -> 00:36:32] Now if you do bit operations
+[00:36:32 -> 00:36:34] it is slightly faster than the other
+[00:36:34 -> 00:36:36] operations. That is why in most of
+[00:36:36 -> 00:36:38] the competitive programmers code you'll
+[00:36:38 -> 00:36:40] find the odd check as
+[00:36:40 -> 00:36:42] this. This is their odd
+[00:36:42 -> 00:36:44] check. They will never write n modulo
+[00:36:44 -> 00:36:46] 2 equal to 1. They'll always
+[00:36:46 -> 00:36:48] write something like this. If they're dividing they'll
+[00:36:48 -> 00:36:50] always write n right shift of
+[00:36:50 -> 00:36:52] 1. Right if they're dividing it by 2.
+[00:36:52 -> 00:36:54] Most of your binary search code
+[00:36:54 -> 00:36:56] when you write something as
+[00:36:56 -> 00:36:58] low plus high by 2
+[00:36:58 -> 00:37:00] this is what you write right?
+[00:37:00 -> 00:37:04] Like this is what you write.
+[00:37:04 -> 00:37:06] But the faster version is
+[00:37:06 -> 00:37:08] low plus high
+[00:37:08 -> 00:37:10] and then right shift by 1.
+[00:37:10 -> 00:37:12] Because right shift by 1 means dividing
+[00:37:12 -> 00:37:14] by 2. So this is how you
+[00:37:14 -> 00:37:16] count the number of set bits.
+[00:37:16 -> 00:37:18] If you're using C++ STL
+[00:37:18 -> 00:37:20] in the STL lecture I've already told you
+[00:37:20 -> 00:37:22] there is an internal function
+[00:37:22 -> 00:37:24] STL in underscore
+[00:37:24 -> 00:37:26] pop count and you can
+[00:37:26 -> 00:37:28] pass in the integer. This will
+[00:37:28 -> 00:37:30] tell you the number of set bits in a given
+[00:37:30 -> 00:37:32] number. So there is one more way in which
+[00:37:32 -> 00:37:34] we can count the number of set bits.
+[00:37:34 -> 00:37:36] Let's take the number 84.
+[00:37:36 -> 00:37:38] If I try to write this in binary
+[00:37:38 -> 00:37:40] it will be 1010
+[00:37:40 -> 00:37:42] 100.
+[00:37:42 -> 00:37:44] Now if I ask you to write
+[00:37:44 -> 00:37:46] n minus 1 which is 83
+[00:37:46 -> 00:37:48] it's binary.
+[00:37:48 -> 00:37:50] You know what it will be.
+[00:37:50 -> 00:37:52] You'll take the rightmost bit
+[00:37:52 -> 00:37:54] turn it to 0 and
+[00:37:54 -> 00:37:56] the right bits will be
+[00:37:56 -> 00:37:58] turned to 1.
+[00:37:58 -> 00:38:00] Everything else stays
+[00:38:00 -> 00:38:02] as it is on the left.
+[00:38:02 -> 00:38:06] So 1010011.
+[00:38:06 -> 00:38:08] Now if I ask you
+[00:38:08 -> 00:38:10] to do an AND
+[00:38:10 -> 00:38:12] what you'll get is
+[00:38:12 -> 00:38:16] 0000101
+[00:38:16 -> 00:38:18] So what I was able to do was
+[00:38:18 -> 00:38:20] I was able to turn off
+[00:38:20 -> 00:38:22] the rightmost bit
+[00:38:22 -> 00:38:24] I was able to turn off the rightmost bit
+[00:38:24 -> 00:38:26] by simply doing
+[00:38:26 -> 00:38:28] n and n minus 1.
+[00:38:28 -> 00:38:30] So once I've done it
+[00:38:30 -> 00:38:32] I'll get a number like this. Correct?
+[00:38:32 -> 00:38:34] Now if I ask you to write
+[00:38:34 -> 00:38:36] a minus 1 of this number
+[00:38:36 -> 00:38:38] like a minus 1 of this number
+[00:38:38 -> 00:38:40] let's write this number that's
+[00:38:40 -> 00:38:42] 10100000
+[00:38:42 -> 00:38:44] Now a minus 1 of this number
+[00:38:44 -> 00:38:46] will be 1111
+[00:38:46 -> 00:38:48] a 0 here
+[00:38:48 -> 00:38:50] and the left one will be same.
+[00:38:50 -> 00:38:52] So again
+[00:38:52 -> 00:38:54] what has happened is this rightmost
+[00:38:54 -> 00:38:56] bit which is 1
+[00:38:56 -> 00:38:58] has been replaced with 0
+[00:38:58 -> 00:39:00] and everything on the right has been replaced
+[00:39:00 -> 00:39:02] with 1s. Again if you do
+[00:39:02 -> 00:39:04] an AND what will happen is
+[00:39:04 -> 00:39:06] you'll get 00000
+[00:39:06 -> 00:39:08] and then a 01.
+[00:39:08 -> 00:39:10] So what has happened is
+[00:39:10 -> 00:39:12] you've turned off the rightmost bit
+[00:39:12 -> 00:39:14] you've turned off the rightmost bit.
+[00:39:14 -> 00:39:16] Perfect. Again if I take this number
+[00:39:16 -> 00:39:18] which is
+[00:39:18 -> 00:39:20] 100000000
+[00:39:20 -> 00:39:22] and I do a minus 1
+[00:39:22 -> 00:39:24] the number that I'll get is
+[00:39:24 -> 00:39:26] 011111
+[00:39:26 -> 00:39:28] I'll do an AND
+[00:39:28 -> 00:39:30] I'll get 00000000
+[00:39:30 -> 00:39:32] So what has happened is
+[00:39:32 -> 00:39:34] again the rightmost bit
+[00:39:34 -> 00:39:36] has been turned off. So can I
+[00:39:36 -> 00:39:38] follow a similar pattern? Maybe
+[00:39:38 -> 00:39:40] yes. So thereby I'll
+[00:39:40 -> 00:39:42] write counter equal to
+[00:39:42 -> 00:39:44] 0 and I'll be like
+[00:39:44 -> 00:39:46] while n is not
+[00:39:46 -> 00:39:48] equal to 0 and at
+[00:39:48 -> 00:39:50] every step what I'll do is
+[00:39:50 -> 00:39:52] n equal to n and
+[00:39:52 -> 00:39:54] n minus 1 and I'll do a
+[00:39:54 -> 00:39:56] counter plus plus. So what will
+[00:39:56 -> 00:39:58] happen is if there's a number like
+[00:39:58 -> 00:40:00] 84 and there are
+[00:40:00 -> 00:40:02] 3 bits which are on
+[00:40:02 -> 00:40:04] and there are 3 bits which are on
+[00:40:04 -> 00:40:06] at the first step
+[00:40:06 -> 00:40:08] the rightmost bit is turned off
+[00:40:08 -> 00:40:10] at the second step
+[00:40:10 -> 00:40:12] the second rightmost bit is
+[00:40:12 -> 00:40:14] turned off and at the last step
+[00:40:14 -> 00:40:16] this one will be turned off.
+[00:40:16 -> 00:40:18] So I'll keep on doing n and n
+[00:40:18 -> 00:40:20] minus 1. I'll keep turning off the
+[00:40:20 -> 00:40:22] rightmost bit and at the end of the day
+[00:40:22 -> 00:40:24] n will be 0. So count
+[00:40:24 -> 00:40:26] will be your number of
+[00:40:26 -> 00:40:28] said bits at the end
+[00:40:28 -> 00:40:30] of the day. And what will be the time
+[00:40:30 -> 00:40:32] complexity over here? The time complexity
+[00:40:32 -> 00:40:34] over here will be B go of
+[00:40:34 -> 00:40:36] the number of said bits.
+[00:40:36 -> 00:40:40] At the worst possible scenario
+[00:40:40 -> 00:40:42] this can be B go of 31
+[00:40:42 -> 00:40:44] for an integer which is
+[00:40:44 -> 00:40:46] similar to
+[00:40:46 -> 00:40:48] the one that we did when we
+[00:40:48 -> 00:40:50] were dividing by 2 because
+[00:40:50 -> 00:40:52] in that scenario as well
+[00:40:52 -> 00:40:54] the worst possible case
+[00:40:54 -> 00:40:56] is logarithmic B go
+[00:40:56 -> 00:40:58] logarithmic base to n which
+[00:40:58 -> 00:41:00] can go as B go of 31 if
+[00:41:00 -> 00:41:02] your number is as
+[00:41:02 -> 00:41:04] big as 2 to the power 31
+[00:41:04 -> 00:41:06] like the biggest number then
+[00:41:06 -> 00:41:08] that can also take a lot of time
+[00:41:08 -> 00:41:10] but since most of the numbers will not
+[00:41:10 -> 00:41:12] have all of them turned like
+[00:41:12 -> 00:41:14] all of the bits as 1. This
+[00:41:14 -> 00:41:16] is a better approach to count the
+[00:41:16 -> 00:41:18] number of said bits which is taking
+[00:41:18 -> 00:41:20] B go of number of said bits
+[00:41:20 -> 00:41:22] so remember this one. So yeah
+[00:41:22 -> 00:41:24] that's it for this particular video. I hope
+[00:41:24 -> 00:41:26] you've understood everything and if that is the case
+[00:41:26 -> 00:41:28] please please do consider giving
+[00:41:28 -> 00:41:30] us a like and if you're new to our channel do consider
+[00:41:30 -> 00:41:32] subscribing to us as well.
+[00:41:32 -> 00:41:34] With this I'll be wrapping up this video. Let's meet in some other video.
+[00:41:34 -> 00:41:37] Till then bye take care.
