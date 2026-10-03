@@ -1,0 +1,574 @@
+Title: Signal handling in Linux
+Video ID: RU0ULe2f6hI
+Detected language: en
+------------------------------------------------------------
+
+[00:00:01 -> 00:00:06] Hi everybody, I'm Chris Cage and this is CS361, Systems Programming.
+[00:00:06 -> 00:00:10] Today we're going to be talking about signals and we're going to be talking about things
+[00:00:10 -> 00:00:11] a little bit differently.
+[00:00:11 -> 00:00:17] Typically I record a couple of videos, one, two, three, I cut them down and get rid
+[00:00:17 -> 00:00:22] of every uh and um and weird pause and false start, but today I'm going to experiment
+[00:00:22 -> 00:00:26] a little bit with doing this in one take, just getting through the things that I want
+[00:00:26 -> 00:00:27] to get through.
+[00:00:27 -> 00:00:31] Let me know in class or however you want whether this was just as good as the
+[00:00:31 -> 00:00:36] other types of videos or whether you would like to go back to the more chopped and cut
+[00:00:36 -> 00:00:40] up videos where there's lots of cuts everywhere showing what I did wrong or getting rid
+[00:00:40 -> 00:00:43] of everything that I did wrong and going through right all at once.
+[00:00:43 -> 00:00:45] Okay, now let's get started.
+[00:00:45 -> 00:00:46] Signals.
+[00:00:46 -> 00:00:49] This chapter was long, right?
+[00:00:49 -> 00:00:55] It was quite a bit and signal handling is a relatively uncommon corner of systems
+[00:00:55 -> 00:01:01] programming but it's still super important for our understanding of how process control
+[00:01:01 -> 00:01:02] works.
+[00:01:02 -> 00:01:07] So without it we wouldn't really be able to interrupt runaway processes, we wouldn't
+[00:01:07 -> 00:01:13] be able to allow processes to safely exit our shells or other programs that control
+[00:01:13 -> 00:01:17] other programs would have a really tough time actually figuring out what the heck
+[00:01:17 -> 00:01:18] is happening.
+[00:01:18 -> 00:01:23] Signals are this fundamental thing that allow us to do inter-process communication
+[00:01:23 -> 00:01:28] between different processes but in a very different way than you would when you're
+[00:01:28 -> 00:01:31] writing a program that just does work.
+[00:01:31 -> 00:01:36] As we're going to see later on in class, there are a lot of ways for one process to
+[00:01:36 -> 00:01:44] send messages to another process very explicitly and the signal mechanism is like that
+[00:01:44 -> 00:01:49] but it's a very specialized tool that's used in this interrupt driven way rather
+[00:01:49 -> 00:01:53] than in an explicit I'm going to wait to read something from process one, I'm
+[00:01:53 -> 00:01:57] going to send something over to process two type of way.
+[00:01:57 -> 00:02:04] This is primarily for unintended unexpected things like my child died or a file descriptor
+[00:02:04 -> 00:02:06] became ready to read.
+[00:02:06 -> 00:02:10] These are things that you're not typically going to want to deal with and the biggest
+[00:02:10 -> 00:02:15] probably trickiest part about this is that this is our first tiny little step into
+[00:02:15 -> 00:02:21] user level concurrent programming where we're running one thread of control for instance
+[00:02:21 -> 00:02:26] our main thread in our program and then something happens and then our code starts
+[00:02:26 -> 00:02:31] running some place else and we explicitly have to make sure that those two pieces are
+[00:02:31 -> 00:02:37] working together the way that we want to do that.
+[00:02:37 -> 00:02:45] Okay so one other, okay next thing, this is where I get mixed up just a little bit.
+[00:02:45 -> 00:02:50] I'm going to go through everything we got here in these slides, I just go over
+[00:02:50 -> 00:02:55] some of these very important pieces of information about the concept of signals
+[00:02:55 -> 00:02:59] and this is going to be mostly review of the stuff that was in the book but overall
+[00:02:59 -> 00:03:05] it's going to be the basics, the straightforward important stuff about signals.
+[00:03:05 -> 00:03:09] So without further ado, recall that we have exceptions, we have this concept of
+[00:03:09 -> 00:03:14] a user level process doing something, it's on a specific instruction, something exceptional
+[00:03:14 -> 00:03:19] happens and rather than executing the next instruction there it goes and does something
+[00:03:19 -> 00:03:22] else and then it's either going to return back and retry that, it's going to return
+[00:03:22 -> 00:03:26] back and do the next instruction or it's not going to return at all.
+[00:03:26 -> 00:03:31] This is what happens when there is kernel level exceptional control flow.
+[00:03:31 -> 00:03:38] We switch over from being in the user space mode over to being in supervisor mode where
+[00:03:38 -> 00:03:42] we can do lots of stuff like kill processes or create new ones or run system calls all
+[00:03:42 -> 00:03:47] that stuff and then we go back down into normal mode, we go back to Clark Kent
+[00:03:47 -> 00:03:50] instead of being Superman.
+[00:03:50 -> 00:03:56] With this there's no way to tell the process hey something happened outside of stopping
+[00:03:56 -> 00:03:59] it and giving it this information.
+[00:03:59 -> 00:04:03] What we get out of the signal mechanism is something that allows us to send these
+[00:04:03 -> 00:04:10] messages back and forth but it's not going to be as heavyweight or as disruptive
+[00:04:10 -> 00:04:20] as it is in the typical interrupt style approach but it's still going to be disruptive
+[00:04:20 -> 00:04:22] just not as disruptive.
+[00:04:22 -> 00:04:27] So the signal by the most basic thing we have here is that signals allow the kernel to
+[00:04:27 -> 00:04:33] send a small message to a process and signals correspond to different types of system events.
+[00:04:33 -> 00:04:37] There are user defined signals which we will use for examples a little bit later
+[00:04:37 -> 00:04:42] on today but those are going to be less common, those are a weird way to use the
+[00:04:42 -> 00:04:49] signal mechanism where mostly what we're using signals for is exceptional things
+[00:04:49 -> 00:04:55] that a process needs to respond to that is outside of their normal operation.
+[00:04:55 -> 00:05:00] So some of the signals that we have here are things like sigint so the most important
+[00:05:00 -> 00:05:07] things that we typically see are sigint, sigsegv, sigkill, sigquit, sigchild,
+[00:05:07 -> 00:05:10] these are all really really important ones.
+[00:05:10 -> 00:05:12] Sigint is when you hit control C on the keyboard.
+[00:05:12 -> 00:05:18] What's really important here about a little aside I wanted to go over is that when
+[00:05:18 -> 00:05:24] you typically type on the keyboard you're not causing exceptions to happen.
+[00:05:24 -> 00:05:26] There's no exception, there's no interrupt.
+[00:05:26 -> 00:05:36] All you're doing is writing individual characters to a file and yeah writing characters to
+[00:05:36 -> 00:05:40] a file if you were in a user level program would actually cause a contact switch,
+[00:05:40 -> 00:05:45] it had to be a syscall, etc. but the driver for the keyboard or the universal
+[00:05:45 -> 00:05:49] serial bus or the teletype, the virtual terminal that you're using isn't going to
+[00:05:49 -> 00:05:53] have to do that it's just going to be reading these bytes in from this device and they're
+[00:05:53 -> 00:05:57] going to show up in that buffer and as soon as somebody calls read they're going
+[00:05:57 -> 00:05:59] to receive those bytes.
+[00:05:59 -> 00:06:03] That read call is a system call right that is going to be exceptional control
+[00:06:03 -> 00:06:08] flow where we jump over but it's very different from a control C on the keyboard.
+[00:06:08 -> 00:06:13] When I hit control C on the keyboard I'm actually triggering an interrupt to happen
+[00:06:13 -> 00:06:17] and then the signal gets sent to the process and we'll see a little bit later on what
+[00:06:17 -> 00:06:22] happens when that when I do that and it's fundamentally different than when I'm just
+[00:06:22 -> 00:06:25] banging on the keyboard normally.
+[00:06:25 -> 00:06:31] We can send this kill signal to processes that will instruct that process will instruct
+[00:06:31 -> 00:06:37] the operating system in fact to stop that process, dismantle it, take it off the
+[00:06:37 -> 00:06:42] CPU, mark it as stopped and never to be started again, things along those lines.
+[00:06:42 -> 00:06:49] We receive a signal when we do an illegal memory access that causes a segmentation fault
+[00:06:49 -> 00:06:55] that is not something that just immediately zaps our process right away instead it's
+[00:06:55 -> 00:07:00] something that gets reported to our process as a signal and this is why when we're
+[00:07:00 -> 00:07:04] debugging with GDB we can actually set a trap on that SigSegV.
+[00:07:04 -> 00:07:10] What GDB can do is it can say aha I am debugging this child process of mine
+[00:07:10 -> 00:07:16] I am going to instruct the Linux kernel hey when this tries to do this illegal thing
+[00:07:16 -> 00:07:21] don't just kill it like it was a normal running process you should instead transfer
+[00:07:21 -> 00:07:25] control to me so that I can take a look at what the heck is happening and that's
+[00:07:25 -> 00:07:28] super super helpful.
+[00:07:28 -> 00:07:32] And then SigChild will see that I think we saw it a little bit already when we're
+[00:07:32 -> 00:07:37] talking about additional processes this is the signal that gets delivered to our
+[00:07:37 -> 00:07:46] process when one of our child processes has died as accident now we're going to
+[00:07:46 -> 00:07:50] get a little bit into this idea of sending signals there are a few very
+[00:07:50 -> 00:07:54] very important concepts that I want to talk about here because when we first
+[00:07:54 -> 00:07:58] think about it signals and interrupts sound like there's things that is
+[00:07:58 -> 00:08:01] immediately going to get sent to our process as soon as physically
+[00:08:01 -> 00:08:05] possible right like we've been talking about interrupts and exceptional
+[00:08:05 -> 00:08:09] control flow and interrupting running instructions right but all of a sudden
+[00:08:09 -> 00:08:13] we're switching over to signals which sounds similar and is being used in a
+[00:08:13 -> 00:08:17] similar way but the way that it actually gets implemented by the
+[00:08:17 -> 00:08:22] operating system is very very different when a signal gets sent to an
+[00:08:22 -> 00:08:28] individual process it will all like sending the signal raises a flag if
+[00:08:28 -> 00:08:31] you think of old-timey mailboxes where you've got that nice little red
+[00:08:31 -> 00:08:37] flag on the side sending a signal raises a flag that says hey there is
+[00:08:37 -> 00:08:41] something in here that you have to take care of it does not immediately cause
+[00:08:41 -> 00:08:46] the the mail carrier to show up and take it out right that the mail carrier
+[00:08:46 -> 00:08:50] doesn't teleport to your mailbox the mail carrier only comes around and
+[00:08:50 -> 00:08:54] takes a look at it whenever it actually handles your running process
+[00:08:54 -> 00:08:58] and if the mail carriers in the process of like sorting the mail
+[00:08:58 -> 00:09:02] outside of your house they're not going to immediately stop sorting that
+[00:09:02 -> 00:09:08] mail to look at your sweet red flag that you've just put up so let's think
+[00:09:08 -> 00:09:12] about this mail carrier analogy because I do think it maps onto signals pretty
+[00:09:12 -> 00:09:17] well and there are very important differences between what we've seen
+[00:09:17 -> 00:09:22] already of exceptional control flow immediately taking over and signal
+[00:09:22 -> 00:09:28] handling which only happens on switches from kernel mode to user mode
+[00:09:28 -> 00:09:32] that's going to be the key cruxing if there's one point that I think a
+[00:09:32 -> 00:09:36] lot of people get tripped up on with signals is that signals only get
+[00:09:36 -> 00:09:43] handled when your user level process does a contact switch or from another
+[00:09:43 -> 00:09:48] process to yours or when you do a contact switch from going into the
+[00:09:48 -> 00:09:53] kernel say for a system call and then back out of the kernel to end that
+[00:09:53 -> 00:09:58] system call when the kernel gives control back to your user level code
+[00:09:58 -> 00:10:05] that is when it decides to actually process that signal by calling your
+[00:10:05 -> 00:10:09] signal handling code I'm getting a little bit ahead of myself but I can't
+[00:10:09 -> 00:10:15] stress this part enough so this is where our analogy breaks down a little
+[00:10:15 -> 00:10:17] bit right I said there's just one little red flag and you can raise it
+[00:10:17 -> 00:10:20] and lower it and that says whether or not a signal needs to be delivered
+[00:10:20 -> 00:10:25] there's actually lots of them I think there's 255 I'd have to double
+[00:10:25 -> 00:10:30] check but you can have lots of different pending signals for a process that have
+[00:10:30 -> 00:10:34] their flags raised and each of them does need to be handled by that
+[00:10:34 -> 00:10:40] running process before it moves on and does whatever else it wants to do
+[00:10:40 -> 00:10:44] yeah so this is something that always always happens to me I explain the
+[00:10:44 -> 00:10:46] thing that's on the next slide because I forget what it is I had on
+[00:10:46 -> 00:10:50] that on that slide but yeah here's in text what I had already mentioned
+[00:10:50 -> 00:10:55] the previous slide when the kernel when the process switches back from kernel
+[00:10:55 -> 00:11:00] mode it checks to see whether there is a pending signal and it checks to see
+[00:11:00 -> 00:11:05] whether it needs to do something based on that ending signal so we can take a
+[00:11:05 -> 00:11:09] look at this example here we've got one process on one side we've got
+[00:11:09 -> 00:11:12] another process on another side so say the process on the left is the
+[00:11:12 -> 00:11:18] actual kill command that you have from the command line on bash you can
+[00:11:18 -> 00:11:23] just type kill space and then the like dash P or something along those lines
+[00:11:23 -> 00:11:28] right in this case we're trying to send the kill the sig kill signal to
+[00:11:28 -> 00:11:35] process 35 when we do that in our kill process we don't immediately go
+[00:11:35 -> 00:11:38] over there and say hey suspended process 35 I'm gonna kill you right
+[00:11:38 -> 00:11:42] now process 35 isn't gonna sit there waiting until it's going to run
+[00:11:42 -> 00:11:47] usually it'll run very very quickly but it's not going to actually be
+[00:11:47 -> 00:11:55] received until the process 35 gets given access to the CPU again so what
+[00:11:55 -> 00:12:00] will happen here is I to perform a syscall in slash bin slash kill it is
+[00:12:00 -> 00:12:08] send the signal to sing kill to the process 35 I return from the kernel
+[00:12:08 -> 00:12:11] mode back into user mode in the current process because that process
+[00:12:11 -> 00:12:17] has not used up its quantum yet every process if it has more work to do it
+[00:12:17 -> 00:12:23] will be given up to I think a hundred milliseconds it's user configurable I
+[00:12:23 -> 00:12:27] think we can dig into like systems one or your hacker virtual machine to figure
+[00:12:27 -> 00:12:32] out how much time each quantum is but let's just pretend it's a hundred
+[00:12:32 -> 00:12:36] milliseconds so if this process has a hundred milliseconds of work to do and
+[00:12:36 -> 00:12:42] nobody else has also has work to do it's going to be given all of that
+[00:12:42 -> 00:12:47] work so it does all that work it does all that work and then eventually the
+[00:12:47 -> 00:12:54] other process 35 will be switched to so eventually it's gonna say ah you've used
+[00:12:54 -> 00:12:58] up your time it's time for me to go over to the other instruction and
+[00:12:58 -> 00:13:04] figure out I'm sorry it's time for me as the kernel to determine which
+[00:13:04 -> 00:13:08] process to run next I'm gonna decide oh let's run process 35 next and so
+[00:13:08 -> 00:13:12] I'm gonna say okay let's go over into the context of process 35 when I
+[00:13:12 -> 00:13:15] get over into the context of process 35 the last thing I do is I set a
+[00:13:15 -> 00:13:21] timer say hey CPU if I haven't woken up in the next hundred milliseconds wake me
+[00:13:21 -> 00:13:24] up or 10 milliseconds or however much it's supposed to based on in scheduling
+[00:13:24 -> 00:13:29] algorithm and then it gives control back to whatever the next instruction
+[00:13:29 -> 00:13:33] is in this situation this is where the signal handling actually happens
+[00:13:33 -> 00:13:38] instead of doing a context switch back into user mode in process 35 the
+[00:13:38 -> 00:13:43] kernel says aha I have a waiting signal to deliver to this process I
+[00:13:43 -> 00:13:46] have to send it this sig kill signal when I see that I have to give it this
+[00:13:46 -> 00:13:51] sig kill signal instead of running that next instruction I'm going to run the
+[00:13:51 -> 00:14:05] exception handler for that specific signal anyhow my next slide previous
+[00:14:05 -> 00:14:10] slide somehow broke sorry okay so signals indicate to a process by
+[00:14:10 -> 00:14:14] setting it some bit that says oh hey this is the signal and if it
+[00:14:14 -> 00:14:18] receives sig kill the single bit is one and each process has a interrupt
+[00:14:18 -> 00:14:25] vector that have that indicates what to do for each of those individual signals
+[00:14:25 -> 00:14:29] some signals the user level process can't control what runs in on their
+[00:14:29 -> 00:14:35] behalf when the signal handler gets called but in most in lots of cases in
+[00:14:35 -> 00:14:38] almost all except for two cases they can define what their process is
+[00:14:38 -> 00:14:45] supposed to do when it receives a signal of a specific bit yeah and so
+[00:14:45 -> 00:14:52] these actions have defaults there there are certain defaults like sig int sig
+[00:14:52 -> 00:14:58] quit sig ill that will by default terminate the process so if you as a
+[00:14:58 -> 00:15:05] user level coder have not yet said hey I want to do something special when
+[00:15:05 -> 00:15:10] this signal comes in it'll just kill your process certain things like sig
+[00:15:10 -> 00:15:17] kill and sig stop will only cannot be changed you cannot change what your user
+[00:15:17 -> 00:15:21] level code is going to do as a result of a single function or as a result of
+[00:15:21 -> 00:15:26] a sig stop function your process will be put to sleep in the sig stop
+[00:15:26 -> 00:15:32] situation your process will be terminated in the sig kill version if
+[00:15:32 -> 00:15:36] you've heard jokes or heard about kill-9 as a way to like kill
+[00:15:36 -> 00:15:42] something no matter what 9 is the ID of sig kill and when somebody says oh I'm
+[00:15:42 -> 00:15:47] gonna kill 9-9 that thing it's like I really absolutely positively need to
+[00:15:47 -> 00:15:52] have that process terminate I cannot allow it to run under any circumstances
+[00:15:52 -> 00:15:57] anymore so that signal cannot be blocked it cannot be ignored it
+[00:15:57 -> 00:16:03] cannot be handled in a custom way it has to terminate the process there's
+[00:16:03 -> 00:16:09] some that will terminate the process and then also dump the core so if you
+[00:16:09 -> 00:16:14] have the memory image of your program and it does a seg fault it's like well
+[00:16:14 -> 00:16:17] one really common thing that I would want to do there is take a look at
+[00:16:17 -> 00:16:21] what was going on I can actually load that core into GDB and it will say
+[00:16:21 -> 00:16:24] oh here's what the stack looked like here's what the variables look like
+[00:16:24 -> 00:16:28] here's what it tried to do when it caused a segmentation fault that's
+[00:16:28 -> 00:16:32] really really useful when you are in the process of debugging a program and
+[00:16:32 -> 00:16:38] if something makes a bad memory access you it's probably a good reason to
+[00:16:38 -> 00:16:41] especially if it was running in production it's a fantastic idea to
+[00:16:41 -> 00:16:46] figure out what the heck went wrong because that is a bad bad buck yeah we
+[00:16:46 -> 00:16:49] can also do a stop and continue that's what sig stop and sig
+[00:16:49 -> 00:16:53] continue are for this is foregrounding and backgrounding jobs I
+[00:16:53 -> 00:16:57] think I showed this in office hours on Tuesday or last Thursday something
+[00:16:57 -> 00:17:03] along those lines there's also default action of just ignoring those signals
+[00:17:03 -> 00:17:09] like by default if a child of mine I just get so bad by default if a child
+[00:17:09 -> 00:17:15] process has terminated the operating system will send me a signal that says
+[00:17:15 -> 00:17:19] hey that child process has terminated and then by default nothing will
+[00:17:19 -> 00:17:23] happen because I don't really need to do anything about that like yeah it
+[00:17:23 -> 00:17:30] will stick around in the it will stick around in the process table until I
+[00:17:30 -> 00:17:33] actually call weight pit on it but there's no like hey hey you need to
+[00:17:33 -> 00:17:37] stop what it is you're doing and handle this child terminating it's not
+[00:17:37 -> 00:17:42] as that's not really a logical thing to do when child process is
+[00:17:42 -> 00:17:45] terminating is a typical expected thing I don't want to stop what I'm
+[00:17:45 -> 00:17:47] doing I just want I don't want to pause everything I'm doing over here
+[00:17:47 -> 00:17:52] and handle the fact that this process exited normally right so by
+[00:17:52 -> 00:17:58] default ignoring sig child is relatively logical then there's weird esoteric
+[00:17:58 -> 00:18:02] things like the window size changing there's user defined signals like sig
+[00:18:02 -> 00:18:07] user one and sig user two that don't have anything semantically involved with
+[00:18:07 -> 00:18:10] them and basically say hey if process one wants to send a signal the
+[00:18:10 -> 00:18:14] process to and arbitrarily define what it's supposed to mean you think user
+[00:18:14 -> 00:18:19] one and sig user two that's what those are there for now when you can
+[00:18:19 -> 00:18:27] so except for sig stop and sig kill you can define a new way to handle that
+[00:18:27 -> 00:18:30] signal and that's what the signal function does there's a little
+[00:18:30 -> 00:18:35] weirdness here and I love catching people on these things the signal
+[00:18:35 -> 00:18:39] function does not send signals the signal function install signal handlers
+[00:18:39 -> 00:18:44] the kill function does not always send the kill signal the kill function is
+[00:18:45 -> 00:18:52] used to send signals hard annoying but we will deal with it right we can handle
+[00:18:52 -> 00:18:57] this now when we're installing these signal handlers we can install special
+[00:18:57 -> 00:19:02] specially named ones like sig IGN and sig DFL so if I install a signal
+[00:19:02 -> 00:19:06] handler called sig IGN that just says ignore this signal I don't want to do
+[00:19:06 -> 00:19:10] anything as a result of the signal or I can set the handler back to the
+[00:19:10 -> 00:19:16] default action which you know if it was sig int is terminate the program if it
+[00:19:16 -> 00:19:21] was sig user one it's do absolutely nothing sig child do absolutely nothing
+[00:19:21 -> 00:19:24] you can set it back to whatever was supposed to happen after you have
+[00:19:24 -> 00:19:31] defined it to something different you could if you wanted to just have your
+[00:19:31 -> 00:19:36] default action be clicked right I could say oh I went on my child process
+[00:19:36 -> 00:19:43] dies I want to die too getting ridiculous but in terms of the analogy
+[00:19:43 -> 00:19:45] but that is the thing that you could do anything maybe on second thought
+[00:19:45 -> 00:19:49] that's not a great idea you can set it back to sig DFL which case there
+[00:19:49 -> 00:19:54] would no longer be something that sig child would do let's switch over to
+[00:19:54 -> 00:20:01] our lectures so here this is our most basic possible process and if I
+[00:20:02 -> 00:20:13] GCC this guy so this is a process and I can send it the signal by hitting
+[00:20:13 -> 00:20:17] control C on my keyboard if I were to run this and I just start banging on
+[00:20:17 -> 00:20:23] my keyboard it just keeps on running right this is a normal process now
+[00:20:23 -> 00:20:28] if I were to come over here and I add this signal so I can say when I
+[00:20:28 -> 00:20:34] when this process receives the sig int signal I want to ignore it I can do
+[00:20:34 -> 00:20:41] that I can just say ignore it so if I GCC of this guy and I run a dot out
+[00:20:42 -> 00:20:44] and then I you know I bang on the keyboard that's expected but if I
+[00:20:44 -> 00:20:49] click control C here nothing happens so I am stuck in here and I need to
+[00:20:49 -> 00:20:54] send a different signal to that process to stop it I know that control
+[00:20:54 -> 00:21:00] backslash if it doesn't pull up my password manager let's kill the
+[00:21:00 -> 00:21:04] password manager so it doesn't take over control C or control backslash
+[00:21:04 -> 00:21:09] yeah so control backslash sends sig quit and I did not cause sig quit
+[00:21:09 -> 00:21:15] to be ignored here it can be even funner it can be a total jerkwad
+[00:21:16 -> 00:21:23] and not sig tail I want to do sig quit and I can both ignore int and quit
+[00:21:24 -> 00:21:29] so if you want to like annoy your friends and have processes run that
+[00:21:29 -> 00:21:33] they can't kill so I can't kill this with control C now I can't kill this
+[00:21:33 -> 00:21:39] with control backslash now in fact I need to go over to another window
+[00:21:43 -> 00:21:48] so I've got a process a dot out here so this 2614 if I want to stop this
+[00:21:48 -> 00:21:54] process I can terminate its parent and it will no longer it'll error out
+[00:21:54 -> 00:21:57] because it tries to write to standard out but standard out doesn't exist
+[00:21:57 -> 00:22:02] anymore and then it doesn't know what to do and I can come over here and I
+[00:22:02 -> 00:22:13] can send the kill signal to 2614 and that one will definitely kill it right
+[00:22:13 -> 00:22:18] so here there was nothing my process could have done let's be fun let's
+[00:22:18 -> 00:22:25] do an actual demo of this this will probably not work but I didn't try it
+[00:22:25 -> 00:22:33] beforehand so here that doesn't work that doesn't work come over here check
+[00:22:33 -> 00:22:40] for what its process ID is kill dash nine of two six not five come back
+[00:22:40 -> 00:22:44] and it was killed right so I even though I told it hey I want to do
+[00:22:44 -> 00:22:48] something different when I kill the signal it doesn't that doesn't work
+[00:22:48 -> 00:22:56] right I cannot mask block prevent ignore the sig kill signal now not only that
+[00:22:56 -> 00:23:05] but we can do our user level process so let's see so we can block I'll go
+[00:23:05 -> 00:23:09] back over and show a couple more demos in a moment but just to cover a few
+[00:23:09 -> 00:23:15] more pieces of the ideas here sometimes we can block signals in addition to
+[00:23:15 -> 00:23:19] changing what we do with them that implicitly the kernel is going to block
+[00:23:19 -> 00:23:24] signals being delivered to your process if it is running that process in
+[00:23:24 -> 00:23:27] kernel mode because we don't want really important operating system
+[00:23:27 -> 00:23:31] stuff to be disrupted by the fact that some excuse me user level
+[00:23:31 -> 00:23:36] signal ended up showing showing up so if I block signals that's kind of
+[00:23:36 -> 00:23:44] like me I don't where does my my mail carrier analogy show up here this is
+[00:23:44 -> 00:23:47] like some jerkwad coming in front of your mailbox and like holding the door
+[00:23:47 -> 00:23:53] closed it's like the the signal the flag can go up and we can say like oh
+[00:23:53 -> 00:23:57] we're going to send the signal and it's going to be pending it's going to
+[00:23:57 -> 00:24:00] it's going to be something we want to deliver and I'm going to keep that
+[00:24:00 -> 00:24:04] flag up but I'm just going to hold that door to my mailbox shut you can't
+[00:24:04 -> 00:24:10] open that mailbox until I have unblocked the signal so those signals become
+[00:24:10 -> 00:24:13] pending but they're not received until the signal handle returns the mail
+[00:24:13 -> 00:24:18] carrier cannot come and open that box until you have taken your hand away
+[00:24:18 -> 00:24:21] and allow them to you know pick up your ballot or whatever if we really
+[00:24:21 -> 00:24:27] want to get topical about this so while we are handling signals in
+[00:24:27 -> 00:24:33] user mode we can receive other signals while we're receiving that one signal
+[00:24:34 -> 00:24:37] I don't even want to try and make an analogy for this but the basic idea is
+[00:24:37 -> 00:24:41] if we have two different signals that can be delivered to our process and
+[00:24:43 -> 00:24:48] the world exists such that we could receive the signal because remember we
+[00:24:48 -> 00:24:51] only receive our signals when we receive the
+[00:24:52 -> 00:24:57] uh sorry I started thinking in my head instead of talking about what I want to talk about
+[00:24:57 -> 00:25:03] we only receive signals when we transfer over from kernel mode back over to user mode so if
+[00:25:03 -> 00:25:09] I'm handling a signal and I'm just doing user level stuff and somebody sends me a different
+[00:25:09 -> 00:25:14] signal I'm going to keep doing that user level stuff until I do a system call or until
+[00:25:14 -> 00:25:19] I get swapped out due to a contact switch when I get swapped back in rather than going
+[00:25:19 -> 00:25:26] back to where I was in that signal handler I'm going to go over to the other signal handler
+[00:25:26 -> 00:25:30] so if I had 50 different signal handlers and I just happened to make it work so that the
+[00:25:30 -> 00:25:35] timing all worked out that I switched back in before I finished the signal handler
+[00:25:35 -> 00:25:39] instead of going back to the next instruction I was supposed to run I'm going to go to some
+[00:25:39 -> 00:25:44] other instruction this this gets really tricky for different signals this can happen but when
+[00:25:45 -> 00:25:52] I am handling a specific signal like the signal for s right or yeah so when I'm handling
+[00:25:52 -> 00:25:59] signal s I cannot receive signal s again I don't want to create like an infinite loop of signal
+[00:25:59 -> 00:26:05] handlers of the same exact signal but if I have a different signal show up I will
+[00:26:05 -> 00:26:14] start handling that so by default s gets blocked when you are handling s but other
+[00:26:14 -> 00:26:18] signals are not blocked while you're handling s every other signal could still interrupt
+[00:26:18 -> 00:26:23] your currently running code signals aren't just sent to an individual process they're sent to an
+[00:26:23 -> 00:26:29] entire group of processes and every process belongs to exactly one process group this
+[00:26:29 -> 00:26:37] concept comes from the fact that we want to create jobs and in the unix model of running
+[00:26:37 -> 00:26:41] lots of different tools that you compose in interesting ways using standard in and standard
+[00:26:41 -> 00:26:46] out this kind of makes sense to have this concept of a process group where I want to say this whole
+[00:26:46 -> 00:26:53] entire job needs to stop or this whole entire job should terminate so I can send a signal to
+[00:26:53 -> 00:27:00] the entire process group and these process groups are used when you're indicating that
+[00:27:00 -> 00:27:04] a bunch of processes work together children belong to the same group as their parents
+[00:27:05 -> 00:27:11] and they can change their group id explicitly by calling a system call so when I if I wanted
+[00:27:11 -> 00:27:17] to run a program called yes and I wanted to and that just sends the character y
+[00:27:18 -> 00:27:23] as much as it possibly can to whatever process is connected to it standard out
+[00:27:24 -> 00:27:29] I can link those processes together and then I want to remove every single file and I want
+[00:27:29 -> 00:27:36] to say yes to whatever prompt rm gives me I can pipe that process yes to that rm star
+[00:27:36 -> 00:27:41] these are linked together in a single job and there's lots of very very powerful things
+[00:27:41 -> 00:27:49] we can do using things like sed and awk and grep and sort and all of these and xargs all
+[00:27:49 -> 00:27:55] of these different tiny little programs can be composed to do very very complicated things
+[00:27:55 -> 00:28:01] very very quickly at the shell it's a little bit out of context or out of scope for this class
+[00:28:01 -> 00:28:06] but that is the this unix philosophy is a very important powerful mechanism if you're doing a
+[00:28:06 -> 00:28:11] lot of data-driven system administration developer work at the terminal very very
+[00:28:11 -> 00:28:18] powerful mechanism but that gets represented in linux by the concept of a job where you have
+[00:28:18 -> 00:28:23] lots of different processes that are connected in some way like yes and rm here are two
+[00:28:23 -> 00:28:26] different processes they're connected by standard and standard on but more importantly
+[00:28:26 -> 00:28:33] they are a thing that a user wanted to do they're a task they're a job that is one big
+[00:28:34 -> 00:28:41] unit now we have foreground jobs and background jobs there's some situations where we want to
+[00:28:41 -> 00:28:46] just cause something to run and we don't want it to take up our terminal we just want to
+[00:28:46 -> 00:28:50] continue running in the background and we'll keep doing our our work we put our ampersand
+[00:28:50 -> 00:28:58] there in front of a or at the end of a command line which says rather that the shell
+[00:28:59 -> 00:29:06] should create fork itself it should exec this other program but then instead of waiting for
+[00:29:06 -> 00:29:10] it to to end and then giving control back it should just immediately give control back to
+[00:29:10 -> 00:29:14] the shell so the shell can keep doing what it wants to do so if i wanted to do like a
+[00:29:15 -> 00:29:22] vs code and i was on a linux machine i would fork it off like this i i want to launch it from my
+[00:29:22 -> 00:29:27] terminal and it's going to be some window by itself but i want to keep running gcc or vi or
+[00:29:27 -> 00:29:30] whatever the heck it is else i want to do at that terminal i don't want that terminal to just
+[00:29:30 -> 00:29:38] be frozen until this program terminates so every terminal like every one of these virtual
+[00:29:39 -> 00:29:45] terminals has one foreground job and any number of background jobs so that foreground job is the
+[00:29:45 -> 00:29:50] thing which is intended to be writing to standard out and reading from standard in at that moment
+[00:29:50 -> 00:29:57] in time uh you know we already talked about sending uh sending signals uh with the kill
+[00:29:57 -> 00:30:02] function right now i want to get to there's a few other important pieces of information in here
+[00:30:02 -> 00:30:09] i got so writing signal handlers is tricky this is hard part this is probably the next section
+[00:30:09 -> 00:30:19] next important section of this video uh so we're going to explore concurrency like actual
+[00:30:19 -> 00:30:23] concurrency issues a little bit later on in the term but for now we're going to just go over
+[00:30:23 -> 00:30:28] some relatively basic guidelines for what to do here so i'm going to switch back over to
+[00:30:28 -> 00:30:35] my demo stuff so in addition to uh installing signal handlers like we have here we can also
+[00:30:35 -> 00:30:42] or i'm sorry in addition to installing like an ignore signal handler like we have here we can
+[00:30:42 -> 00:30:51] also install a signal handler that does something in and of itself so here i am going to install
+[00:30:51 -> 00:30:56] this function so i'm passing a reference to this function remember this is just a symbol
+[00:30:56 -> 00:31:02] and that symbol refers to a location in memory that location in memory just so happens to have
+[00:31:02 -> 00:31:10] an assembly instruction that is the beginning of a function so if i were to gcc this this one
+[00:31:10 -> 00:31:17] right here signals three and i want to run a dot out here again i'm pounding like four times
+[00:31:17 -> 00:31:27] a second of what just for fun i guess and if i hit control c here i will send a sig i'm going
+[00:31:27 -> 00:31:31] to write to standard out this message you can't stop me so if you want to be a total
+[00:31:31 -> 00:31:37] jerkwad you can do that and of course again we can control backslash right here what's
+[00:31:37 -> 00:31:46] really important is that there are two such that there's three places where this signal
+[00:31:46 -> 00:31:56] could potentially be delivered to this process it's going to be after the a system call like
+[00:31:56 -> 00:32:03] printf if i said printf will eventually call right and if the signal was sent if i hit
+[00:32:03 -> 00:32:11] control c during the few microseconds that it took to run the right system call then as my
+[00:32:11 -> 00:32:17] code transitions back to user mode at the end of the printf statement at the end of that right
+[00:32:17 -> 00:32:23] system call instead of running the next instruction of my code right here in main however that got
+[00:32:23 -> 00:32:28] compiled i am instead going to run the first instruction of signal handler which is a little
+[00:32:28 -> 00:32:35] bit tricky because while i am going to get my own stack frame in signal handler so that it can
+[00:32:35 -> 00:32:43] have its own local variables i don't have my own global variables i don't have my own anything
+[00:32:43 -> 00:32:52] really to do stuff on like independently of the main thread and this like immediately to
+[00:32:52 -> 00:32:56] me it's like oh that's not that big a deal right like just do whatever you need to do
+[00:32:56 -> 00:33:03] but there's a lot of functionality that relies on global variables there's a lot of things
+[00:33:03 -> 00:33:08] which you cannot do here i had to write this write system call basically manually here
+[00:33:09 -> 00:33:15] so that i didn't do something that is not safe to be called from a signal handler if you take
+[00:33:15 -> 00:33:24] a look in the book there are many many library functions the standard library has a small
+[00:33:24 -> 00:33:28] handful and there's hundreds and hundreds of functions in the standard library these are the
+[00:33:28 -> 00:33:34] only ones that are safe to be called from a signal handler you can see right is in there
+[00:33:34 -> 00:33:43] but printf sn printf f gets f puts puts get car get char all of that stuff is not in there
+[00:33:43 -> 00:33:48] there's a lot of things that are unsafe because they're going to be interacting with the
+[00:33:48 -> 00:33:54] outside uh the outside world of your user level process outside of just your own individual
+[00:33:54 -> 00:34:01] stack frame and so that's one of the big hard parts about signal handling is because i interrupted
+[00:34:01 -> 00:34:06] this code instead of running line 21 right because like when i think about programming
+[00:34:06 -> 00:34:11] in a normal world where this didn't exist where i didn't use a signal handler if i ran this
+[00:34:11 -> 00:34:19] line printf i know as the program that one of two things is going to happen next either the
+[00:34:19 -> 00:34:23] assembly instruction that increments counter will happen next or my program is going to die
+[00:34:23 -> 00:34:29] right those are the only two things in the normal non-signal handler world that could potentially
+[00:34:29 -> 00:34:36] happen next and if i modified counter in that signal handler then counter might get bumped
+[00:34:36 -> 00:34:41] up by two instead of by one or it might get set back to zero or something and if i'm reasoning
+[00:34:41 -> 00:34:49] about my program and what it's supposed to do uh like if i wanted to yeah like sorry if
+[00:34:49 -> 00:34:54] i was reasoning about my program and what it would do in a normal world i can be safe
+[00:34:54 -> 00:35:00] like i can know without a shadow of a doubt that if i run this code this is going to print a
+[00:35:00 -> 00:35:05] number and then that same number is the number that's going to get incremented here uh if
+[00:35:06 -> 00:35:09] i had access to counter up here in the signal handler i could change it to
+[00:35:09 -> 00:35:17] minus a mil or like a million or zero or some value arbitrarily and this code would
+[00:35:17 -> 00:35:23] no longer have the invariance that it expected that's that's the super hard part about
+[00:35:23 -> 00:35:29] concurrent programming when you have different threads that are going threads of control that
+[00:35:29 -> 00:35:34] are going to run at different points in time and you can't be sure of when which one runs
+[00:35:34 -> 00:35:39] and when which other one runs now when we get over to the final module of class we're going
+[00:35:39 -> 00:35:44] to learn how to actually really solve that problem but for now we're kind of going to say
+[00:35:44 -> 00:35:49] the best thing to do to prevent that from being a problem is that when we run our signal handlers
+[00:35:49 -> 00:35:57] we're only going to do things that don't have unexpected impact on the outside world if we only
+[00:35:57 -> 00:36:04] work within our own little stack frame of say our signal handler then when it gets thrown
+[00:36:04 -> 00:36:08] away because the signal handler returns it's not that big a deal we know that things are
+[00:36:08 -> 00:36:12] going to work the way that we want them to and we're not going to have to think about
+[00:36:12 -> 00:36:21] these really really gnarly problems of concurrency so this is all to say that
+[00:36:22 -> 00:36:27] yeah we're going to have our guidelines we write our signal handlers and let's go over
+[00:36:27 -> 00:36:30] our guidelines so these are the same guidelines we have in the book these six things telling
+[00:36:30 -> 00:36:36] you to keep your signal handler simple call these async async signal safe functions
+[00:36:36 -> 00:36:42] save and restore erno remember erno is a global variable that the c standard library uses
+[00:36:42 -> 00:36:49] to keep track of what the error state of a specific function is if its return value
+[00:36:49 -> 00:36:55] can't give you a real error code like if the return value has to give you how many bytes were
+[00:36:55 -> 00:37:00] read and you can't send a specific error because if there's 17 different errors like
+[00:37:00 -> 00:37:05] what do you do you want to say i sent uh you know seven characters means a special thing you
+[00:37:05 -> 00:37:09] can't do that so instead what the c standard library does is it uses a global variable
+[00:37:09 -> 00:37:13] error node which you can then interpret using those p error str error functions
+[00:37:16 -> 00:37:23] you can if you're doing something that is going to deal with very important data structures you
+[00:37:23 -> 00:37:29] can temporarily block signals this can say listen all these other signals need to stop
+[00:37:29 -> 00:37:33] i'm gonna do something that's very important that is going to manipulate the status of this
+[00:37:33 -> 00:37:39] process if you do an s trace on your shell when it launches a new program you'll see a lot of
+[00:37:39 -> 00:37:45] sig proc mask and that is masking off signals basically preventing them from being delivered
+[00:37:45 -> 00:37:52] until it finishes a very important chunk of of code when we declare global variables is
+[00:37:52 -> 00:37:58] volatile this prevents the compiler from storing them in a register this means that we if we're
+[00:37:58 -> 00:38:03] ever going to manipulate the value in this variable it must be immediately persisted to
+[00:38:03 -> 00:38:09] memory it cannot be stored in a register until it gets persisted back to whatever
+[00:38:09 -> 00:38:15] address it's uh it lives in typically you don't have to do that you know the compiler can
+[00:38:15 -> 00:38:19] optimize to rather than keep something on a stack frame it's just going to keep it in a
+[00:38:19 -> 00:38:24] register which makes things much much faster remember that registers are just amazingly
+[00:38:24 -> 00:38:29] faster than even your l1 cache so it's a really good idea to not just use volatile left right
+[00:38:29 -> 00:38:35] and center you don't want to use that everywhere but if something has to always have the correct
+[00:38:35 -> 00:38:41] value stored in memory no matter what you can set it as volatile and there's also the sig atomic
+[00:38:41 -> 00:38:47] t it basically means that not only is reading that value out of memory always going to give
+[00:38:47 -> 00:38:54] you the right value but writing to it is also always going to give you the right value it's an
+[00:38:54 -> 00:39:02] atomic right which means that whatever you do to write to that variable happens in one instruction
+[00:39:02 -> 00:39:10] no matter what so flags that are installed this way don't need to be protected with any
+[00:39:11 -> 00:39:16] synchronization primitives they don't have to be protected with blocking signals they
+[00:39:16 -> 00:39:22] can just be manipulated like i'm going to show you in my demo code pretty soon so let's go back
+[00:39:22 -> 00:39:33] over to our demo code so if we go over here to uh this is a decent safe way to receive a
+[00:39:33 -> 00:39:41] signal and then do something based on that signal so first we have a volatile sig atomic t
+[00:39:41 -> 00:39:45] so this means volatile here means that keep running will never be stored in a register
+[00:39:45 -> 00:39:51] it will always have its correct value in memory the sig atomic t means i can write to it
+[00:39:51 -> 00:39:56] and it won't cause some inconsistent scenario and we make it static because we we don't want
+[00:39:56 -> 00:40:02] anybody else outside of us to have their own keep running excuse me manipulated by our own
+[00:40:02 -> 00:40:08] keep running right we know that this is only for us to see uh now when we run our signal
+[00:40:08 -> 00:40:14] handler we need to do async signal safe things and that means async signal safe
+[00:40:15 -> 00:40:21] system calls like write or i guess this is a library call technically we can do if statements
+[00:40:21 -> 00:40:26] based on these things i can set a value to keep running that's also safe to do
+[00:40:28 -> 00:40:35] and the most important high level bit here is that i'm not going to do things like exit
+[00:40:36 -> 00:40:43] this process in the signal handler i'm not going to clean up i'm not going to fix whatever
+[00:40:43 -> 00:40:48] went wrong i am purely going to say if this signal got delivered and it's something i need
+[00:40:48 -> 00:40:55] to eventually take care of i'm going to set a flag in my code as opposed to in the kernel's
+[00:40:55 -> 00:41:01] process table that says hey you need to do something when you get around to doing it in
+[00:41:01 -> 00:41:06] the main execution thread that's fundamentally what we're doing here and what we'll be doing
+[00:41:06 -> 00:41:13] in some other assignments later on in class so here we install our head handler for a second
+[00:41:13 -> 00:41:17] and we check this flag to see whether we're supposed to keep running or not
+[00:41:18 -> 00:41:23] and we do everything that we were doing before uh and you know we peer if our sleep fails
+[00:41:24 -> 00:41:33] and if i gcc this sucker right here signals four and i run it i can control c here and i can do
+[00:41:33 -> 00:41:42] things in the signal handler and i can keep i can tell it to stop running and then i actually
+[00:41:42 -> 00:41:47] check it in the main thread so every single time i go through this while loop i am checking
+[00:41:47 -> 00:41:50] whether keep running is true or not and i only keep running if keep running is there you could
+[00:41:50 -> 00:41:55] imagine that you could use rather than this you could have something like well true and then you
+[00:41:55 -> 00:42:06] could have you know if a special flat special flag being equal to zero then you know do what
+[00:42:06 -> 00:42:14] you need to based on the fact that the signal got delivered right so what we can do is we
+[00:42:14 -> 00:42:20] can say aha thank you operating system for interrupting us in the middle of our program
+[00:42:21 -> 00:42:26] and delivering this signal i'm going to deliver that to the main thread when the main thread is
+[00:42:26 -> 00:42:32] ready to handle it until then my single hander will be done and that's a safe way to do do
+[00:42:32 -> 00:42:38] things like this but it would not be safe to do it'll almost always not be safe to do
+[00:42:38 -> 00:42:43] whatever special things you need to do in your signal handler that is how we get around
+[00:42:43 -> 00:42:50] the challenges of concurrency with respect to signal handling i think that's not what i wanted
+[00:42:50 -> 00:42:57] to have there okay now how signals actually get delivered this is probably the next main section
+[00:42:57 -> 00:43:04] of the video right here the kernel is going to maintain these pending bit vectors and blocked
+[00:43:04 -> 00:43:12] bit vectors for every single process each bit corresponds to an individual signal and their bits
+[00:43:12 -> 00:43:16] they can be set to zero which means there's no signal pending they can be set to one which
+[00:43:16 -> 00:43:21] means there's a signal pending what's really important here is that you can't set one bit
+[00:43:21 -> 00:43:29] to two or three or four so i can't say i delivered this signal seven times there's no
+[00:43:29 -> 00:43:34] way for the operating system to keep track of the fact that that signal got delivered
+[00:43:35 -> 00:43:41] more than once it can or got sent more than once it's really hard to keep all of these
+[00:43:41 -> 00:43:48] all this terminology separate so you send a signal that raises the pending bit when you
+[00:43:48 -> 00:43:53] deliver the signal that's when the bit gets set from one to zero and it actually gets handled
+[00:43:53 -> 00:44:01] by the user level process so you can only have pending set to one you can't have pending set
+[00:44:01 -> 00:44:07] to two or three or four for a specific signal you can only have it pending once no matter how
+[00:44:07 -> 00:44:12] many times someone has tried to send you sig user one you can only set that bit to one
+[00:44:13 -> 00:44:19] you can't send it to one really hard right so i can send 17,000 different sig user ones
+[00:44:19 -> 00:44:23] and only one of them could potentially be delivered that's the trick that we're worrying
+[00:44:23 -> 00:44:28] about right here spoiler alert uh likewise blocked is also a bit vector but that's a lot
+[00:44:28 -> 00:44:34] more semantically consistent if you want to be fancy about it right that means that this
+[00:44:34 -> 00:44:41] process has said i do not want to receive this signal right now so if that signal is pending
+[00:44:41 -> 00:44:46] the colonel is going to say don't care i can't deliver it until it has been unblocked once the
+[00:44:46 -> 00:44:51] user level process has decided i am willing to receive the signal now then the colonel can just
+[00:44:51 -> 00:44:56] be like gotcha you've got this signal that you have to take care of and then it'll take care
+[00:44:56 -> 00:45:05] of it but until then it doesn't worry about it so the things the system calls that deal with
+[00:45:05 -> 00:45:11] signals most common ones here are wait sleep and pause so wait allows us to block our process
+[00:45:11 -> 00:45:16] until we receive the sig child signal so this puts us to sleep until a specific signal is
+[00:45:16 -> 00:45:22] ready to be delivered and then it just gets delivered so you can use wait like we did in
+[00:45:22 -> 00:45:29] last week's lecture without installing a signal handler right we get blocked until we return and
+[00:45:29 -> 00:45:35] see sig child gets ignored but in this case it gets ignored and then your program continues
+[00:45:35 -> 00:45:40] running which is super useful sleep not use sleep that we just use but the sleep system
+[00:45:40 -> 00:45:47] call will block our process until one of two situations either a the number of seconds that
+[00:45:47 -> 00:45:53] you asked to sleep has finished or be any old signal at all got received it will immediately
+[00:45:53 -> 00:46:00] move on to the next line of your code so i can show something a little bit maybe unexpected
+[00:46:00 -> 00:46:09] so i come over here to my most basic example let's do this and then let's do
+[00:46:09 -> 00:46:23] to sleep for three seconds and then let's do enter result zero result equals this
+[00:46:26 -> 00:46:30] i still had three seconds to sleep
+[00:46:31 -> 00:46:41] uh and then result result printf is spelled incorrectly
+[00:46:43 -> 00:46:53] and then you see see signals two so if i send uh so that makes sense i still had zero signals
+[00:46:54 -> 00:47:00] oh wait i oh this this is the one i've got to kill from another window fantastic chris
+[00:47:01 -> 00:47:08] uh kill four three three nine and it sig kill doesn't send kill oh it does
+[00:47:09 -> 00:47:16] sig term that's in sig term which can also be masked by default kill send sig term which is
+[00:47:16 -> 00:47:20] different from sig quit which is different from sig kill which is different from significant
+[00:47:20 -> 00:47:26] there's lots of different ways to stop a signal so let's nuke all of those make it again
+[00:47:27 -> 00:47:39] run it here uh and sig int is not uh ignored and therefore again terminates the process so i do want
+[00:47:39 -> 00:47:52] to only have that one gcc this sucker come on why is this not doing we're in the middle of
+[00:47:52 -> 00:48:05] the sleep i guess when i ignore it it doesn't even stop the sleep interesting uh let's say
+[00:48:07 -> 00:48:11] i had an example where this was actually working uh
+[00:48:11 -> 00:48:30] uh let's pull this in here and set this to say handler see if this is what i want to
+[00:48:31 -> 00:48:33] yeah okay so that works uh
+[00:48:33 -> 00:48:43] uh so if i handle that signal and i return control back what's really this is so this
+[00:48:43 -> 00:48:48] is actually a really interesting example i have right here first i second typing when i'm really
+[00:48:48 -> 00:48:57] really trying to go fast second i am trying to count and third i have sleep returning here
+[00:48:57 -> 00:49:05] so what can happen to system calls is that sometimes signals can cause them to return
+[00:49:06 -> 00:49:13] prematurely so sleep here gets returned prematurely and it doesn't retry that system
+[00:49:13 -> 00:49:19] call we can sometimes ask to retry a system call if it is retryable there's some stuff
+[00:49:19 -> 00:49:28] at the very end of 8.5 that talks about this but the basic idea here is that i was running
+[00:49:28 -> 00:49:35] the sleep system call and i said please sleep for three seconds that sleep for three seconds
+[00:49:35 -> 00:49:48] did not complete because i lost my face cam all right hopefully this didn't overheat kill itself
+[00:49:49 -> 00:50:01] uh yeah anyway uh what's going on next oh we're okay we're okay uh so
+[00:50:02 -> 00:50:08] where was i you go into the kernel because you called sleep sometimes you're not just
+[00:50:08 -> 00:50:13] going to be guaranteed to sleep for three seconds sleep as we saw on this slide implicitly
+[00:50:13 -> 00:50:17] is saying either sleep for that many seconds or continue after you receive a signal and
+[00:50:17 -> 00:50:23] handle it so that's the important part here there are some system calls that are going to
+[00:50:23 -> 00:50:26] be interrupted and they aren't going to finish what it is they were supposed to finish
+[00:50:26 -> 00:50:30] they're going to instead go back and do something else usually they will tell us hey
+[00:50:30 -> 00:50:38] this got interrupted there is a specific error no like e enter uh what is it like it's uh
+[00:50:38 -> 00:50:45] e i m t uh i don't think i have error you know
+[00:50:50 -> 00:50:58] oh god i'm sure this yeah so e i e i m t r is the error that means that your system call
+[00:50:58 -> 00:51:06] got interrupted that is probably what would happen as a result of that uh so if i do a p error
+[00:51:06 -> 00:51:29] here uh just return from sleep yeah so there's success in that case right erno is not set to
+[00:51:29 -> 00:51:35] anything but if i control c this i get e i n t r which p error will hopefully tell us means
+[00:51:35 -> 00:51:40] the system call got interrupted so sometimes if you receive a signal it can stop the system
+[00:51:40 -> 00:51:44] call that you're doing you were reading from a file and it didn't finish all what it needed
+[00:51:44 -> 00:51:49] to do it got interrupted you'll get an error that says that that happened and then sometimes
+[00:51:49 -> 00:51:56] it can be retried you can ask the system to retry it but sometimes it's just not going to
+[00:51:56 -> 00:52:01] to work so you when you are sending and receiving signals and trying to handle them
+[00:52:01 -> 00:52:06] instead of just letting your program die which is what you know typically signals do like you
+[00:52:06 -> 00:52:10] control c and it kills your program okay you know big deal uh i guess i didn't need that
+[00:52:11 -> 00:52:15] uh that's not that big a deal but when you're actually trying to recover from the fact that
+[00:52:15 -> 00:52:17] you received a signal this is another thing that you need to be aware of
+[00:52:19 -> 00:52:25] let's uh tell us for now okay so uh pause blocks us until we receive any signal so
+[00:52:25 -> 00:52:29] that's kind of like sleep infinity wait you know puts us to sleep until we get our child
+[00:52:29 -> 00:52:37] signal and that's about all i had on the slides let's switch over to tricky one and
+[00:52:37 -> 00:52:51] tricky two for now so this these are examples that are in the discussion questions and i'm not
+[00:52:51 -> 00:52:54] going to go over them in the videos i'm just going to straight up give you the answer
+[00:52:54 -> 00:52:58] but if you do want to experiment with these from the discussion questions you're more than
+[00:52:58 -> 00:53:02] welcome to actually take a look at it we'll talk about these during discussion during uh
+[00:53:03 -> 00:53:11] that was like uh during what's it called cohoot time and uh if you want to experiment with them
+[00:53:11 -> 00:53:16] right now uh they are in this vs code lectures repository thanks so much for watching again let
+[00:53:16 -> 00:53:21] me know whether this off the cuff version instead of the fully edited version seems just
+[00:53:21 -> 00:53:26] as good i ramble a little bit more but when i'm on camera live i can usually keep the
+[00:53:26 -> 00:53:30] rambling to a minimum so thanks so much and i'll see you next time

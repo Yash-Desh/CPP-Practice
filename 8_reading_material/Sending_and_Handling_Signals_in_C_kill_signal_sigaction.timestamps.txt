@@ -1,0 +1,125 @@
+Title: Sending and Handling Signals in C (kill, signal, sigaction)
+Video ID: 83M5-NPDeWs
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:02] Hey friends, let's talk about signals.
+[00:00:04 -> 00:00:08] A while back I made a video that talked about how we can use fork to create multiple processes.
+[00:00:08 -> 00:00:12] Today I want to look at how we can interact with those processes.
+[00:00:12 -> 00:00:14] During that video I mentioned that you can kill processes.
+[00:00:14 -> 00:00:18] Today I want to expand on that because killing is a pretty limited type of interaction.
+[00:00:18 -> 00:00:25] So signals are one of the simplest ways that you can interact with a process on macOS, Linux, or any Unix-style operating system.
+[00:00:25 -> 00:00:27] Windows of course does their own thing.
+[00:00:27 -> 00:00:33] If you've been programming in Linux, macOS, or Unix-style operating system, you've probably used signals you may not be aware of.
+[00:00:33 -> 00:00:36] When you ask, well every time you ever hit Ctrl C to terminate a program.
+[00:00:36 -> 00:00:38] So let's look at an example.
+[00:00:38 -> 00:00:41] Let's say I have a program that never terminates. It just runs forever.
+[00:00:41 -> 00:00:43] Now most student programs that act like this are written by accident.
+[00:00:43 -> 00:00:46] This one is intentional for illustrative purposes.
+[00:00:46 -> 00:00:50] Now when you run a program like this, you naturally enjoy its cute repetition for a while,
+[00:00:50 -> 00:00:52] and then you hit Ctrl C to kill it.
+[00:00:52 -> 00:00:55] And maybe you didn't realize it, but right then you send a signal to the process.
+[00:00:55 -> 00:01:00] It's the sigint signal, which by default interrupts the process and tells it to end.
+[00:01:00 -> 00:01:03] Not that interesting, but we can change things up a bit.
+[00:01:03 -> 00:01:05] So let's just play with this a little bit.
+[00:01:05 -> 00:01:08] Let's say that I want to do things differently when Ctrl C is pressed.
+[00:01:08 -> 00:01:12] So I can add a function that will be called whenever a particular signal is received,
+[00:01:12 -> 00:01:15] and I'm going to use the signal function to register that function.
+[00:01:15 -> 00:01:20] So here I'm just saying that I want my handler function to run whenever a sigint signal is received.
+[00:01:20 -> 00:01:25] And now when I run it and I press Ctrl C, well, yeah, now we're definitely in the running
+[00:01:25 -> 00:01:27] for the most obnoxious C program ever written.
+[00:01:27 -> 00:01:30] Seriously, at this point, what do I do? I have a program that won't die.
+[00:01:30 -> 00:01:32] Fortunately, there are other signals that I can send.
+[00:01:32 -> 00:01:35] Notice that I have my program print out its process ID.
+[00:01:35 -> 00:01:38] That's just for convenience, and it's to make this next part a little easier.
+[00:01:38 -> 00:01:40] Now let's show that process we mean business.
+[00:01:40 -> 00:01:42] Let's send the sigterm signal.
+[00:01:42 -> 00:01:46] Now sigterm sternly tells the process to go terminate itself.
+[00:01:46 -> 00:01:49] And of course, I haven't told you yet how to send signals other than sigint,
+[00:01:49 -> 00:01:54] and you do that with the kill command, which is really poorly named and not nearly as violent as it sounds.
+[00:01:54 -> 00:01:55] At least not always.
+[00:01:55 -> 00:01:58] Yes, sometimes it kills processes, but sometimes it doesn't.
+[00:01:58 -> 00:01:59] It just sends messages.
+[00:01:59 -> 00:02:03] I can call kill from within a program, but I can also do it from the command line just like this.
+[00:02:03 -> 00:02:07] I tell it what signal I want it to send and the process ID and hey, look, we got it.
+[00:02:07 -> 00:02:08] We killed the process.
+[00:02:08 -> 00:02:13] Of course, nothing stops my more obnoxious alter ego from just handling sigterm as well.
+[00:02:13 -> 00:02:15] So we can add a handler for that.
+[00:02:15 -> 00:02:19] And basically now we're handling sigterm.
+[00:02:19 -> 00:02:21] So at this point, things aren't looking too good.
+[00:02:21 -> 00:02:23] Fortunately, there's still sigkill.
+[00:02:23 -> 00:02:26] You'll sometimes hear people talk about kill dash nine.
+[00:02:26 -> 00:02:27] So that's the same thing.
+[00:02:27 -> 00:02:29] Let's try it out.
+[00:02:29 -> 00:02:30] Take that process.
+[00:02:30 -> 00:02:33] How does the heavy hand of justice feel now, buddy?
+[00:02:33 -> 00:02:37] And I may try to keep the arms race going and handle sigkill, but fortunately, it's not going to work.
+[00:02:37 -> 00:02:39] I can't handle sigkill.
+[00:02:39 -> 00:02:41] Sigkill is simply an order, not a request.
+[00:02:41 -> 00:02:44] Now, signals do more than just kill processes.
+[00:02:44 -> 00:02:46] They can also stop processes.
+[00:02:46 -> 00:02:48] They can also continue processes.
+[00:02:48 -> 00:02:51] You can send user to find signals, which then is just a communication.
+[00:02:51 -> 00:02:53] It means whatever you want it to mean.
+[00:02:53 -> 00:02:57] And oddly enough, programs even receive a signal when they segfault.
+[00:02:57 -> 00:02:58] True story.
+[00:02:58 -> 00:03:00] So let's try that one out really quickly.
+[00:03:00 -> 00:03:02] If I make a pointer, let's set it to null.
+[00:03:02 -> 00:03:03] And then I'm going to try to dereference it.
+[00:03:03 -> 00:03:05] This should definitely segfault.
+[00:03:05 -> 00:03:06] And it does.
+[00:03:06 -> 00:03:07] And now let's add a handler.
+[00:03:07 -> 00:03:08] And there you have it.
+[00:03:08 -> 00:03:10] We've just handled a segfault.
+[00:03:10 -> 00:03:11] Well, sort of.
+[00:03:11 -> 00:03:14] You see, what we really did was we just made a mess.
+[00:03:14 -> 00:03:17] I handled the segfault signal, but it didn't fix the situation.
+[00:03:17 -> 00:03:19] It didn't fix the bad pointer.
+[00:03:19 -> 00:03:24] And so after I handle it, it's simply just going to try the bad memory access again.
+[00:03:24 -> 00:03:26] And we get stuck in an endless loop.
+[00:03:26 -> 00:03:29] And now I've got to hunt down the PID and kill it from the terminal.
+[00:03:29 -> 00:03:32] And for the record, do not fix segfaults this way.
+[00:03:32 -> 00:03:37] I'm just showing you how signals work and that there actually are signals that are sent during a segfault.
+[00:03:37 -> 00:03:39] But it's far better just to check your pointers.
+[00:03:39 -> 00:03:41] OK, so that's fine, but why would I ever need this?
+[00:03:41 -> 00:03:47] Other than killing processes, I might want to use the user-defined signals to just let a process know that something's happened.
+[00:03:47 -> 00:03:50] If I have two processes that are working together, one could just signal the other and say,
+[00:03:50 -> 00:03:53] hey, that thing that I was going to do for you, I just did it.
+[00:03:53 -> 00:03:56] Another common use case is you want to handle signals when something bad happens.
+[00:03:56 -> 00:04:01] When you're being killed, when someone hits Control C or Kill Dash 9 or whatever,
+[00:04:01 -> 00:04:07] you may want to have the opportunity to close file handles, to free up some memory,
+[00:04:07 -> 00:04:11] to make sure that things are in a consistent state before your program actually terminates.
+[00:04:11 -> 00:04:13] And you're not going to use this all the time.
+[00:04:13 -> 00:04:17] But let's face it, sometimes the default Control C behavior just isn't enough.
+[00:04:17 -> 00:04:19] Sometimes you need to fail gracefully.
+[00:04:19 -> 00:04:21] So finally, I want to mention a few more things.
+[00:04:21 -> 00:04:25] The first thing is that I use signal in my example because it's simple.
+[00:04:25 -> 00:04:29] But it turns out there's actually a newer function called sigaction that is preferred over signal.
+[00:04:29 -> 00:04:31] And this is because it gives you more options.
+[00:04:31 -> 00:04:32] It gives you more information.
+[00:04:32 -> 00:04:36] It just gives you more control over the process of how you handle signals.
+[00:04:36 -> 00:04:39] And so if you use sigaction, your code is going to be more portable.
+[00:04:39 -> 00:04:40] And so that's recommended.
+[00:04:40 -> 00:04:44] And this is what my original code would look like if I was using sigaction.
+[00:04:44 -> 00:04:48] Second, you'll notice that in my signal handlers, I used write instead of printf.
+[00:04:48 -> 00:04:49] And there's a reason for that.
+[00:04:49 -> 00:04:51] Signal handlers run asynchronously.
+[00:04:51 -> 00:04:54] That means that they can interrupt your code at any point.
+[00:04:54 -> 00:04:57] And so you can't just run any code in a signal handler.
+[00:04:57 -> 00:05:01] In the standard library, some functions are listed as async signal safe.
+[00:05:01 -> 00:05:04] Now, this simply means that they're safe to run in a signal handler.
+[00:05:04 -> 00:05:06] Means that they can run asynchronously with other code.
+[00:05:06 -> 00:05:09] There are a lot of functions on this list, but printf is not on this list.
+[00:05:09 -> 00:05:13] But write is, and so I use that instead, since that's actually what printf uses.
+[00:05:13 -> 00:05:15] It's a little clunkier, but it's safe.
+[00:05:15 -> 00:05:19] And that doesn't mean that printf will always crash if I use it in a signal handler.
+[00:05:19 -> 00:05:22] It just means that printf might crash or it might cause problems.
+[00:05:22 -> 00:05:25] It's just not always going to be safe to do this.
+[00:05:25 -> 00:05:28] And nobody likes programs that crash randomly for no apparent reason.
+[00:05:28 -> 00:05:30] And that's what I have for you today.
+[00:05:30 -> 00:05:31] Signals.
+[00:05:31 -> 00:05:32] You probably won't use them in every project.
+[00:05:32 -> 00:05:34] You probably won't use them every day.
+[00:05:34 -> 00:05:37] But now you'll have them when you need them.
+[00:05:37 -> 00:05:39] I hope this helps a future project.
+[00:05:39 -> 00:05:40] Until next time, I'll see you later.

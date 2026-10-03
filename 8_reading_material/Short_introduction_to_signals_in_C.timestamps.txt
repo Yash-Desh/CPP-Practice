@@ -1,0 +1,189 @@
+Title: Short introduction to signals in C
+Video ID: 5We_HtLlAbs
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:02] Another communication method between processes
+[00:00:02 -> 00:00:06] that is used all throughout Linux is signals.
+[00:00:06 -> 00:00:10] Unlike pipes where you could send say an array,
+[00:00:10 -> 00:00:14] signals, with signals you just sort of send a notification,
+[00:00:14 -> 00:00:18] just a simple integer that says to the other process
+[00:00:18 -> 00:00:20] what it should do.
+[00:00:20 -> 00:00:23] And that's it, it doesn't send any more information.
+[00:00:23 -> 00:00:26] And that is used to sort of take control
+[00:00:26 -> 00:00:27] of that process.
+[00:00:27 -> 00:00:29] So for example, if I have a process
+[00:00:29 -> 00:00:32] and I want to pause it, to pause its execution,
+[00:00:32 -> 00:00:35] well, I can actually do that using signals.
+[00:00:35 -> 00:00:38] Now let's see how we can send such a signal.
+[00:00:38 -> 00:00:41] To start off, we're gonna actually fork our process.
+[00:00:41 -> 00:00:44] I'm gonna say if PID equals fork,
+[00:00:44 -> 00:00:47] and if our PID is negative one,
+[00:00:47 -> 00:00:50] then I'm just gonna return an error code.
+[00:00:50 -> 00:00:54] Okay, and then if we are in the child process,
+[00:00:54 -> 00:00:56] if our PID is zero,
+[00:00:56 -> 00:01:00] I want to do something not amazing.
+[00:01:00 -> 00:01:03] That is just an infinite loop
+[00:01:03 -> 00:01:05] of printing sentences on the screen.
+[00:01:05 -> 00:01:08] And I don't want it to print out at maximum speed.
+[00:01:08 -> 00:01:10] I just, let's say I want 20 times a second
+[00:01:10 -> 00:01:11] to print on the screen.
+[00:01:11 -> 00:01:13] So I'm just gonna sleep.
+[00:01:13 -> 00:01:15] I'm gonna call the use sleep function.
+[00:01:15 -> 00:01:19] And this guy takes in the number of microseconds
+[00:01:19 -> 00:01:21] it should just pause its execution.
+[00:01:21 -> 00:01:22] I'm gonna give it here.
+[00:01:22 -> 00:01:26] Since microseconds are one millionth of a second,
+[00:01:26 -> 00:01:31] I'm gonna give it 50,000 millionth of a second.
+[00:01:32 -> 00:01:34] That's really 50 milliseconds
+[00:01:34 -> 00:01:38] and that should be exactly 120th of a second.
+[00:01:39 -> 00:01:42] This use sleep function you can find in uniSTD.h.
+[00:01:44 -> 00:01:47] All right, and let's say in the else program,
+[00:01:47 -> 00:01:50] what we do is just simply wait of null.
+[00:01:50 -> 00:01:51] That's all.
+[00:01:51 -> 00:01:52] Now this is a bit problematic
+[00:01:52 -> 00:01:55] because the program just continues on printing
+[00:01:55 -> 00:01:57] on the screen forever and ever and ever and ever
+[00:01:57 -> 00:01:58] and ever and ever.
+[00:01:58 -> 00:02:00] And it never stops.
+[00:02:00 -> 00:02:03] So both the parent and the child
+[00:02:03 -> 00:02:05] are just gonna get stuck.
+[00:02:05 -> 00:02:07] So if I try to launch this,
+[00:02:07 -> 00:02:11] well, you'll notice that it's just gonna keep on printing
+[00:02:11 -> 00:02:13] on the terminal here.
+[00:02:13 -> 00:02:16] Even if I try to terminate the process here,
+[00:02:16 -> 00:02:18] I'm just gonna terminate the parent
+[00:02:18 -> 00:02:22] and the child process is gonna keep on printing
+[00:02:22 -> 00:02:23] on the screen.
+[00:02:23 -> 00:02:24] So I don't have to go to htop
+[00:02:24 -> 00:02:25] and actually kill the process.
+[00:02:25 -> 00:02:27] Although what I just did,
+[00:02:27 -> 00:02:29] basically terminating that process
+[00:02:29 -> 00:02:32] from the htop command,
+[00:02:32 -> 00:02:35] can be done programmatically in C
+[00:02:35 -> 00:02:37] and you can send signals even here.
+[00:02:37 -> 00:02:41] To do so, we're gonna need to include first signal.h.
+[00:02:41 -> 00:02:43] So I'm just gonna include here signal.h
+[00:02:43 -> 00:02:48] and this guy gives us a simple function
+[00:02:48 -> 00:02:50] that we can call on the parent
+[00:02:50 -> 00:02:52] to kill the child process
+[00:02:52 -> 00:02:57] that just kind of started executing in an infinite loop.
+[00:02:57 -> 00:02:59] To send a signal to another process,
+[00:02:59 -> 00:03:01] we can call the function named kill
+[00:03:01 -> 00:03:03] and albeit the name is strange,
+[00:03:03 -> 00:03:07] it doesn't necessarily kill the process.
+[00:03:07 -> 00:03:08] It just sends a signal
+[00:03:08 -> 00:03:13] and then the process that receives that signal
+[00:03:13 -> 00:03:15] knows what to do with it,
+[00:03:15 -> 00:03:17] whether it is to terminate itself
+[00:03:17 -> 00:03:19] or pause its execution or whatever else
+[00:03:19 -> 00:03:21] it might need to do.
+[00:03:21 -> 00:03:22] In this case, what we're gonna do
+[00:03:22 -> 00:03:24] is actually terminate the process.
+[00:03:24 -> 00:03:27] So we're gonna first have to pass in the process ID
+[00:03:27 -> 00:03:29] that we want to send the signal to.
+[00:03:29 -> 00:03:33] So well, we know the process ID is this speed here,
+[00:03:33 -> 00:03:37] because that's what we're receiving in the parent process.
+[00:03:37 -> 00:03:41] And next is the signal that we want to send
+[00:03:41 -> 00:03:45] and that is we want to send the sig kill signal
+[00:03:45 -> 00:03:49] that should actually terminate the child process.
+[00:03:49 -> 00:03:52] And now to make sure that the while loop runs for a while,
+[00:03:52 -> 00:03:57] I'm gonna wait for a second using the slip function
+[00:03:58 -> 00:03:59] that takes in just seconds here.
+[00:03:59 -> 00:04:01] So I'm gonna say slip of one.
+[00:04:01 -> 00:04:02] So wait one second
+[00:04:02 -> 00:04:04] before actually killing the child process,
+[00:04:04 -> 00:04:08] which should print about 20 lines in the terminal.
+[00:04:08 -> 00:04:10] So if I try to launch this now,
+[00:04:10 -> 00:04:14] you will notice that we're gonna get some lines of code
+[00:04:14 -> 00:04:16] of text printed on the screen,
+[00:04:16 -> 00:04:21] and then both processes actually finish their execution.
+[00:04:21 -> 00:04:23] With this, we were able to actually stop the execution
+[00:04:23 -> 00:04:26] of a process that kept on executing something
+[00:04:26 -> 00:04:28] forever and ever.
+[00:04:28 -> 00:04:30] This is useful when you have something
+[00:04:30 -> 00:04:33] like an event handler that keeps on listening
+[00:04:33 -> 00:04:37] for things to receive forever and ever
+[00:04:37 -> 00:04:40] until someone sends the sig kill signal
+[00:04:40 -> 00:04:43] or other types of signals.
+[00:04:43 -> 00:04:45] Now, a really important thing to notice here
+[00:04:45 -> 00:04:49] is that receiving signals did not depend
+[00:04:49 -> 00:04:52] on the order of the execution of the code.
+[00:04:52 -> 00:04:53] So right with pipes,
+[00:04:53 -> 00:04:56] we had to actually hit a line of code
+[00:04:56 -> 00:05:01] that said read or write or something specific.
+[00:05:01 -> 00:05:04] But in here, even though we were in a while loop,
+[00:05:04 -> 00:05:07] the signal got handled and the process got killed.
+[00:05:07 -> 00:05:10] So these signals are sort of outside
+[00:05:10 -> 00:05:13] the code they're executing.
+[00:05:13 -> 00:05:14] So whenever you're executing some code,
+[00:05:14 -> 00:05:16] if you receive a signal,
+[00:05:16 -> 00:05:18] the process just pauses there for a second
+[00:05:18 -> 00:05:22] and executes the code that needs to be executed
+[00:05:22 -> 00:05:25] when a signal is received.
+[00:05:26 -> 00:05:28] And in this case, it actually terminated the process
+[00:05:28 -> 00:05:30] so nothing else was printed afterwards.
+[00:05:30 -> 00:05:34] But suppose you could actually send different signals,
+[00:05:34 -> 00:05:36] telling it whatever you want.
+[00:05:36 -> 00:05:38] And after it is handled,
+[00:05:38 -> 00:05:40] it could continue to execution.
+[00:05:40 -> 00:05:44] Now there are all sorts of signals in Linux.
+[00:05:44 -> 00:05:46] Here's a list of them.
+[00:05:46 -> 00:05:49] You don't really have to know all of them.
+[00:05:49 -> 00:05:51] You don't really have to use all of them,
+[00:05:51 -> 00:05:52] but here they are.
+[00:05:52 -> 00:05:54] And some notes here.
+[00:05:54 -> 00:05:57] You can see the SIG child process,
+[00:05:57 -> 00:06:00] which is actually the signal that is sent
+[00:06:00 -> 00:06:02] from the child to the parent
+[00:06:02 -> 00:06:05] when a child actually terminates.
+[00:06:05 -> 00:06:07] And there's a few other ones
+[00:06:07 -> 00:06:08] that we can take a look here.
+[00:06:08 -> 00:06:10] Here's SIG kill that we have used
+[00:06:10 -> 00:06:12] to actually stop the process.
+[00:06:12 -> 00:06:15] And down here, I think it is,
+[00:06:15 -> 00:06:18] there's SIGUSR1 and SIGUSR2.
+[00:06:18 -> 00:06:20] So these are sort of signals
+[00:06:20 -> 00:06:25] that are not defined by the operating system.
+[00:06:26 -> 00:06:27] They are user-defined.
+[00:06:27 -> 00:06:31] So they are there for basically for somebody to use them
+[00:06:31 -> 00:06:33] in case you want something custom.
+[00:06:33 -> 00:06:36] As you can see, all the others actually have some
+[00:06:36 -> 00:06:40] sort of default functionality.
+[00:06:40 -> 00:06:42] Other interesting, notable signals
+[00:06:42 -> 00:06:45] are the SIGSTOP signal,
+[00:06:45 -> 00:06:47] which just basically stops the execution,
+[00:06:47 -> 00:06:49] pauses the execution of the process,
+[00:06:49 -> 00:06:53] so that, well, the process is not terminated.
+[00:06:53 -> 00:06:57] It can continue its execution, but it's just paused.
+[00:06:57 -> 00:07:01] And then when it receives the SIGCONT
+[00:07:01 -> 00:07:04] or SIGCONTINUE signal,
+[00:07:04 -> 00:07:05] it can continue its execution.
+[00:07:05 -> 00:07:07] So with this, you can actually
+[00:07:07 -> 00:07:10] basically control whether or not
+[00:07:10 -> 00:07:13] a process is executing or not.
+[00:07:13 -> 00:07:14] That's really all I wanted to talk about
+[00:07:14 -> 00:07:15] in today's video,
+[00:07:15 -> 00:07:20] just a very, very basic explanation of signals.
+[00:07:21 -> 00:07:22] They are different from pipes
+[00:07:22 -> 00:07:25] and they are used to control,
+[00:07:25 -> 00:07:27] mostly control the processes
+[00:07:27 -> 00:07:30] at a sort of granular level,
+[00:07:30 -> 00:07:32] just terminate the process or stop the process
+[00:07:32 -> 00:07:36] or something related to processes or IO happened.
+[00:07:37 -> 00:07:39] In later lessons, we're gonna take a look
+[00:07:39 -> 00:07:42] at how to actually handle a signal,
+[00:07:42 -> 00:07:45] because right now we just send a SIGKILL command
+[00:07:45 -> 00:07:46] and it automatically kills itself,
+[00:07:46 -> 00:07:50] but you can actually tell it how to handle that signal.
+[00:07:50 -> 00:07:53] You can actually tell it to ignore certain signals
+[00:07:53 -> 00:07:56] and a lot more other customizations
+[00:07:56 -> 00:07:58] can be achieved with these signals.
+[00:07:58 -> 00:08:00] It is quite interesting.
+[00:08:00 -> 00:08:02] So I hope you stick around.
+[00:08:02 -> 00:08:04] Okay, thank you guys so much for watching.
+[00:08:04 -> 00:08:05] I hope you got something out of it.
+[00:08:05 -> 00:08:06] If you do have any questions,
+[00:08:06 -> 00:08:08] you can leave them down in the comments below
+[00:08:08 -> 00:08:10] or on our Discord server.
+[00:08:10 -> 00:08:11] Take care, bye.
