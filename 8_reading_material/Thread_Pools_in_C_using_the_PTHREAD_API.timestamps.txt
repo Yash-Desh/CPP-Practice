@@ -1,0 +1,216 @@
+Title: Thread Pools in C (using the PTHREAD API)
+Video ID: _n2hE2gyPxU
+Detected language: en
+------------------------------------------------------------
+
+[00:00:00 -> 00:00:05] In this video, I want to take a look at thread pools. What are they and how to implement them
+[00:00:05 -> 00:00:12] using the pthread API? First and first, what are they? Well, they're just a simple way of handling
+[00:00:13 -> 00:00:20] tasks in a multi-threaded manner. So suppose we have something that generates long running tasks,
+[00:00:20 -> 00:00:26] right? It could be a simple program that looks at a file and so on and so forth,
+[00:00:26 -> 00:00:32] does some calculations every so often. And those tasks could be a lot, like let's say 20, 30,
+[00:00:32 -> 00:00:42] 100 tasks, okay? And the idea is since, you know, every computer nowadays has multiple cores on its
+[00:00:42 -> 00:00:49] CPU. So if we were to just iterate over each task and execute it sequentially, well, it
+[00:00:49 -> 00:00:56] wouldn't be that efficient. We would only be using really one core. So we would like that
+[00:00:56 -> 00:01:00] if, for example, there are three tasks that have to be executed at, like they are created at the
+[00:01:00 -> 00:01:06] same time, they should also be executed at the same time. So these thread pools are what are
+[00:01:06 -> 00:01:14] going to help us understand or execute these tasks, multiple tasks at the same time. But
+[00:01:14 -> 00:01:19] before we start, I want to give an overview over what exactly we need to implement because
+[00:01:19 -> 00:01:25] that's quite a bit and I think it will help. First things first, a thread pool usually has
+[00:01:25 -> 00:01:31] a set number of threads always running, right? So the thread is either executing a task that
+[00:01:31 -> 00:01:36] it has been given or it's just waiting for a task to appear in the queue. So I'm going to
+[00:01:36 -> 00:01:46] denote that thread pool with this rectangle here. I'm going to say, let's say four threads.
+[00:01:46 -> 00:01:58] Let's say that we have four threads in this thread pool. Okay. And the next element is
+[00:01:58 -> 00:02:06] the task, really. And the task is going to be found inside the task queue, right? So I'm going
+[00:02:06 -> 00:02:12] to have here a task queue. It's going to be probably around here, let's say. And
+[00:02:13 -> 00:02:20] now it's a queue because the tasks are going to be taken from the queue in the order that
+[00:02:20 -> 00:02:26] they were inserted. So as we don't have any issues with ordering on the tasks, right? And
+[00:02:26 -> 00:02:31] lastly, in the picture, we do have the main thread, but this could be really anything that
+[00:02:31 -> 00:02:39] is using our thread pool. So I'm going to say here main thread, but just keep in mind
+[00:02:40 -> 00:02:47] that it might not be the case. It just might be a user, a simple user like that.
+[00:02:47 -> 00:02:51] Now let's think about the operations that we do between all these, right? First things
+[00:02:51 -> 00:02:57] first, the most obvious one is to be able to create a task and submit it to the task queue,
+[00:02:57 -> 00:03:02] right? You have something like, let's say the user, the main thread wants you to
+[00:03:02 -> 00:03:09] add two numbers, right? And we want to send a task to the task queue and then
+[00:03:09 -> 00:03:13] we'll see from there. But that's what the main thread should be able to do.
+[00:03:13 -> 00:03:18] In this case, we have this arrow drawn here and we're going to write on it that
+[00:03:19 -> 00:03:28] it should be able to insert and create, I guess, create a task, right? So that's going to be
+[00:03:29 -> 00:03:35] that operation. Next up, it should be possible for us to
+[00:03:38 -> 00:03:43] execute these threads. But first, before actually executing the threads, we have to get it
+[00:03:43 -> 00:03:49] and assign it a thread, right? Because we have multiple threads, we have to somehow
+[00:03:49 -> 00:03:54] take a task and assign it to a thread. So we're going to have to have a mechanism for
+[00:03:54 -> 00:04:00] getting a task, right? And waiting for it. And I'm going to denote that with an arrow here
+[00:04:00 -> 00:04:05] that is on the task queue itself. And it's going to be something like
+[00:04:06 -> 00:04:14] wait and get a task, right? This is going to simply either wait if there's nothing to get,
+[00:04:14 -> 00:04:20] if the queue is empty, or simply get it and do something with it afterwards. Now,
+[00:04:22 -> 00:04:27] once we get a task, there's one last thing that we have to do on the threads themselves
+[00:04:27 -> 00:04:31] and that is to actually execute the task. So I'm going to denote that with,
+[00:04:31 -> 00:04:36] I'm going to move this a little bit to the top here and I'm going to denote that with an
+[00:04:36 -> 00:04:46] arrow to itself, right? And this is going to be executing our task. And these are the main,
+[00:04:46 -> 00:04:49] the three main operations that we should be able to do with the thread.
+[00:04:50 -> 00:04:57] Now, sure, we can also send back a result to the main thread. But for now, for this tutorial,
+[00:04:57 -> 00:05:02] we're only going to cover this much. The tasks are not going to be able to give us a result.
+[00:05:02 -> 00:05:05] They're just going to, let's say, print something on the screen and that's it.
+[00:05:05 -> 00:05:09] Now, let's go over first creating the task itself. So the task is going to be,
+[00:05:09 -> 00:05:14] for all purposes, is going to be a struct. So I'm going to have here type the struct,
+[00:05:14 -> 00:05:22] let's say a task and type that to the name of task. And very simple and straightforward.
+[00:05:22 -> 00:05:28] I'm going to keep the tasks just incredibly simple, but they could be more generalized.
+[00:05:28 -> 00:05:32] But in this case, what I'm going to do is going to add two variables, A and B,
+[00:05:32 -> 00:05:40] in the task itself. And what the task is going to be is just adding those two numbers.
+[00:05:40 -> 00:05:44] That's what the task is going to represent in our case. I'm going to have here two variables
+[00:05:44 -> 00:05:49] and that execute task function is going to add them together and print it on screen or
+[00:05:49 -> 00:05:55] something. That's all I want the program to do. In a later video that I'm probably going to link
+[00:05:55 -> 00:06:00] up top, we're going to find out how to actually execute whatever on those drag pools.
+[00:06:00 -> 00:06:05] But now this is going to be very simple. Next up, we have the task queue. So I'm going
+[00:06:05 -> 00:06:11] to have here a simple task array. I'm going to say task queue and let's give it a max
+[00:06:11 -> 00:06:19] size of 256. That should be plenty of space. Then of course we have an int that represents the,
+[00:06:20 -> 00:06:25] I guess, task count, really. And that's going to be initialized to zero because we don't have any
+[00:06:25 -> 00:06:30] task at the beginning. And lastly, I want a function that executes the tasks. I'm going
+[00:06:30 -> 00:06:37] to create here a simple void function that says execute task of actually the task itself.
+[00:06:37 -> 00:06:42] And I'm going to get a reference to it simply because, well, we shouldn't really create a copy
+[00:06:42 -> 00:06:49] of it. There's no point in doing that. And what I'm going to do is say int result equals task
+[00:06:49 -> 00:06:55] arrow A plus task arrow B. Now, as I said, think about this operation as something that
+[00:06:55 -> 00:07:00] takes a long time, is a lot of processing and does whatever. We're just abstracting here
+[00:07:01 -> 00:07:05] for you to understand easily. And then of course let's print this result on the screen.
+[00:07:05 -> 00:07:14] So the sum of percent D and percent D, that is percent D. I'm going to print out all the
+[00:07:14 -> 00:07:22] variables here. So task of A, task of B, and the result that we have here.
+[00:07:23 -> 00:07:29] Okay, that's awesome. And that's really all there is to executing the task. Very simple
+[00:07:29 -> 00:07:35] and straightforward, I know. Now we can actually test this whole thing. We can simply create a task
+[00:07:36 -> 00:07:41] and just execute it on the main thread. So to do so, we can just say task as a T1,
+[00:07:43 -> 00:07:46] and I'm going to initialize it like this. I'm going to say that A variable is going to be,
+[00:07:46 -> 00:07:51] let's say five and B is going to be something like 10. Right. And then what we have to do
+[00:07:51 -> 00:07:58] is just say execute task of our T1 here. Okay. If I try to launch this, we should be able
+[00:07:58 -> 00:08:06] to get a result. Let's see. And we did get the sum of five and 10 is 15. Amazing. So that works.
+[00:08:06 -> 00:08:14] So now that we have the basic block for the thread pools mechanism, that is the task and
+[00:08:14 -> 00:08:18] actually executing the task, this is not really what we want, right? We want to actually
+[00:08:19 -> 00:08:23] execute the task in a multi-threaded manner. Right now we're literally executing the task on
+[00:08:23 -> 00:08:29] the main thread sequentially. So that's not what we want. Therefore we should start by
+[00:08:29 -> 00:08:36] creating those threads. Since you've seen me create threads and ultra this series of videos,
+[00:08:36 -> 00:08:53] I'm going to fast forward through that. Okay. So that's basically everything here.
+[00:08:53 -> 00:08:59] I have created here a reference to a start thread function, and that's going to be our
+[00:09:00 -> 00:09:05] function that waits and gets a task from the queue. So here we're going to have
+[00:09:06 -> 00:09:11] a start thread and it's going to take in arguments, but we're not going to pass any
+[00:09:11 -> 00:09:17] arguments. Now, because of the nature of thread pools, basically every thread is either waiting
+[00:09:17 -> 00:09:23] or getting a task and executing it, it's never going to terminate. It's never going to finish
+[00:09:23 -> 00:09:29] its execution. Therefore we should have actually a while loop here. And in this while loop,
+[00:09:29 -> 00:09:33] well, we're going to take tasks from the queue. So basically what we're going to have to
+[00:09:33 -> 00:09:41] do is let's say declare here a task and we're simply going to take the first element inside
+[00:09:41 -> 00:09:50] the queue. So that is task queue of zero. That is because in the queue, think of the queue as,
+[00:09:50 -> 00:09:56] let's say, having some integers, just all the integers from one to five. What we want to do
+[00:09:56 -> 00:10:02] is since one was inserted first, we want to take the first one that was inserted. Therefore
+[00:10:02 -> 00:10:07] we have to take in one. So that's our task queue of zero, but we also need to move everything
+[00:10:07 -> 00:10:11] to the left. So I'm going to have to make it two, three, four, five. And that's what
+[00:10:11 -> 00:10:17] the next step is going to be. And it's going to be a simple for loop. It goes from zero up to
+[00:10:17 -> 00:10:24] task count minus one. We don't need a last element. And it's going to say task queue of
+[00:10:24 -> 00:10:31] i equals task queue of i plus one. This week I'm going to release a video regarding
+[00:10:32 -> 00:10:38] how to work with queues, how to implement the operations on them and be on the lookout for that.
+[00:10:39 -> 00:10:44] And of course lastly we have to decrement task count because we have taken an element from this
+[00:10:44 -> 00:10:49] task queue. Now to make sure we don't take an element that doesn't exist, we should actually
+[00:10:49 -> 00:10:55] surround all this in an if statement that checks if we have actually a task, right? So
+[00:10:55 -> 00:11:03] we're going to have here an if statement and there we go. And lastly, well we have to think
+[00:11:03 -> 00:11:08] about this being a critical section simply because the task queue is going to be modified
+[00:11:08 -> 00:11:13] by multiple threads, but we don't want, for example, two threads to take the same task,
+[00:11:13 -> 00:11:18] right? We want only one thread to take a task. Therefore the action of taking from the queue
+[00:11:19 -> 00:11:22] and of course checking if there's anything in the queue is going to be a critical section,
+[00:11:22 -> 00:11:28] so it's going to be surrounded by a mutex lock which we have to create let's say up here.
+[00:11:28 -> 00:11:35] And I have here put tthread mutex t and I'm going to call it let's say mutex for our queue.
+[00:11:36 -> 00:11:41] This is the naming scheme I usually choose just prefix every variable name with their type,
+[00:11:41 -> 00:11:46] but in this case it's not a mutex, it's not a queue of mutexes, it's the mutex
+[00:11:46 -> 00:11:56] for the queue, all right? So I hope it's not too ambiguous. I'm going to initialize it like any
+[00:11:56 -> 00:12:05] other and to use them we're going to have them in between this if statement. So I'm going to
+[00:12:05 -> 00:12:12] have here pthread mutex lock and in here we're going to have the mutex queue locked and
+[00:12:12 -> 00:12:20] unlocked after we have taken a task from the queue. And if everything goes well that means that
+[00:12:20 -> 00:12:26] we can actually execute the task. Now it's very important to know where we actually execute the
+[00:12:26 -> 00:12:36] task because if we call execute task inside of here, well then that's going to be a problem
+[00:12:36 -> 00:12:43] and that problem is regarding this critical section since we are in between a lock and
+[00:12:43 -> 00:12:47] unlock of a mutex that means that this section is being executed by one thread
+[00:12:48 -> 00:12:53] at a time that means that a task is only executed by one thread at a time so we have to actually
+[00:12:53 -> 00:13:00] move it outside this critical section that is very important and of course we have to somehow
+[00:13:00 -> 00:13:05] check if we have a task because right we might not actually have a task so I'm going to say
+[00:13:05 -> 00:13:12] here a int let's say found I'm going to set it to zero and if there's something found I'm
+[00:13:12 -> 00:13:20] going to say found equals one right and I'm going to say here if found equals one then yes
+[00:13:20 -> 00:13:25] you can execute that task that you were given amazing that is our start thread function that
+[00:13:25 -> 00:13:32] is the function it gets and waits for the task now let's go on and implement the submit task
+[00:13:32 -> 00:13:40] function so the submit task function is very straightforward we have we want to add a task to
+[00:13:40 -> 00:13:48] the queue and simply increment the count right we have here a let's say task queue of task count
+[00:13:49 -> 00:13:56] equals task and now we know that the last element in the queue is task count minus one
+[00:13:56 -> 00:14:04] right that's its index so therefore the next empty slot is definitely task count right that's
+[00:14:04 -> 00:14:08] why that's how we are adding here to the queue and we should actually increment the count
+[00:14:08 -> 00:14:16] once we're done some people actually do like incrementing it in here I see I think this is
+[00:14:16 -> 00:14:21] more readable but you can do it however you want now because we're actually dealing with the
+[00:14:21 -> 00:14:26] queue here in a multi-threaded program we have to make sure that this is properly
+[00:14:26 -> 00:14:30] synchronized and we don't have any race conditions therefore I'm going to add here
+[00:14:30 -> 00:14:41] a p12 mutex lock for again our queue mutex and unlock at the end of this section and that's about
+[00:14:41 -> 00:14:47] it for submitting a task now we have all three operations finally finished now we can start
+[00:14:47 -> 00:14:55] actually using these threads to do so first I'm going to remove this example that was just
+[00:14:55 -> 00:15:00] executing a task on the main thread and I'm going to submit let's say a hundred tasks
+[00:15:00 -> 00:15:08] and I have here an i for from zero to a hundred and that's going to submit a task that we create
+[00:15:08 -> 00:15:19] here task t and say a is let's use random numbers why not let's say that and that so
+[00:15:19 -> 00:15:28] any number between zero and 99 and of course initialize the random generation function with
+[00:15:28 -> 00:15:34] this and lastly we want to submit this task and I'm calling submit task of our t here
+[00:15:35 -> 00:15:47] so that's very straightforward I think now let's try to execute this program so as you can see it
+[00:15:47 -> 00:15:51] indeed actually processed a lot of tasks and let's say that there are a hundred tasks I
+[00:15:51 -> 00:15:58] didn't actually count them but it's pretty safe to say there are a hundred summations here
+[00:15:58 -> 00:16:05] but there's one issue with this with this little program if we take a look at a different
+[00:16:05 -> 00:16:12] in a different terminal in each top here is the cpu usage of the computer and we can notice
+[00:16:12 -> 00:16:18] that it is quite high and it is actually because our program if I stop the program
+[00:16:19 -> 00:16:26] it's going to be going down to like five percent now why is that happening remember in
+[00:16:27 -> 00:16:35] our diagram how we actually thought that okay this operation should be waiting for a task
+[00:16:35 -> 00:16:40] if there's no task and it should be getting the task and execute it if there is a task
+[00:16:40 -> 00:16:48] right but we never waited for a task right are we whenever really calling any sleep any wait
+[00:16:48 -> 00:16:56] any nothing in here and what these threads actually do is they the one of the threads
+[00:16:56 -> 00:17:04] let's say locks the the mutex then checks if the task count is higher than zero it looks
+[00:17:04 -> 00:17:11] at it and says no it's not then it exits it unlocks the mutex and then another thread comes
+[00:17:11 -> 00:17:15] in checks another thread comes in and so on and so forth for forever and ever and ever
+[00:17:15 -> 00:17:21] really really really really fast it's doing that and this is not great this is not great
+[00:17:21 -> 00:17:27] because it's using cpu resources for no reason right this checking forever is incredibly costly
+[00:17:27 -> 00:17:33] so to fix that we have to add condition variables we actually have a video on condition
+[00:17:33 -> 00:17:37] variables and how to use that and I suggest you take a look at it up top if you haven't
+[00:17:37 -> 00:17:42] already but the idea is very simple we're going to have a condition variable on this
+[00:17:43 -> 00:17:51] condition and that is a simple one loop on our task count if it's if it's actually zero so I'm
+[00:17:51 -> 00:17:56] going to check if it's actually zero and if it is I'm going to continue waiting so pthread
+[00:17:57 -> 00:18:05] cond wait on our condition variable let's say conq and we should define this as well let's
+[00:18:05 -> 00:18:20] define it up top here pthread cond t cond and I'm going to initialize it just like so
+[00:18:22 -> 00:18:26] so we're going to wait on the conq and of course we have to pass in the mutex here so
+[00:18:26 -> 00:18:31] I'm going to have to pass in the mutex queue so that when we're waiting it unlocks the
+[00:18:31 -> 00:18:35] mutex for us so that other threads could check if there is something or other threads
+[00:18:35 -> 00:18:41] could actually modify the queue all right now the nice part about this while loop is that
+[00:18:41 -> 00:18:46] if we are here right that means that we have passed this while loop okay straightforward but
+[00:18:46 -> 00:18:53] that also means that the task count is definitely not zero and it's most likely not negative one
+[00:18:53 -> 00:18:59] so therefore it's one or something higher so we don't have to check again if the task
+[00:18:59 -> 00:19:06] count is zero because we know for sure it isn't so that kind of gets removed and this
+[00:19:06 -> 00:19:12] also gets removed because we know for sure that we have we have a task to execute if we are
+[00:19:12 -> 00:19:16] executing this code here so we can remove this found variable here we have created
+[00:19:18 -> 00:19:24] just like so and this is our final start thread function that waits and gets a task
+[00:19:24 -> 00:19:28] and then execute it if if it finds one and lastly we need to actually signal on this
+[00:19:28 -> 00:19:34] condition because just waiting it is just going to block it forever and ever so to signal it
+[00:19:34 -> 00:19:40] we're going to actually do that in submit us so whenever we're submitting a task we should signal
+[00:19:40 -> 00:19:46] a single thread to check if there is actually a task there and if it is it should execute it
+[00:19:46 -> 00:19:52] and we don't need to call broadcast here because we only for if we only add one task
+[00:19:52 -> 00:19:56] and for one task we only need one thread at most so i'm just going to say pthread
+[00:19:57 -> 00:20:08] cond signal of our cond queue and now finally we can start executing this without having
+[00:20:08 -> 00:20:15] too many issues and as you can see we have a hundred tasks well hopefully a hundred we can
+[00:20:15 -> 00:20:21] change this to a more manageable number let's say we can say 10 and if we count them they
+[00:20:21 -> 00:20:28] should be exactly 10 and that is correct and if we take a look at each top again our cpu usage
+[00:20:28 -> 00:20:35] is very much better now finally we're done implementing the thread pools right we can now
+[00:20:36 -> 00:20:40] try to play around with it and see what are the advantages of having a thread pool so
+[00:20:41 -> 00:20:45] first things first let's create here again a hundred tasks right if we launch this again
+[00:20:45 -> 00:20:52] it's going to be very instant like it's going to be all the threads are all the tasks are being
+[00:20:52 -> 00:20:59] finished almost instantly but we can make the tasks take quite a bit longer by simply saying
+[00:20:59 -> 00:21:06] use sleep here of 50 milliseconds and think about this use sleep as being something like
+[00:21:06 -> 00:21:11] an operation that takes a long time right so in our case i'm just going to do a use sleep
+[00:21:11 -> 00:21:17] and if we try to launch this now we should see that it takes quite a while but it's still quite
+[00:21:17 -> 00:21:24] fast right we don't have any issues now what happens if we do the same thing but we are
+[00:21:24 -> 00:21:30] going to be using let's say one only one thread we can have a thread pool of only one
+[00:21:30 -> 00:21:35] thread but it's like executing it sequentially we should see a pretty big difference now
+[00:21:35 -> 00:21:42] if i try to launch this you will notice how much slower that is so whereas before it was
+[00:21:42 -> 00:21:50] almost instant executing a hundred tasks now it's kind of going along but not that fast
+[00:21:50 -> 00:21:56] now as you can see with four threads it's very much faster and we could add more than four
+[00:21:56 -> 00:22:01] threads it is possible but i don't think in our case it's going to matter too much
+[00:22:02 -> 00:22:09] simply because the cpu that i'm running on right now has only four cores so yeah that's
+[00:22:09 -> 00:22:13] that's that actually all there is for implementing thread pools themselves in the
+[00:22:13 -> 00:22:18] next video i'm gonna take a look at how to actually make them useful because i know we're
+[00:22:18 -> 00:22:24] literally just summing numbers and sleeping for 50 milliseconds what if we want to do something
+[00:22:24 -> 00:22:32] more generic right how can we do that and you'll see that next for now i hope you got something
+[00:22:32 -> 00:22:35] out of this video if you do have any questions leave them down in the comments below or on our
+[00:22:35 -> 00:22:40] discord server again the source code for all this will be found on our website link in
+[00:22:40 -> 00:22:43] the description below all right take care bye
