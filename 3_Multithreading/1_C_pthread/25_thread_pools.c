@@ -1,6 +1,10 @@
 // Author: Yash Deshpande
 // Date  : 26-10-2025
-// Tutor : CodeVault (https://youtu.be/_n2hE2gyPxU?si=TdPnSsAn6_2T8YZo)
+// Tutor : CodeVault (Thread Pools in C (using the PTHREAD API))
+// Link  : https://youtu.be/_n2hE2gyPxU?si=TdPnSsAn6_2T8YZo
+
+
+// THIS PROGRAM HANGS!!! NO EXIT CONDITION
 
 #include <stdio.h>
 #include <stdlib.h>
